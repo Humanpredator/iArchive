@@ -1,0 +1,80 @@
+{
+    "name": "Instagram-Bot",
+    "description": "Telegram bot to manage your Instagram account.",
+    "keywords": [
+      "telegram",
+      "best",
+      "instagram",
+      "download",
+      "bot"
+    ],
+    "repository": "",
+    "env": {
+      "API_ID": {
+        "description": "Get this value from https://my.telegram.org",
+        "value": "",
+        "required": true
+      },
+      "API_HASH": {
+        "description": "Get this value from https://my.telegram.org",
+        "value": "",
+        "required": true
+      },
+      "BOT_TOKEN": {
+        "description": "Your bot token from @BotFather",
+        "value": "",
+        "required": true
+      },
+      "OWNER_ID": {
+        "description": "Enter Your Telegram id",
+        "value": "",
+        "required": true
+      },
+      "DATABASE_URL": {
+        "description": "Enter your database url",
+        "value": "",
+        "required": false
+      },
+      "IGNORE_PENDING_REQUESTS": {
+        "description": "Enter true or false",
+        "value": "True",
+        "required": false
+      },
+      "SUDO_USERS": {
+        "description": "Enter your sudo users",
+        "value": "",
+        "required": false
+      },
+      "AUTHORIZED_CHATS"  : {
+        "description": "Enter your authorized chats",
+        "value": "",
+        "required": false
+      },
+      "DOWNLOAD_STATUS_UPDATE_INTERVAL": {
+        "description": "Enter your download status update interval",
+        "value": "5",
+        "required": false
+      },
+      "GDRIVE_FOLDER_ID": {
+        "description": "Enter your google drive folder id",
+        "value": "",
+        "required": true
+      }
+
+
+    },
+    "formation": {
+      "worker": {
+        "quantity": 1,
+        "size": "free"
+      }
+    },
+    "buildpacks": [
+      {
+        "url": "https://github.com/jonathanong/heroku-buildpack-ffmpeg-latest"
+      },
+      {
+        "url": "heroku/python"
+      }
+    ]
+  }

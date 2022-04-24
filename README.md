@@ -31,40 +31,7 @@ You can Download almost anything From your Instagram Account.
 **Available Commands and Usage**
 ```
 /start - Check wheather bot alive.
-/restart - Restart the bot (If you messed up anything use /restart.)
-/help - Shows this menu.
-/login - Login into your account.
-/logout - Logout of your account.
-/account - Shows the details of logged in account.
-
-/post: To get post of any username's in Instagram
-Example : /posts samantharuthprabhuoffl
-
-/igtv: To get IGTV Posts of any username's in Instagram
-If no username given, downloads your IGTV.
-
-/feed <number of posts to download> - Downloads posts from your feed.If no number specified all posts from feed will be downloaded.
-Example: /feed 10 to download latest 10 posts from feed.
-
-/saved <number of posts to download> - Downloads your saved posts. If no number specified all saved posts will be downloaded.
-Example: /saved 10 to download latest 10 saved posts.
-
-/followers <username> - Get a list of all followers of given username. If no username given, then your list will be retrieved.
-Example: /followers samantharuthprabhuoffl
-
-/following <username> - Get a list of all followees of given username. If no username given, then your list will be retrieved.
-
-/fans <username> - Get a list of of followees who follow back the given username. If no username given, your list will be retrieved.
-
-/notfollowing <username> - Get a list of followees who is not following back the given username.
-
-/tagged <username> - Downloads all posts in which given username is tagged. If nothing given your tagged posts will be downloaded.
-
-/story <username> - Downloads all stories from given username. If nothing given your stories will be downloaded.
-
-/stories - Downloads all the stories of all your followees.
-
-/highlights <username> - Downloads highlights from given username, If nothing given your highlights will be downloaded.
+/help - To get all available commands.
 
 ```
 ## Deployment

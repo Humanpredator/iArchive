@@ -131,8 +131,9 @@ python3 -m bot
 Contributions are welcomed, But Kanging and editing a few lines wont make you a Developer.
 Fork the repo, Do not Import code.    
     1.If you're loggin into your account for first time confirm your login location on IG
-    2.Don't Download posts frequently, instagram may temporarily block your account under suspicious activity.Again you     have to reset your IG password to work agin.
+    2.Don't Download posts frequently, instagram may temporarily block your account under suspicious activity.Again you have to reset your IG password to work agin.
     3.If any error occur restart the bot or check your IG account and login again.
+    4.If /login show checkpoint link use session_token.py
 
 ```
 

@@ -40,7 +40,7 @@ def post(update, context):
                             InlineKeyboardButton("Videos Only", callback_data=f"videos#{username}")
                         ],
                         [
-                            InlineKeyboardButton("Pic+vid", callback_data=f"picandvid#{username}"),
+                            InlineKeyboardButton("Pictures and Videos", callback_data=f"picandvid#{username}"),
                             InlineKeyboardButton("ALL Posts", callback_data=f"allposts#{username}"),
                         ]
                     ]
@@ -280,6 +280,7 @@ def notfollowing(update, context):
 
 
 def feed(update, context):
+    chat_id = update.message.chat_id
     USER=usercheck()
     session=f"./{USER}"
     args=update.message.text.split(" ", maxsplit=1)
@@ -309,7 +310,8 @@ def feed(update, context):
                 ":feed",
                 "--count", count
                 ]
-            download_insta(command, m, dir,username,fetch='My Feed')
+
+            download_insta(command, m, dir,username ,chat_id,fetch='My Feed')
         elif is_link(args[1])==True:
             sendMessage("Please send a username not link use /ig <b>link</b> ", context.bot, update)
         else:
@@ -329,12 +331,13 @@ def feed(update, context):
                 "--dirname-pattern", dir,
                 ":feed"
                 ]
-        download_insta(command, m, dir,username,fetch='My Feed')
+        download_insta(command, m, dir,username,chat_id,fetch='My Feed')
 
 
 
 
 def saved(update, context):
+    chat_id = update.message.chat_id
     USER=usercheck()
     session=f"./{USER}"
     args=update.message.text.split(" ", maxsplit=1)
@@ -364,7 +367,7 @@ def saved(update, context):
                 ":saved",
                 "--count", count
                 ]
-            download_insta(command, m, dir,username,fetch='My Saved')
+            download_insta(command, m, dir,username,chat_id,fetch='My Saved')
         elif is_link(args[1])==True:
             sendMessage("Please send a username not link use /ig <b>link</b> ", context.bot, update)
         else:
@@ -384,7 +387,7 @@ def saved(update, context):
             "--dirname-pattern", dir,
             ":saved"
             ]
-        download_insta(command, m, dir,username,fetch='My Saved')
+        download_insta(command, m, dir,username,chat_id,fetch='My Saved')
 
 
 
@@ -392,6 +395,7 @@ def saved(update, context):
 
 
 def tagged(update, context):
+    chat_id = update.message.chat_id
     USER=usercheck()
     session=f"./{USER}"
     args=update.message.text.split(" ", maxsplit=1)
@@ -427,7 +431,7 @@ def tagged(update, context):
             "--dirname-pattern", dir,
             "--", username
             ]
-        download_insta(command, m, dir,username,fetch='Tagged')
+        download_insta(command, m, dir,username,chat_id,fetch='Tagged')
 
     else:
         sendMessage("Please send a username.", context.bot, update)
@@ -436,6 +440,7 @@ def tagged(update, context):
 
 
 def story(update, context):
+    chat_id = update.message.chat_id
     USER=usercheck()
     session=f"./{USER}"
     args=update.message.text.split(" ", maxsplit=1)
@@ -471,7 +476,7 @@ def story(update, context):
             "--dirname-pattern", dir,
             "--", username
             ]
-        download_insta(command, m, dir,username,fetch='Stories')      
+        download_insta(command, m, dir,username,chat_id,fetch='Stories')      
 
     else:
         sendMessage("Please send a username.", context.bot, update)
@@ -479,6 +484,7 @@ def story(update, context):
 
 
 def stories(update, context):
+    chat_id = update.message.chat_id
     USER=usercheck()
     session=f"./{USER}"
     username=USER
@@ -502,7 +508,7 @@ def stories(update, context):
         "--dirname-pattern", dir,
         ":stories"
         ]
-    download_insta(command, m, dir,username,fetch='My Following Stories')
+    download_insta(command, m, dir,username,chat_id,fetch='My Following Stories')
 
 
 
@@ -512,6 +518,7 @@ def stories(update, context):
 
 
 def highlights(update, context):
+    chat_id = update.message.chat_id
     USER=usercheck()
     session=f"./{USER}"
     args=update.message.text.split(" ", maxsplit=1)
@@ -548,7 +555,7 @@ def highlights(update, context):
             "--dirname-pattern", dir,
             "--", username
             ]
-        download_insta(command, m, dir,username,fetch=f'Highlights')
+        download_insta(command, m, dir,username,chat_id,fetch=f'Highlights')
     else:
         sendMessage("Please send a username.", context.bot, update)
 

@@ -1,18 +1,20 @@
+import shutil
 import pytz
 import subprocess
 import time
-from bot.helper.ext_utils.fs_utils import rmv
+from bot.helper.ext_utils.fs_utils import subfolder
 from bot.helper.upload_utilis.gdrive import gup
 from bot.helper.telegram_helper.message_utils import *
 from datetime import datetime
 import threading
 from bot.helper.ext_utils.bot_utils import usercheck
-from bot import OWNER_ID,DOWNLOAD_STATUS_UPDATE_INTERVAL
+from bot import DOWNLOAD_STATUS_UPDATE_INTERVAL,TG_UPLOAD
+from bot.helper.upload_utilis.tg_upload import tgup
 IST = pytz.timezone('Asia/Kolkata')
 
 
 #A function to download content from Instagram
-def download_insta(command, m,dir,username,fetch):
+def download_insta(command, m,dir,username,chat_id,fetch):
     def download(command,m,dir,fetch):
         USER = usercheck()
         session=f"./{USER}"
@@ -52,9 +54,14 @@ def download_insta(command, m,dir,username,fetch):
                     LOGGER.info(f"{e}")
                     pass
                 return True
-        editMessage(f"<b>Download Completed</b>\n<b>Directory</b> : <code>{dir}</code>\n<b>session</b> : <code>{session}</code>\n<b>Type</b> : <code>{fetch}</code>" ,m)
-        subdir= f"{OWNER_ID}/{username}/{username}"
-        rmv(subdir)
-        gup(dir, m)
+        LOGGER.info(f"Download Complete for {dir}")
+        subfolder(dir)
+        gup(dir, m,username,fetch)
+        if TG_UPLOAD:
+            tgup(chat_id, dir)
+        else:
+            print("TG_UPLOAD is disabled")
+            pass
+        shutil.rmtree(dir)    
     threading.Thread(target=download, args=(command,m,dir,fetch)).start()
     return True

@@ -45,15 +45,16 @@ def user_login(update, context):
                 photo=profilepic
                 )
                 return ConversationHandler.END
-            except TwoFactorAuthRequiredException:
-                editMessage("Send your 2F Code within 60sec...!", m)
-                return CODE_SAVE
-        
+            
             except BadCredentialsException:
                 editMessage("Wrong Credentials\n\n/login again", m)
                 pass
                 return ConversationHandler.END
-            
+           
+            except TwoFactorAuthRequiredException:
+                editMessage("Send your 2F Code within 60sec...!", m)
+                return CODE_SAVE
+
             except Exception as e:
                 editMessage(f"{e}\nTry /login again", m)
                 return ConversationHandler.END

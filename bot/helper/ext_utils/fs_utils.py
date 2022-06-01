@@ -17,7 +17,29 @@ def rmv(subdir):
             print("Path doesn't exists....Skiped!")
             pass
 
+def subpath(path):
+    subfolder=[]
+    try:
+        for it in os.scandir(path):
+            if it.is_dir():
+                subfolder.append(it.path)
+        return subfolder
+    except:
+        pass
 
+def subfolder(DIR):
+    try:
+        dirlist= subpath(DIR)
+        for dir in dirlist:
+            files = os.listdir(dir)
+            for file in files:
+                file_name = os.path.join(dir, file)
+                shutil.move(file_name, DIR +'/'+file)
+                print("Files Moved")
+                print(f'{DIR},{file_name}')
+            rmv(dir)
+    except:
+        pass  
 
 username=usercheck()
 

@@ -31,7 +31,20 @@ def fcount(dir):
             totalFiles += 1
     LOGGER.info(f'Total Files: {totalFiles}')
     return totalFiles
+
+def fsize(dir):
+    # assign size
+    size = 0
     
+    # assign folder path
+    Folderpath = dir 
+    
+    # get size
+    for ele in os.scandir(Folderpath):
+        size+=os.stat(ele).st_size
+        
+    return size    
+
 def get_readable_time(seconds: int) -> str:
     result = ''
     (days, remainder) = divmod(seconds, 86400)

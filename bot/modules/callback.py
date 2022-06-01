@@ -40,21 +40,22 @@ def cb_handler(update, context):
         reply_markup=InlineKeyboardMarkup(
                 [
                     [
-                        InlineKeyboardButton("Pictures", callback_data=f"photos#{username}"),
-                        InlineKeyboardButton("Vidoes", callback_data=f"videos#{username}")
+                        InlineKeyboardButton("Pictures Only", callback_data=f"photos#{username}"),
+                        InlineKeyboardButton("Videos Only", callback_data=f"videos#{username}")
                     ],
                     [
-                        InlineKeyboardButton("Pic+vid", callback_data=f"picandvid#{username}"),
+                        InlineKeyboardButton("Pictures and videos", callback_data=f"picandvid#{username}"),
                         InlineKeyboardButton("All Posts", callback_data=f"allposts#{username}"),
                     ]
                 ]
             )
-        bot.send_message(chat_id=query.message.chat.id, text=f"<b>User {name} has {mediacount} posts</b>",reply_markup=reply_markup,parse_mode="HTML")
+        bot.send_message(chat_id=query.message.chat.id, text="Select the type of posts you want to fetch",reply_markup=reply_markup,parse_mode="HTML")
     
 
     
 
     elif query.data.startswith("photos"):
+        chat_id=query.message.chat.id
         if mediacount==0:
             query.edit_message_text("There are no posts by the user")
             return
@@ -75,10 +76,10 @@ def cb_handler(update, context):
                 "--dirname-pattern", dir,
                 "--", username
                 ]
-            download_insta(command, m, dir,username,fetch='Photos')
-    
+            download_insta(command, m, dir,username,chat_id,fetch='Photos')
 
     elif query.data.startswith("videos"):
+        chat_id=query.message.chat.id
         if mediacount==0:
             query.edit_message_text("There are no posts by the user")
             return
@@ -98,10 +99,11 @@ def cb_handler(update, context):
             "--dirname-pattern", dir,
             "--", username
             ]
-        download_insta(command, m, dir,username,fetch='Videos')
+        download_insta(command, m, dir,username,chat_id,fetch='Videos')
 
         
     elif query.data.startswith("picandvid"):
+        chat_id=query.message.chat.id
         if mediacount==0:
             query.edit_message_text("There are no posts by the user")
             return
@@ -119,11 +121,12 @@ def cb_handler(update, context):
             "--dirname-pattern", dir,
             "--", username
             ]
-        download_insta(command, m, dir,username,fetch='Photos+Videos')
+        download_insta(command, m, dir,username,chat_id,fetch='Photos+Videos')
 
 
 
     elif query.data.startswith("allposts"):
+        chat_id=query.message.chat.id
         if mediacount==0:
             query.edit_message_text("There are no posts by the user")
             return
@@ -144,7 +147,7 @@ def cb_handler(update, context):
             "--dirname-pattern", dir,
             "--", username
             ]
-        download_insta(command, m, dir,username,fetch='All Photos')
+        download_insta(command, m, dir,username,chat_id,fetch='All Posts')
 
         
 
@@ -163,6 +166,7 @@ def cb_handler(update, context):
         bot.send_message(chat_id=query.message.chat.id, text=f"Do you want to download IGTV Posts of {name}?", reply_markup=reply_markup)
     
     elif query.data.startswith("yes"):
+        chat_id=query.message.chat.id
         if igtvcount==0:
             query.edit_message_text("There are no IGTV posts by the user")
             return
@@ -184,7 +188,7 @@ def cb_handler(update, context):
             "--dirname-pattern", dir,
             "--", username
             ]
-        download_insta(command, m, dir,username,fetch='IGTV')
+        download_insta(command, m, dir,username,chat_id,fetch='IGTV')
 
         
     elif query.data.startswith("no"):
@@ -218,21 +222,22 @@ def cb_handler(update, context):
 
 
     
-    elif query.data.startswith("followees"):
+    elif query.data.startswith("following"):
         query.delete_message()
         chat_id=query.message.chat.id
-        m=bot.send_message(chat_id, f"Fetching Followees of {name}")
+        m=bot.send_message(chat_id, f"Fetching Following list of {name}")
         try: 
-            followees=f"**Followees List for {name}**\n\n"
+            followees=f"**Following List for {name}**\n\n"
             f = profile.get_followees()
             for p in f:
                 followees += f"\nName: {p.username} :     Link to Profile: www.instagram.com/{p.username}"
-            text_file = open(f"{username}'s followees.txt", "w")
+            text_file = open(f"{username}'s following.txt", "w")
             text_file.write(followees)
             text_file.close()
             m.delete()
-            bot.send_document(chat_id=chat_id, document=f"./{username}'s followees.txt", caption=f"{name}'s followees\n\nA Project By [XTZ_Bots](https://t.me/subin_works)")
-            os.remove(f"./{username}'s followees.txt")
+            bot.send_document(chat_id=chat_id, document=open(f"{username}'s following.txt", 'rb'),caption=f"<b>{name}'s following</b>", parse_mode='HTML')
+            os.remove(f"./{username}'s following.txt")
+            LOGGER.info("following list removed")
         except:
             bot.send_message(chat_id=chat_id, text=f"Error Occured")
             return
@@ -260,7 +265,7 @@ def cb_handler(update, context):
                 "--dirname-pattern", dir,
                 ":feed"
                 ]
-            download_insta(command, m, dir,username,fetch='My Feed')
+            download_insta(command, m, dir,username,chat_id,fetch='My Feed')
            
         elif cmd=="saved":
             command = [
@@ -277,7 +282,7 @@ def cb_handler(update, context):
                 "--dirname-pattern", dir,
                 ":saved"
                 ]
-            download_insta(command, m, dir,username,fetch='My Saved')
+            download_insta(command, m, dir,username,chat_id,fetch='My Saved')
             
         elif cmd=="tagged":
             command = [
@@ -295,7 +300,7 @@ def cb_handler(update, context):
                 "--dirname-pattern", dir,
                 "--", username
                 ]
-            download_insta(command, m, dir,username,fetch='Tagged')
+            download_insta(command, m, dir,username,chat_id,fetch='Tagged')
             
         elif cmd=="stories":
             command = [
@@ -313,7 +318,7 @@ def cb_handler(update, context):
                 "--dirname-pattern", dir,
                 "--", username
                 ]
-            download_insta(command, m, dir,username,fetch='Stories')
+            download_insta(command, m, dir,username,chat_id,fetch='Stories')
             
         elif cmd=="fstories":
             command = [
@@ -330,7 +335,7 @@ def cb_handler(update, context):
                 "--dirname-pattern", dir,
                 ":stories"
                 ]
-            download_insta(command, m, dir,username,fetch='Stories of My Following')
+            download_insta(command, m, dir,username,chat_id,fetch='Stories of My Following')
         elif cmd=="highlights":
             command = [
                 "instaloader",
@@ -347,7 +352,7 @@ def cb_handler(update, context):
                 "--dirname-pattern", dir,
                 "--", username
                 ]
-            download_insta(command, m, dir,username,fetch='Highlights')
+            download_insta(command, m, dir,username,chat_id,fetch='Highlights')
 
         
 callback_handler = CallbackQueryHandler(cb_handler)

@@ -133,7 +133,7 @@ Fork the repo, Do not Import code.
     1.If you're loggin into your account for first time confirm your login location on IG
     2.Don't Download posts frequently, instagram may temporarily block your account under suspicious activity.Again you have to reset your IG password to work agin.
     3.If any error occur restart the bot or check your IG account and login again.
-    4.If /login shows checkpoint link use session_token.py.
+    4.If /login shows checkpoint link use session_file.py.
 
 ```
 

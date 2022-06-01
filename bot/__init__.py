@@ -146,6 +146,16 @@ try:
     IGNORE_PENDING_REQUESTS = IGNORE_PENDING_REQUESTS.lower() == 'true'
 except KeyError:
     IGNORE_PENDING_REQUESTS = False
+try:
+    INDEX_URL=getConfig("INDEX_URL")
+except:
+    INDEX_URL = False
+
+try:
+    TG_UPLOAD = getConfig("TG_UPLOAD")
+    TG_UPLOAD = TG_UPLOAD.lower() == 'true'
+except:
+    TG_UPLOAD = False
 
 updater = tg.Updater(token=BOT_TOKEN)
 bot = updater.bot

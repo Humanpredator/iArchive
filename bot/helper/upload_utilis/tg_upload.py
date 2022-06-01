@@ -49,22 +49,21 @@ def tgup(chat_id, dir):
             media = []
             for photo in chunk:
                 media.append(InputMediaPhoto(open(photo,'rb')))
+                up+=1
+                rm-=1
             try:
                 datetime_ist = datetime.now(IST)
                 ISTIME = datetime_ist.strftime("%I:%M:%S %p - %d %B %Y")
-                up+=1
                 time.sleep(DOWNLOAD_STATUS_UPDATE_INTERVAL)
                 bot.send_media_group(chat_id=chat_id, media=media)
-                rm-=1
-                editMessage(f"Telegram Uploading...\nTotal Files : {total}\nUploaded : {up}\nRemaining : {rm}\nLast Updated : {ISTIME}\nType: Pictures",m)
             except FloodWait as e:
                 time.sleep(e.x)
                 bot.send_media_group(chat_id=chat_id, media=media)
-                rm-=1
-                editMessage(f"Telegram Uploading...\nTotal Files : {total}\nUploaded : {up}\nRemaining : {rm}\nLast Updated : {ISTIME}\nType: Pictures",m)
             except Exception as e:
                 print(f"{e}")
                 pass
+            editMessage(f"Telegram Uploading...\nTotal Files : {total}\nUploaded : {up}\nRemaining : {rm}\nLast Updated : {ISTIME}\nType: Pictures",m)
+    
     if totalvideo>0:
         for i in range(0, len(VDO), 10):
             chunk = VDO[i:i + 10]
@@ -72,22 +71,22 @@ def tgup(chat_id, dir):
             media = []
             for video in chunk:
                 media.append(InputMediaVideo(media=open(video, 'rb')))
+                up+=1
+                rm-=1
             try:
                 datetime_ist = datetime.now(IST)
                 ISTIME = datetime_ist.strftime("%I:%M:%S %p - %d %B %Y")
-                up+=1
                 time.sleep(DOWNLOAD_STATUS_UPDATE_INTERVAL)
-                bot.send_media_group(chat_id=chat_id, media=media)
-                rm-=1
-                editMessage(f"Telegram Uploading...\nTotal Files : {total}\nUploaded : {up}\nRemaining : {rm}\nLast Updated : {ISTIME}\nType: vidoes",m)
+                bot.send_media_group(chat_id=chat_id, media=media)  
             except FloodWait as e:
                 time.sleep(e.x)
                 bot.send_media_group(chat_id=chat_id, media=media)
-                rm-=1
-                editMessage(f"Telegram Uploading...\nTotal Files : {total}\nUploaded : {up}\nRemaining : {rm}\nLast Updated : {ISTIME}\nType: Vidoes",m)
+                rm-=1   
             except Exception as e:
                 print(f"{e}")
                 pass
+            editMessage(f"Telegram Uploading...\nTotal Files : {total}\nUploaded : {up}\nRemaining : {rm}\nLast Updated : {ISTIME}\nType: Vidoes",m)
+   
     if totalgif>0:
         for gif in GIF:
             try:
@@ -99,6 +98,7 @@ def tgup(chat_id, dir):
                 rm-=1
                 editMessage(f"Telegram Uploading...\nTotal Files : {total}\nUploaded : {up}\nRemaining : {rm}\nLast Updated : {ISTIME}\nType: GIF's",m)
             except FloodWait as e:
+                up+=1
                 time.sleep(e.x)
                 bot.send_animation(chat_id=chat_id, animation=open(gif, 'rb'))
                 rm-=1
@@ -106,6 +106,6 @@ def tgup(chat_id, dir):
             except Exception as e:
                 print(f"{e}")
                 pass
-    
+            
     editMessage("Telegram Upload Completed",m)
     return True

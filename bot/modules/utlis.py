@@ -48,12 +48,12 @@ def account(update, context):
                         
                         InlineKeyboardButton("My Highlights", callback_data=f"highlights#{username}"),
                         InlineKeyboardButton("My Stories ", callback_data=f"stories#{username}"),
-                        InlineKeyboardButton("Stories of My Followees", callback_data=f"fstories#{username}")
+                        InlineKeyboardButton("Stories of My Following", callback_data=f"fstories#{username}")
                     ],
 
                     [
                         InlineKeyboardButton("List Of My Followers", callback_data=f"followers#{username}"),
-                        InlineKeyboardButton("List Of My Followees", callback_data=f"followees#{username}")
+                        InlineKeyboardButton("List Of My Following", callback_data=f"following#{username}")
                     ]
                 ]
                 )
@@ -185,7 +185,7 @@ def ig(update, context):
                             ],
                             [
                                 InlineKeyboardButton(f"{name}'s Followers", callback_data=f"followers#{username}"),
-                                InlineKeyboardButton(f"{name}'s Followees", callback_data=f"followees#{username}")
+                                InlineKeyboardButton(f"{name}'s Following", callback_data=f"following#{username}")
                             ]
                         ]
                     )
@@ -247,7 +247,7 @@ def ig(update, context):
                             ],
                             [
                                 InlineKeyboardButton(f"{name}'s Followers", callback_data=f"followers#{username}"),
-                                InlineKeyboardButton(f"{name}'s Followees", callback_data=f"followees#{username}")
+                                InlineKeyboardButton(f"{name}'s Following", callback_data=f"following#{username}")
                             ]
                         ]
                     )

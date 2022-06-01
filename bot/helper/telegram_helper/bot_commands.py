@@ -13,7 +13,7 @@ class _BotCommands:
         self.HelpCommand = 'help'
         self.LogCommand = 'log'
         self.ShellCommand = 'sl'
-        self.IgPostCommand = 'post'
+        self.IgPostCommand = 'posts'
         self.IgTvCommand = 'igtv'
         self.IgFollowersCommand= 'followers'
         self.IgFollowingCommand= 'following'

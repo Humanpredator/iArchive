@@ -1,18 +1,17 @@
-#import Modules
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 import os,time
-import shutil
-from bot import LOGGER,parent_id
+from bot import LOGGER,parent_id,INDEX_URL
 from os import path
 from pyrogram import *
-from bot.helper.ext_utils.bot_utils import fcount, get_readable_file_size
+from bot.helper.ext_utils.bot_utils import fcount, get_readable_file_size,fsize
 from bot.helper.telegram_helper.message_utils import *
-
+from bot.helper.telegram_helper import button_build
 DRIVE= parent_id
 
+
 #gdrive upload function
-def gup(dir, m):
+def gup(dir, m,username,fetch):
     #Route the modules
     gauth = GoogleAuth()
     #check if the credentials file exists
@@ -27,6 +26,8 @@ def gup(dir, m):
 
         count = 0
         editMessage(f"Drive Upload Starts, Please Wait....!\nThis may take longer time Depending upon number of posts.",m)
+
+        
         #Main gfolder id where store all the ig profile archive 
         gFolderID= DRIVE#Gdrive Folder id to store all the user posts conatining files  Folder
         directory = dir #Route the main dir to function directory variables
@@ -91,11 +92,21 @@ def gup(dir, m):
                 except:
                     pass
                 LOGGER.info(f'File {localfilelist} is Successfully Uploaded') 
-            gid = (f'https://drive.google.com/drive/u/1/folders/{matchedFolderID}')
-            msg = f'<b>Uploaded: </b><code>{dir}</code>\n<b>Total Files: </b><code>{fcount(dir)}</code>\n<b>Folder Size: </b><code>{get_readable_file_size(fsize(dir))}</code>\n<b>Drive Link: </b><code>{gid}</code>'
-            LOGGER.info(gid)
-            editMessage(msg,m)
-        
+            msg = f'''
+<b>Uploaded Completed: </b><code>{username}</code>
+<b>Directory: </b><code>{dir}</code>
+<b>Total Files: </b><code>{fcount(dir)}</code>
+<b>Folder Size: </b><code>{get_readable_file_size(fsize(dir))}</code>
+<b>Type: </b><code>{fetch}</code>
+'''
+            buttons = button_build.ButtonMaker()
+            buttons.buildbutton("Drive Link", f'https://drive.google.com/drive/u/1/folders/{matchedFolderID}')
+            buttons.buildbutton("Index Link",INDEX_URL)
+            buttons.buildbutton("IG Link",f"https://instagram.com/{username}")
+            markup = InlineKeyboardMarkup(buttons.build_menu(3))
+            LOGGER.info(f'Uploaded Completed: {username}')
+            editMessage(msg,m,markup)
+            return True    
     #else part To Create New GFolde for the Dir And Upload the Files...!
         else:
             #Create folder for the title dir 
@@ -122,31 +133,30 @@ def gup(dir, m):
                     pass
                 LOGGER.info(f'File {localfilelist} is Successfully Uploaded') 
             LOGGER.info(f'All Files was Successfully Uploaded')
-            gid = (f'https://drive.google.com/drive/u/1/folders/{newgFolderID}')
-            LOGGER.info(gid)
-            msg = f'<b>Uploaded Completed: </b><code>{dir}</code>\n<b>Total Files: </b><code>{fcount(dir)}</code>\n<b>Folder Size: </b><code>{get_readable_file_size(fsize(dir))}</code>\n<b>Drive Link: </b><code>{gid}</code>'
-            editMessage(msg,m)
-        shutil.rmtree(dir)
-        LOGGER.info(f'Clearing Downloads: {dir}')
+            msg = f'''
+<b>Uploaded Completed: </b><code>{username}</code>
+<b>Directory: </b><code>{dir}</code>
+<b>Total Files: </b><code>{fcount(dir)}</code>
+<b>Folder Size: </b><code>{get_readable_file_size(fsize(dir))}</code>
+<b>Type: </b><code>{fetch}</code>
+'''
+            buttons = button_build.ButtonMaker()
+            buttons.buildbutton("Drive Link", f'https://drive.google.com/drive/u/1/folders/{matchedFolderID}')
+            buttons.buildbutton("Index Link",INDEX_URL)
+            buttons.buildbutton("IG Link",f"https://instagram.com/{username}")
+            markup = InlineKeyboardMarkup(buttons.build_menu(3))
+            LOGGER.info(f'Uploaded Completed: {username}')
+            editMessage(msg,m,markup)
+            return True
     else:
         LOGGER.warning("No Credentials File Found..Upload stopped")
-
-
-
-
-
-
-
-def fsize(dir):
-    # assign size
-    size = 0
     
-    # assign folder path
-    Folderpath = dir 
-    
-    # get size
-    for ele in os.scandir(Folderpath):
-        size+=os.stat(ele).st_size
-        
-    return size
+
+
+
+
+
+
+
+
 

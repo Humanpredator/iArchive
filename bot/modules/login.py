@@ -16,7 +16,6 @@ def user_login(update, context):
     args=update.message.text.split(" ", maxsplit=2)
     if len(args)>2:
         username=args[1]
-        usersave(username)
         password=args[2]
         deleteMessage(context.bot, update.message)
         m = sendMessage(f"Checking user @{username} \n Please Wait..!", context.bot, update)
@@ -29,6 +28,7 @@ def user_login(update, context):
                 insta.login(username, password)
                 insta.save_session_to_file(filename=f"./{username}")
                 STATUS.add(1)
+                usersave(username)
                 m = bot.edit_message_text(f"Fetching the details of @{username}\n please wait...!", m.chat_id, m.message_id)
                 profile = Profile.from_username(insta.context, username)
                 mediacount = profile.mediacount

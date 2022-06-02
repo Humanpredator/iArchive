@@ -1,9 +1,8 @@
 {
     "name": "Instagram-Bot",
-    "description": "Telegram bot to manage your Instagram account.",
+    "description": "Telegram bot to download any Instagram posts.",
     "keywords": [
       "telegram",
-      "best",
       "instagram",
       "download",
       "bot"
@@ -59,8 +58,17 @@
         "description": "Enter your google drive folder id",
         "value": "",
         "required": true
+      },
+      "TG_UPLOAD": {
+        "description": "set to 'True' if you want to upload to telegram, default is 'False'",
+        "value": "",
+        "required": false
+      },
+      "INDEX_URL": {
+        "description": "Enter your index Url",
+        "value": "",
+        "required": false
       }
-
 
     },
     "formation": {

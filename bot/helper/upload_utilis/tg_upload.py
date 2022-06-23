@@ -1,6 +1,6 @@
 import glob
 from datetime import datetime
-from bot import DOWNLOAD_STATUS_UPDATE_INTERVAL
+from bot import DOWNLOAD_STATUS_UPDATE_INTERVAL,LOGGER
 from videoprops import get_audio_properties
 from pyrogram.errors import FloodWait
 from bot.helper.ext_utils.bot_utils import usercheck
@@ -108,4 +108,5 @@ def tgup(chat_id, dir):
                 pass
             
     editMessage("Telegram Upload Completed",m)
+    LOGGER.info(f"Telegram Upload Completed")
     return True

@@ -1,6 +1,5 @@
 from telegram import InlineKeyboardButton
 
-
 class ButtonMaker:
     def __init__(self):
         self.button = []

@@ -17,8 +17,6 @@ from bot.helper.ext_utils import fs_utils
 from .modules import authorize, shell, speedtest,callback,insta_cmds,login,utlis
 from .start_help import ig_help, start
 
-
-
 def stats(update, context):
     currentTime = get_readable_time(time.time() - botStartTime)
     total, used, free = shutil.disk_usage('.')
@@ -41,7 +39,6 @@ def stats(update, context):
             f'<b>DISK:</b> <code>{disk}%</code>'
     sendMessage(stats, context.bot, update)
 
-
 def restart(update, context):
     restart_message = sendMessage("Restarting, Please wait!", context.bot, update)
     # Save restart message object in order to reply to it after restarting
@@ -50,21 +47,16 @@ def restart(update, context):
         f.write(f"{restart_message.chat.id}\n{restart_message.message_id}\n")
     os.execl(executable, executable, "-m", "bot")
 
-
 def ping(update, context):
     start_time = int(round(time.time() * 1000))
     reply = sendMessage("Starting Ping", context.bot, update)
     end_time = int(round(time.time() * 1000))
     editMessage(f'{end_time - start_time} ms', reply)
 
-
 def log(update, context):
     sendLogFile(context.bot, update)
 
-
-#tg
 def main():
-
     fs_utils.start_cleanup()
     try:
         USER=usercheck()
@@ -89,7 +81,6 @@ def main():
                     bot.sendMessage(chat_id=i, text=text, parse_mode=ParseMode.HTML)
         except Exception as e:
             LOGGER.warning(e)
-    # bot.set_my_commands(botcmds)
 
     ping_handler = CommandHandler(BotCommands.PingCommand, ping,
                                   filters=CustomFilters.authorized_chat | CustomFilters.authorized_user, run_async=True)

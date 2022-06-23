@@ -1,16 +1,13 @@
 import os
+import maskpass
 from instaloader import Instaloader, TwoFactorAuthRequiredException
 S = "0"
 STATUS = set(int(x) for x in (S).split())
 L = Instaloader()
 
-
-
 def generate():
-    print("Now Enter your Instagram username")
-    id = input()
-    print("Enter Your Instagram Password")
-    pwd = input()
+    id = input("Now Enter your Instagram username:")
+    pwd = maskpass.askpass(mask="*") 
     try:
         L.login(id, pwd)
         L.save_session_to_file(filename=f"./{id}")
@@ -28,7 +25,7 @@ def generate():
     except Exception as e:
         print(e)
         return
-    print("Succesfully Logged into Instagram")
+    print("Successfully Logged into Instagram")
 def usersavelocal(username):
     file = open("username.txt","w")
     if os.path.isfile("username.txt"):

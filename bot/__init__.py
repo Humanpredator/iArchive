@@ -14,10 +14,7 @@ from psycopg2 import Error
 import socket
 import faulthandler
 from instaloader import Instaloader
-
-
 faulthandler.enable()
-
 socket.setdefaulttimeout(600)
 
 botStartTime = time.time()
@@ -132,7 +129,6 @@ app = Client('insta_scrap', api_id=int(TELEGRAM_API), api_hash=TELEGRAM_HASH, bo
 S = "0"
 STATUS = set(int(x) for x in (S).split())
 L=Instaloader()
-
 
 # Generate Telegraph Token
 sname = ''.join(random.SystemRandom().choices(string.ascii_letters, k=8))

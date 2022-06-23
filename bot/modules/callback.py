@@ -32,8 +32,6 @@ def cb_handler(update, context):
         query.answer()
         bot.send_document(query.message.chat.id,profilepichd,caption=f"<b>Name:</b>{name}\n<b>Username:</b>{username}",parse_mode="HTML")
     
-    
-   
     elif query.data.startswith("post"):
         query.delete_message()
         query.answer()
@@ -51,9 +49,6 @@ def cb_handler(update, context):
             )
         bot.send_message(chat_id=query.message.chat.id, text="Select the type of posts you want to fetch",reply_markup=reply_markup,parse_mode="HTML")
     
-
-    
-
     elif query.data.startswith("photos"):
         chat_id=query.message.chat.id
         if mediacount==0:
@@ -100,8 +95,7 @@ def cb_handler(update, context):
             "--", username
             ]
         download_insta(command, m, dir,username,chat_id,fetch='Videos')
-
-        
+  
     elif query.data.startswith("picandvid"):
         chat_id=query.message.chat.id
         if mediacount==0:
@@ -122,8 +116,6 @@ def cb_handler(update, context):
             "--", username
             ]
         download_insta(command, m, dir,username,chat_id,fetch='Photos+Videos')
-
-
 
     elif query.data.startswith("allposts"):
         chat_id=query.message.chat.id
@@ -148,9 +140,6 @@ def cb_handler(update, context):
             "--", username
             ]
         download_insta(command, m, dir,username,chat_id,fetch='All Posts')
-
-        
-
 
     elif query.data.startswith("igtv"):
         query.delete_message()
@@ -189,15 +178,12 @@ def cb_handler(update, context):
             "--", username
             ]
         download_insta(command, m, dir,username,chat_id,fetch='IGTV')
-
-        
+   
     elif query.data.startswith("no"):
         query.delete_message()
         query.answer()
         bot.send_message(chat_id=query.message.chat.id, text=f"Process Cancelled posts")
         bot.delete_message(chat_id=query.message.chat.id, message_id=m.message_id, timeout=5)
-
-
 
     elif query.data.startswith("followers"):
         query.delete_message()
@@ -217,11 +203,7 @@ def cb_handler(update, context):
         except:
             bot.send_message(chat_id=chat_id, text=f"Error Occured")
             return
-
-
-
-
-    
+ 
     elif query.data.startswith("following"):
         query.delete_message()
         chat_id=query.message.chat.id
@@ -241,7 +223,6 @@ def cb_handler(update, context):
         except:
             bot.send_message(chat_id=chat_id, text=f"Error Occured")
             return
-
     
     else:
         dir=f"{OWNER_ID}/{username}"
@@ -353,8 +334,7 @@ def cb_handler(update, context):
                 "--", username
                 ]
             download_insta(command, m, dir,username,chat_id,fetch='Highlights')
-
-        
+       
 callback_handler = CallbackQueryHandler(cb_handler)
 dispatcher.add_handler(callback_handler)
 

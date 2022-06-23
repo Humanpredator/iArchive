@@ -16,11 +16,12 @@ def user_login(update, context):
     args=update.message.text.split(" ", maxsplit=2)
     if len(args)>2:
         username=args[1]
+        
         password=args[2]
         deleteMessage(context.bot, update.message)
         m = sendMessage(f"Checking user @{username} \n Please Wait..!", context.bot, update)
         if 1 in STATUS:
-            editMessage(f"Default @{USER} is Already Logged In,Try To Remove By /logout", m)
+            editMessage(f"Default @{USER} is Already Logged In,Try To /logout", m)
         elif is_link(args[1])==True:
             editMessage("Please send a username not link use /ig <b>link</b> ", m)
         else:
@@ -52,6 +53,7 @@ def user_login(update, context):
                 return ConversationHandler.END
            
             except TwoFactorAuthRequiredException:
+                usersave(username)
                 editMessage("Send your 2F Code within 60sec...!", m)
                 return CODE_SAVE
 
@@ -95,7 +97,7 @@ def codei (update, context):
             photo=profilepic
             )
         except BadCredentialsException:
-            sendMessage("Wrong Credentials\n\n/iglogin again", context.bot, update)
+            sendMessage("Wrong Credentials\n\n/login again", context.bot, update)
             pass
         except Exception as e:
             sendMessage(f"{e}\nTry /login again", context.bot, update)
@@ -110,11 +112,11 @@ def codei (update, context):
 def logout(update, context):
     USER=usercheck()
     if 1 in STATUS:
-        sendMessage("Succesfully Logged Out", context.bot, update)
+        sendMessage("Successfully Logged Out", context.bot, update)
         STATUS.remove(1)
         os.remove(f"./{USER}")
     else:
-        sendMessage("You are not Logged in\nTry to Login /login ", context.bot, update)
+        sendMessage("You are not Logged in\nTry to /login ", context.bot, update)
 
 
 

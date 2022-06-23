@@ -9,11 +9,8 @@ from bot import dispatcher,OWNER_ID,L,STATUS
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from telegram.ext import CommandHandler
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton
-
 insta = L
 
-
-#post handler
 def post(update, context):
     USER=usercheck()
     session=f"./{USER}"
@@ -49,8 +46,6 @@ def post(update, context):
     else:
         sendMessage("Please send a username", context.bot, update)
 
-
-#igtv handler
 def igtv(update, context):
     USER=usercheck()
     session=f"./{USER}"
@@ -84,9 +79,6 @@ def igtv(update, context):
     else:
         sendMessage("Please send a username", context.bot, update)
     
-
-
-#followers handler
 def followers(update, context):
     USER=usercheck()
     session=f"./{USER}"
@@ -126,7 +118,6 @@ def followers(update, context):
     else:
         sendMessage("Please send a username", context.bot, update)
 
-#followings handler
 def following(update, context):
     USER=usercheck()
     session=f"./{USER}"
@@ -165,9 +156,6 @@ def following(update, context):
             sendMessage("Error Occured", context.bot, update)
     else:
         sendMessage("Please send a username", context.bot, update)
-
-
-
 
 def fans(update, context):
     USER=usercheck()
@@ -222,8 +210,6 @@ def fans(update, context):
     else:
         sendMessage("Please send a username", context.bot, update)
 
-
-
 def notfollowing(update, context):
     USER=usercheck()
     session=f"./{USER}"
@@ -274,10 +260,6 @@ def notfollowing(update, context):
             sendMessage("Error Occured", context.bot, update)
     else:
         sendMessage("Please send a username", context.bot, update)
-
-
-
-
 
 def feed(update, context):
     chat_id = update.message.chat_id
@@ -333,9 +315,6 @@ def feed(update, context):
                 ]
         download_insta(command, m, dir,username,chat_id,fetch='My Feed')
 
-
-
-
 def saved(update, context):
     chat_id = update.message.chat_id
     USER=usercheck()
@@ -389,11 +368,6 @@ def saved(update, context):
             ]
         download_insta(command, m, dir,username,chat_id,fetch='My Saved')
 
-
-
-
-
-
 def tagged(update, context):
     chat_id = update.message.chat_id
     USER=usercheck()
@@ -435,9 +409,6 @@ def tagged(update, context):
 
     else:
         sendMessage("Please send a username.", context.bot, update)
-
-
-
 
 def story(update, context):
     chat_id = update.message.chat_id
@@ -481,8 +452,6 @@ def story(update, context):
     else:
         sendMessage("Please send a username.", context.bot, update)
 
-
-
 def stories(update, context):
     chat_id = update.message.chat_id
     USER=usercheck()
@@ -509,13 +478,6 @@ def stories(update, context):
         ":stories"
         ]
     download_insta(command, m, dir,username,chat_id,fetch='My Following Stories')
-
-
-
-
-
-
-
 
 def highlights(update, context):
     chat_id = update.message.chat_id
@@ -558,8 +520,6 @@ def highlights(update, context):
         download_insta(command, m, dir,username,chat_id,fetch=f'Highlights')
     else:
         sendMessage("Please send a username.", context.bot, update)
-
-
 
 post_handler = CommandHandler(BotCommands.IgPostCommand, post, CustomFilters.authorized_chat | CustomFilters.owner_filter | CustomFilters.authorized_user, run_async=True)
 dispatcher.add_handler(post_handler)

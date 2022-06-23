@@ -13,8 +13,8 @@ def start(update, context):
     reply_markup = InlineKeyboardMarkup(buttons.build_menu(1))
     if CustomFilters.authorized_user(update) or CustomFilters.authorized_chat(update):
         start_string = f'''
-This bot is made from or mod from instagram-bot.\n
-Bot Can Scrap the Instagram Accounts posts..!
+Thanks to SUBIN for repo.\n
+This bot can download all the Instagram Accounts posts..!
 Type /{BotCommands.HelpCommand} to get a list of available Instagram commands..!
 '''
         sendMarkup(start_string, context.bot, update, reply_markup)

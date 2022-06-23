@@ -120,7 +120,7 @@ def mirror(update, context):
                     "-f", session,
                     "--", f"-{shortcode}"
                     ]
-                download_insta(command, m, dir,username,fetch='posts')
+                download_insta(command, m,dir,username,chat_id,fetch='posts')
             except Exception as e:
                 print(e)
                 sendMessage(f"Error: {e}", context.bot, update)
@@ -131,7 +131,7 @@ def mirror(update, context):
             return
 
     else:
-        sendMessage("send insta posts links after /mirror ", context.bot, update)
+        sendMessage("send insta post links after /mirror ", context.bot, update)
        
 def ig(update, context):
     args=update.message.text.split(" ", maxsplit=1)

@@ -1,6 +1,6 @@
 import psycopg2
-from psycopg2 import Error
 from bot import AUTHORIZED_CHATS, SUDO_USERS, DB_URI, LOGGER
+
 
 class DbManger:
     def __init__(self):
@@ -10,7 +10,7 @@ class DbManger:
         try:
             self.conn = psycopg2.connect(DB_URI)
             self.cur = self.conn.cursor()
-        except psycopg2.DatabaseError as error :
+        except psycopg2.DatabaseError as error:
             LOGGER.error("Error in dbMang : ", error)
             self.err = True
 
@@ -18,7 +18,7 @@ class DbManger:
         self.cur.close()
         self.conn.close()
 
-    def db_auth(self,chat_id: int):
+    def db_auth(self, chat_id: int):
         self.connect()
         if self.err:
             return "There's some error check log for details"
@@ -29,7 +29,7 @@ class DbManger:
         AUTHORIZED_CHATS.add(chat_id)
         return 'Authorized successfully'
 
-    def db_unauth(self,chat_id: int):
+    def db_unauth(self, chat_id: int):
         self.connect()
         if self.err:
             return "There's some error check log for details"
@@ -40,12 +40,13 @@ class DbManger:
         AUTHORIZED_CHATS.remove(chat_id)
         return 'Unauthorized successfully'
 
-    def db_addsudo(self,chat_id: int):
+    def db_addsudo(self, chat_id: int):
         self.connect()
         if self.err:
             return "There's some error check log for details"
         if chat_id in AUTHORIZED_CHATS:
-            sql = 'UPDATE users SET sudo = TRUE where uid = {};'.format(chat_id)
+            sql = 'UPDATE users SET sudo = TRUE where uid = {};'.format(
+                chat_id)
             self.cur.execute(sql)
             self.conn.commit()
             self.disconnect()
@@ -59,7 +60,7 @@ class DbManger:
             SUDO_USERS.add(chat_id)
             return 'Successfully Authorized and promoted as Sudo'
 
-    def db_rmsudo(self,chat_id: int):
+    def db_rmsudo(self, chat_id: int):
         self.connect()
         if self.err:
             return "There's some error check log for details"

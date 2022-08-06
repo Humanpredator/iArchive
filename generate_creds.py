@@ -4,10 +4,10 @@ import os
 
 if path.exists("client_secrets.json"):
     gauth = GoogleAuth()
-    
+
     if gauth.credentials is None:
         # Authenticate if they're not there
-        gauth.LocalWebserverAuth()   
+        gauth.LocalWebserverAuth()
     else:
         # Initialize the saved creds
         gauth.Authorize()
@@ -17,4 +17,3 @@ if path.exists("client_secrets.json"):
 else:
     print("client_secrets.json file not found")
     exit()
-

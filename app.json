@@ -1,6 +1,6 @@
 {
     "name": "Instagram-Bot",
-    "description": "Telegram bot to manage your Instagram account.",
+    "description": "Advanced IG downloader TG bot made with python.",
     "keywords": [
       "telegram",
       "best",
@@ -10,12 +10,12 @@
     ],
     "repository": "",
     "env": {
-      "API_ID": {
+      "TELEGRAM_API": {
         "description": "Get this value from https://my.telegram.org",
         "value": "",
         "required": true
       },
-      "API_HASH": {
+      "TELEGRAM_HASH": {
         "description": "Get this value from https://my.telegram.org",
         "value": "",
         "required": true
@@ -59,6 +59,16 @@
         "description": "Enter your google drive folder id",
         "value": "",
         "required": true
+      },
+      "TG_UPLOAD": {
+        "description": "Set 'True' to upload to telegram, 'False' to not upload to telegram",
+        "value": "False",
+        "required": false
+      },
+      "INDEX_URL": {
+        "description": "Enter your index url",
+        "value": "",
+        "required": false
       }
 
 

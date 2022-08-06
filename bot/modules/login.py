@@ -1,36 +1,37 @@
-from bot.helper.ext_utils.bot_utils import acc_type,usercheck,usersave,is_link,yes_or_no
+from bot.helper.ext_utils.bot_utils import acc_type, usercheck, usersave, is_link, yes_or_no
 import os
 from instaloader import Profile, TwoFactorAuthRequiredException, BadCredentialsException
 from bot.helper.telegram_helper.message_utils import *
 from bot.helper.telegram_helper.filters import CustomFilters
-from bot import  dispatcher,L,STATUS
+from bot import dispatcher, L, STATUS
 from bot.helper.telegram_helper.bot_commands import BotCommands
-from telegram.ext import  CommandHandler, MessageHandler, Filters,ConversationHandler
-
+from telegram.ext import CommandHandler, MessageHandler, Filters, ConversationHandler
 
 insta = L
-CODE_SAVE = range(2) 
+CODE_SAVE = range(2)
+
 
 def user_login(update, context):
-    USER=usercheck()
-    args=update.message.text.split(" ", maxsplit=2)
-    if len(args)>2:
-        username=args[1]
-        
-        password=args[2]
+    USER = usercheck()
+    args = update.message.text.split(" ", maxsplit=2)
+    if len(args) > 2:
+        username = args[1]
+        password = args[2]
         deleteMessage(context.bot, update.message)
-        m = sendMessage(f"Checking user @{username} \n Please Wait..!", context.bot, update)
+        m = sendMessage(
+            f"Checking given user @{username} and password.\nPlease Wait...!", context.bot, update)
         if 1 in STATUS:
-            editMessage(f"Default @{USER} is Already Logged In,Try To /logout", m)
-        elif is_link(args[1])==True:
-            editMessage("Please send a username not link use /ig <b>link</b> ", m)
+            editMessage(f"@{USER} is already logged in.\nTry to /logout.", m)
+        elif is_link(args[1]) == True:
+            editMessage("Don't use links...!", m)
         else:
             try:
                 insta.login(username, password)
                 insta.save_session_to_file(filename=f"./{username}")
                 STATUS.add(1)
                 usersave(username)
-                m = bot.edit_message_text(f"Fetching the details of @{username}\n please wait...!", m.chat_id, m.message_id)
+                editMessage(
+                    f"Fetching the details of @{username}\n Please wait...!", m)
                 profile = Profile.from_username(insta.context, username)
                 mediacount = profile.mediacount
                 name = profile.full_name
@@ -41,47 +42,53 @@ def user_login(update, context):
                 following = profile.followees
                 deleteMessage(context.bot, m)
                 bot.send_photo(
-                chat_id=update.message.chat.id,
-                caption=f"You are successfully Logged In as {name}\n\n<b>Your Account Details</b>\n\n🏷 <b>Name</b>: {name}\n🔖 <b>Username</b>: {profile.username}\n📝 <b>Bio</b>: {bio}\n📍 <b>Account Type</b>: {acc_type(profile.is_private)}\n🏭 <b>Is Business Account?</b>: {yes_or_no(profile.is_business_account)}\n👥 <b>Total Followers</b>: {followers}\n👥 <b>Total Following</b>: {following}\n📸 <b>Total Posts</b>: {mediacount}\n📺 <b>IGTV Videos</b>: {igtvcount}",parse_mode="HTML",
-                photo=profilepic
+                    chat_id=update.message.chat.id,
+                    caption=f"You are successfully logged in as {name}\n\n<b>Your Account Details</b>\n\n🏷 <b>Name</b>: {name}\n🔖 <b>Username</b>: {profile.username}\n📝 <b>Bio</b>: {bio}\n📍 <b>Account Type</b>: {acc_type(profile.is_private)}\n🏭 <b>Is Business Account?</b>: {yes_or_no(profile.is_business_account)}\n👥 <b>Total Followers</b>: {followers}\n👥 <b>Total Following</b>: {following}\n📸 <b>Total Posts</b>: {mediacount}\n📺 <b>IGTV Videos</b>: {igtvcount}", parse_mode="HTML",
+                    photo=profilepic
                 )
-                return ConversationHandler.END
-            
+                return
+
             except BadCredentialsException:
-                editMessage("Wrong Credentials\n\n/login again", m)
+                editMessage("Wrong credentials\nTry to /login again.", m)
                 pass
-                return ConversationHandler.END
-           
+                return
+
             except TwoFactorAuthRequiredException:
                 usersave(username)
-                editMessage("Send your 2F Code within 60sec...!", m)
+                editMessage("Send your 2F code within 30sec...!", m)
                 return CODE_SAVE
 
             except Exception as e:
-                editMessage(f"{e}\nTry /login again", m)
-                return ConversationHandler.END
+                editMessage(f"{e}\nTry to /login again.", m)
+                return
     else:
         if 1 in STATUS:
-            sendMessage(f"@{USER} Already Logged In try to Logout by /logout\nUse /account to see Current User", context.bot, update)
-            return ConversationHandler.END
+            sendMessage(
+                f"@{USER} is already logged in.\n Try to /logout.\n Use /account to see current logged in user.", context.bot, update)
+            return
         else:
-            sendMessage(f'Send Your Ig Username and Password\n\n/login <b>username</b> <b>password</b>', context.bot, update)
-            return ConversationHandler.END
+            sendMessage(
+                f'Send /login <b>username</b> <b>password</b>', context.bot, update)
+            return
+
 
 def timeout(update, context):
-    update.message.reply_text('Oh! TimeOut\nTry Again /login')
+    update.message.reply_text('Oh! TimeOut.\nTry to /login again.')
     return ConversationHandler.END
 
-def codei (update, context):
-    username=usercheck()
-    codei= update.message.text
-    if codei.isdigit()==True:
-        codei=int(codei)
+
+def codei(update, context):
+    username = usercheck()
+    codei = update.message.text
+    if codei.isdigit() == True:
+        codei = int(codei)
+        m = sendMessage(
+            f"Checking given code.\n please wait...!", context.bot, update)
         try:
             insta.two_factor_login(codei)
             insta.save_session_to_file(filename=f"./{username}")
             STATUS.add(1)
-            m= sendMessage( "Fetching details from Instagram", context.bot, update)
+            editMessage("Fetching details from Instagram..!", m)
             profile = Profile.from_username(insta.context, username)
             mediacount = profile.mediacount
             name = profile.full_name
@@ -92,40 +99,40 @@ def codei (update, context):
             following = profile.followees
             deleteMessage(context.bot, m)
             bot.send_photo(
-            chat_id=update.message.chat.id,
-            caption=f"You are successfully In as {name}\n\n<b>Your Account Details</b>\n\n🏷 <b>Name</b>: {name}\n🔖 <b>Username</b>: {profile.username}\n📝 <b>Bio</b>: {bio}\n📍 <b>Account Type</b>: {acc_type(profile.is_private)}\n🏭 <b>Is Business Account?</b>: {yes_or_no(profile.is_business_account)}\n👥 <b>Total Followers</b>: {followers}\n👥 <b>Total Following</b>: {following}\n📸 <b>Total Posts</b>: {mediacount}\n📺 <b>IGTV Videos</b>: {igtvcount}",parse_mode="HTML",
-            photo=profilepic
+                chat_id=update.message.chat.id,
+                caption=f"You are successfully in as {name}\n\n<b>Your Account Details</b>\n\n🏷 <b>Name</b>: {name}\n🔖 <b>Username</b>: {profile.username}\n📝 <b>Bio</b>: {bio}\n📍 <b>Account Type</b>: {acc_type(profile.is_private)}\n🏭 <b>Is Business Account?</b>: {yes_or_no(profile.is_business_account)}\n👥 <b>Total Followers</b>: {followers}\n👥 <b>Total Following</b>: {following}\n📸 <b>Total Posts</b>: {mediacount}\n📺 <b>IGTV Videos</b>: {igtvcount}", parse_mode="HTML",
+                photo=profilepic
             )
         except BadCredentialsException:
-            sendMessage("Wrong Credentials\n\n/login again", context.bot, update)
+            editMessage("Wrong credentials\n Try to /login again.", m)
             pass
         except Exception as e:
-            sendMessage(f"{e}\nTry /login again", context.bot, update)
+            editMessage(f"{e}\nTry to /login again.", m)
             pass
     else:
-        sendMessage("Please Enter a valid code", context.bot, update)
-    
+        sendMessage("Please enter a valid code.", context.bot, update)
     return ConversationHandler.END
 
-            
 
 def logout(update, context):
-    USER=usercheck()
+    USER = usercheck()
     if 1 in STATUS:
-        sendMessage("Successfully Logged Out", context.bot, update)
+        sendMessage("Your'e successfully logged out.", context.bot, update)
         STATUS.remove(1)
         os.remove(f"./{USER}")
+        os.remove('username.txt')
     else:
-        sendMessage("You are not Logged in\nTry to /login ", context.bot, update)
+        sendMessage("You're not logged in.\n Try to /login.",
+                    context.bot, update)
 
 
+logout_handler = CommandHandler(BotCommands.IgLogoutCommand, logout,
+                                filters=CustomFilters.owner_filter | CustomFilters.sudo_user)
 
-logout_handler = CommandHandler(BotCommands.IgLogoutCommand, logout, filters=CustomFilters.owner_filter | CustomFilters.sudo_user, run_async=True)
-
-userlogin_handler = ConversationHandler(entry_points=[CommandHandler( BotCommands.LoginCommand, user_login, filters=CustomFilters.owner_filter | CustomFilters.sudo_user, run_async=True)], 
-    states={CODE_SAVE: [MessageHandler(Filters.text, codei)],
-    ConversationHandler.TIMEOUT: [MessageHandler(Filters.text | Filters.command,timeout)]},
-    fallbacks=[],conversation_timeout=60)
+userlogin_handler = ConversationHandler(entry_points=[CommandHandler(BotCommands.LoginCommand, user_login, filters=CustomFilters.owner_filter | CustomFilters.sudo_user)],
+                                        states={CODE_SAVE: [MessageHandler(Filters.text, codei)],
+                                                ConversationHandler.TIMEOUT: [MessageHandler(Filters.text | Filters.command, timeout)]},
+                                        fallbacks=[], conversation_timeout=30)
 
 dispatcher.add_handler(logout_handler)
 

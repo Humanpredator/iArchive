@@ -23,7 +23,8 @@ if os.path.exists('log.txt'):
         f.truncate(0)
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    handlers=[logging.FileHandler('log.txt'), logging.StreamHandler()],
+                    handlers=[logging.FileHandler(
+                        'log.txt'), logging.StreamHandler()],
                     level=logging.INFO)
 
 LOGGER = logging.getLogger(__name__)
@@ -44,6 +45,7 @@ load_dotenv('config.env')
 def getConfig(name: str):
     return os.environ[name]
 
+
 def mktable():
     try:
         conn = psycopg2.connect(DB_URI)
@@ -55,6 +57,7 @@ def mktable():
     except Error as e:
         logging.error(e)
         exit(1)
+
 
 BOT_TOKEN = None
 # Stores list of users and chats the bot is authorized to use in
@@ -88,7 +91,8 @@ except:
 try:
     BOT_TOKEN = getConfig('BOT_TOKEN')
     parent_id = getConfig('GDRIVE_FOLDER_ID')
-    DOWNLOAD_STATUS_UPDATE_INTERVAL = int(getConfig('DOWNLOAD_STATUS_UPDATE_INTERVAL'))
+    DOWNLOAD_STATUS_UPDATE_INTERVAL = int(
+        getConfig('DOWNLOAD_STATUS_UPDATE_INTERVAL'))
     OWNER_ID = int(getConfig('OWNER_ID'))
     TELEGRAM_API = getConfig('TELEGRAM_API')
     TELEGRAM_HASH = getConfig('TELEGRAM_HASH')
@@ -107,7 +111,7 @@ if DB_URI is not None:
         cur = conn.cursor()
         sql = "SELECT * from users;"
         cur.execute(sql)
-        rows = cur.fetchall()  #returns a list ==> (uid, sudo)
+        rows = cur.fetchall()  # returns a list ==> (uid, sudo)
         for row in rows:
             AUTHORIZED_CHATS.add(row[0])
             if row[1]:
@@ -123,12 +127,13 @@ if DB_URI is not None:
         conn.close()
 
 LOGGER.info("Generating USER_SESSION_STRING")
-app = Client('insta_scrap', api_id=int(TELEGRAM_API), api_hash=TELEGRAM_HASH, bot_token=BOT_TOKEN,)
+app = Client('insta_scrap', api_id=int(TELEGRAM_API),
+             api_hash=TELEGRAM_HASH, bot_token=BOT_TOKEN,)
 
-#IG CONFIG
+# IG CONFIG
 S = "0"
 STATUS = set(int(x) for x in (S).split())
-L=Instaloader()
+L = Instaloader()
 
 # Generate Telegraph Token
 sname = ''.join(random.SystemRandom().choices(string.ascii_letters, k=8))
@@ -143,7 +148,7 @@ try:
 except KeyError:
     IGNORE_PENDING_REQUESTS = False
 try:
-    INDEX_URL=getConfig("INDEX_URL")
+    INDEX_URL = getConfig("INDEX_URL")
 except:
     INDEX_URL = False
 

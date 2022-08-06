@@ -38,6 +38,6 @@ def shell(update, context):
         message.reply_text(reply, parse_mode=ParseMode.MARKDOWN)
 
 
-SHELL_HANDLER = CommandHandler(BotCommands.ShellCommand, shell, 
-                                                  filters=CustomFilters.owner_filter, run_async=True)
+SHELL_HANDLER = CommandHandler(BotCommands.ShellCommand, shell,
+                               filters=CustomFilters.owner_filter, run_async=True)
 dispatcher.add_handler(SHELL_HANDLER)

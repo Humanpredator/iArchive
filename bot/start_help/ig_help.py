@@ -1,14 +1,13 @@
 from telegram.ext import CommandHandler
 from telegraph import Telegraph
-from bot import  dispatcher,telegraph_token
+from bot import dispatcher, telegraph_token
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.message_utils import *
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper import button_build
 
 
-
-help_string_telegraph=f'''
+help_string_telegraph = f'''
 <b>/{BotCommands.HelpCommand}</b>: To get this message
 <br><br>
 <b>/{BotCommands.IgLogoutCommand}</b>: To Logout Default Account.
@@ -48,16 +47,14 @@ help_string_telegraph=f'''
 '''
 
 ighelp = Telegraph(access_token=telegraph_token).create_page(
-        title='Instagram Bot Help',
-        author_name='SUBIN',
-        author_url='https://github.com/subinps',
-        html_content=help_string_telegraph,
-    )["path"]
+    title='Instagram Bot Help',
+    author_name='SUBIN',
+    author_url='https://github.com/subinps',
+    html_content=help_string_telegraph,
+)["path"]
 
 
-
-
-help_string=f'''
+help_string = f'''
 /{BotCommands.PingCommand}: Check how long it takes to Ping the Bot
 
 /{BotCommands.AuthorizeCommand}: Authorize a chat or a user to use the bot (Can only be invoked by Owner & Sudo of the bot)
@@ -89,5 +86,6 @@ def igbot_help(update, context):
     sendMarkup(help_string, context.bot, update, reply_markup)
 
 
-ighelp_handler = CommandHandler(BotCommands.HelpCommand, igbot_help, filters=CustomFilters.authorized_chat | CustomFilters.authorized_user | CustomFilters.owner_filter, run_async=True)
+ighelp_handler = CommandHandler(BotCommands.HelpCommand, igbot_help, filters=CustomFilters.authorized_chat |
+                                CustomFilters.authorized_user | CustomFilters.owner_filter, run_async=True)
 dispatcher.add_handler(ighelp_handler)

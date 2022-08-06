@@ -9,17 +9,17 @@ class _BotCommands:
         self.PingCommand = 'ping'
         self.RestartCommand = 'restart'
         self.SpeedCommand = 'speedtest'
-        self.StatsCommand = 'stats'#10
+        self.StatsCommand = 'stats'  # 10
         self.HelpCommand = 'help'
         self.LogCommand = 'log'
         self.ShellCommand = 'sl'
         self.IgPostCommand = 'posts'
         self.IgTvCommand = 'igtv'
-        self.IgFollowersCommand= 'followers'
-        self.IgFollowingCommand= 'following'
-        self.IgFansCommand= 'fans'
+        self.IgFollowersCommand = 'followers'
+        self.IgFollowingCommand = 'following'
+        self.IgFansCommand = 'fans'
         self.IgNotFollowingCommand = 'notfollowing'
-        self.IgFeedCommand = 'feed'#10
+        self.IgFeedCommand = 'feed'  # 10
         self.IgSavedCommand = 'saved'
         self.IgTaggedCommand = 'tagged'
         self.IgStoryCommand = 'story'
@@ -29,5 +29,7 @@ class _BotCommands:
         self.IgLogoutCommand = 'logout'
         self.IgAccountCommand = 'account'
         self.IgSearchCommand = 'ig'
-        self.IgMirrorCommand='mirror'#10
+        self.IgMirrorCommand = 'mirror'  # 10
+
+
 BotCommands = _BotCommands()

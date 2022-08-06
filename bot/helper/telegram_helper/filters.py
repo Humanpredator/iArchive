@@ -1,6 +1,7 @@
 from telegram.ext import MessageFilter
 from bot import AUTHORIZED_CHATS, SUDO_USERS, OWNER_ID
 
+
 class CustomFilters:
     class _OwnerFilter(MessageFilter):
         def filter(self, message):
@@ -22,8 +23,7 @@ class CustomFilters:
     authorized_chat = _AuthorizedChat()
 
     class _SudoUser(MessageFilter):
-        def filter(self,message):
+        def filter(self, message):
             return bool(message.from_user.id in SUDO_USERS)
 
     sudo_user = _SudoUser()
-

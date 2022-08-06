@@ -5,9 +5,10 @@ S = "0"
 STATUS = set(int(x) for x in (S).split())
 L = Instaloader()
 
+
 def generate():
     id = input("Now Enter your Instagram username:")
-    pwd = maskpass.askpass(mask="*") 
+    pwd = maskpass.askpass(mask="*")
     try:
         L.login(id, pwd)
         L.save_session_to_file(filename=f"./{id}")
@@ -25,11 +26,15 @@ def generate():
     except Exception as e:
         print(e)
         return
-    print("Successfully Logged into Instagram")
+    print("Succesfully Logged into Instagram")
+
+
 def usersavelocal(username):
-    file = open("username.txt","w")
+    file = open("username.txt", "w")
     if os.path.isfile("username.txt"):
         with open("username.txt") as f:
             file.write(username)
             file.close()
+
+
 generate()

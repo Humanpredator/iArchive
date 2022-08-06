@@ -1,21 +1,24 @@
-import shutil, psutil
+import shutil
+import psutil
 import signal
 import os
 import time
 from sys import executable
+from pyrogram import idle
 
 from telegram import ParseMode
 from telegram.ext import CommandHandler
 
-from bot import IGNORE_PENDING_REQUESTS, LOGGER, bot, app, dispatcher, updater, botStartTime, OWNER_ID, AUTHORIZED_CHATS,L,STATUS
+from bot import IGNORE_PENDING_REQUESTS, LOGGER, bot, app, dispatcher, updater, botStartTime, OWNER_ID, AUTHORIZED_CHATS, L, STATUS
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.message_utils import *
 from bot.helper.ext_utils.bot_utils import usercheck
 from .helper.ext_utils.bot_utils import get_readable_file_size, get_readable_time
 from .helper.telegram_helper.filters import CustomFilters
 from bot.helper.ext_utils import fs_utils
-from .modules import authorize, shell, speedtest,callback,insta_cmds,login,utlis
+from .modules import authorize, shell, speedtest, callback, insta_cmds, login, utlis
 from .start_help import ig_help, start
+
 
 def stats(update, context):
     currentTime = get_readable_time(time.time() - botStartTime)
@@ -39,13 +42,16 @@ def stats(update, context):
             f'<b>DISK:</b> <code>{disk}%</code>'
     sendMessage(stats, context.bot, update)
 
+
 def restart(update, context):
-    restart_message = sendMessage("Restarting, Please wait!", context.bot, update)
+    restart_message = sendMessage(
+        "Restarting, Please wait!", context.bot, update)
     # Save restart message object in order to reply to it after restarting
     with open(".restartmsg", "w") as f:
         f.truncate(0)
         f.write(f"{restart_message.chat.id}\n{restart_message.message_id}\n")
     os.execl(executable, executable, "-m", "bot")
+
 
 def ping(update, context):
     start_time = int(round(time.time() * 1000))
@@ -53,17 +59,19 @@ def ping(update, context):
     end_time = int(round(time.time() * 1000))
     editMessage(f'{end_time - start_time} ms', reply)
 
+
 def log(update, context):
     sendLogFile(context.bot, update)
+
 
 def main():
     fs_utils.start_cleanup()
     try:
-        USER=usercheck()
+        USER = usercheck()
         os.path.exists(f"./{USER}")
         L.load_session_from_file(USER, filename=f"./{USER}")
         STATUS.add(1)
-        LOGGER.info(f"{USER}Session file loaded")   
+        LOGGER.info(f"{USER}-Session file loaded")
     except FileNotFoundError:
         LOGGER.info("Session file not Found")
     # Check if the bot is restarting
@@ -75,10 +83,12 @@ def main():
     elif OWNER_ID:
         try:
             text = "<b>Bot Restarted!</b>"
-            bot.sendMessage(chat_id=OWNER_ID, text=text, parse_mode=ParseMode.HTML)
+            bot.sendMessage(chat_id=OWNER_ID, text=text,
+                            parse_mode=ParseMode.HTML)
             if AUTHORIZED_CHATS:
                 for i in AUTHORIZED_CHATS:
-                    bot.sendMessage(chat_id=i, text=text, parse_mode=ParseMode.HTML)
+                    bot.sendMessage(chat_id=i, text=text,
+                                    parse_mode=ParseMode.HTML)
         except Exception as e:
             LOGGER.warning(e)
 
@@ -88,15 +98,17 @@ def main():
                                      filters=CustomFilters.owner_filter | CustomFilters.sudo_user, run_async=True)
     stats_handler = CommandHandler(BotCommands.StatsCommand,
                                    stats, filters=CustomFilters.authorized_chat | CustomFilters.authorized_user, run_async=True)
-    log_handler = CommandHandler(BotCommands.LogCommand, log, filters=CustomFilters.owner_filter | CustomFilters.sudo_user, run_async=True)
+    log_handler = CommandHandler(
+        BotCommands.LogCommand, log, filters=CustomFilters.owner_filter | CustomFilters.sudo_user, run_async=True)
     dispatcher.add_handler(ping_handler)
     dispatcher.add_handler(restart_handler)
     dispatcher.add_handler(stats_handler)
     dispatcher.add_handler(log_handler)
     updater.start_polling(drop_pending_updates=IGNORE_PENDING_REQUESTS)
     LOGGER.info("Bot Started!")
-    signal.signal(signal.SIGINT,fs_utils.exit_clean_up)
+    signal.signal(signal.SIGINT, fs_utils.exit_clean_up)
+
 
 app.start()
 main()
-
+idle()

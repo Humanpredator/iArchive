@@ -1,5 +1,4 @@
 import logging
-import threading
 import os
 import re
 
@@ -19,12 +18,13 @@ def get_readable_file_size(size_in_bytes) -> str:
     except IndexError:
         return 'File too large'
 
+
 def fcount(dir):
     APP_FOLDER = dir
     totalFiles = 0
     totalDir = 0
     for base, dirs, files in os.walk(APP_FOLDER):
-        print('Searching in : ',base)
+        print('Searching in : ', base)
         for directories in dirs:
             totalDir += 1
         for Files in files:
@@ -32,18 +32,14 @@ def fcount(dir):
     LOGGER.info(f'Total Files: {totalFiles}')
     return totalFiles
 
+
 def fsize(dir):
-    # assign size
     size = 0
-    
-    # assign folder path
-    Folderpath = dir 
-    
-    # get size
+    Folderpath = dir
     for ele in os.scandir(Folderpath):
-        size+=os.stat(ele).st_size
-        
-    return size    
+        size += os.stat(ele).st_size
+    return size
+
 
 def get_readable_time(seconds: int) -> str:
     result = ''
@@ -63,12 +59,22 @@ def get_readable_time(seconds: int) -> str:
     result += f'{seconds}s'
     return result
 
+
+def progress_bar(count, size):
+    percent = 100
+    bar_length = 20
+    pbar = ("\r[{:20s}] {:2.1f}%".format(
+        '#'*int(count/size*bar_length), count/size*percent))
+    return pbar
+
+
 def usersave(username):
-    file = open("username.txt","w")
+    file = open("username.txt", "w")
     if os.path.isfile("username.txt"):
         with open("username.txt") as f:
             file.write(username)
             file.close()
+
 
 def usercheck():
     if os.path.isfile("username.txt"):
@@ -77,12 +83,12 @@ def usercheck():
             return username
 
 
-
 def acc_type(val):
     if(val):
         return "🔒Private🔒"
     else:
         return "🔓Public🔓"
+
 
 def yes_or_no(val):
     if(val):
@@ -90,21 +96,10 @@ def yes_or_no(val):
     else:
         return "No"
 
+
 def is_link(args):
     iglink = r'^https://www\.instagram\.com/([A-Za-z0-9._]+/)?(p|tv|reel)/([A-Za-z0-9\-_]*)'
     if re.search(iglink, args):
         return True
-    else:  
+    else:
         return False
-
-def new_thread(fn):
-    """To use as decorator to make a function call threaded.
-    Needs import
-    from threading import Thread"""
-
-    def wrapper(*args, **kwargs):
-        thread = threading.Thread(target=fn, args=args, kwargs=kwargs)
-        thread.start()
-        return thread
-
-    return wrapper

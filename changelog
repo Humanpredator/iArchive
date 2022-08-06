@@ -1,0 +1,5 @@
+IS-v1.0 beta-stable release(2022-08-06)
+-Added Tgupload.
+-Added G-drive Upload.
+-Added Progress bar.
+-Improved Upload (both Gdrive and TG) Function and Messages.

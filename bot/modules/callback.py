@@ -32,7 +32,6 @@ def cb_handler(update, context):
                           caption=f"<b>Name:</b>{name}\n<b>Username:</b>{username}", parse_mode="HTML")
 
     elif query.data.startswith("post"):
-        query.delete_message()
         query.answer()
         reply_markup = InlineKeyboardMarkup(
             [
@@ -205,17 +204,17 @@ def cb_handler(update, context):
         chat_id = query.message.chat.id
         m = bot.send_message(chat_id, f"Fetching Followers List of {name}")
         try:
-            followers = f"**Followers List for {name}**\n\n"
+            followers=f"**Followers List for {name}**\n\n"
             f = profile.get_followers()
             for p in f:
-                followers += f"\nName: {p.username} : Link to Profile: www.instagram.com/{p.username}"
-            text_file = open(f"{username}'s followers.txt", "w")
+                followers += f"\nName: {p.username} :     Link to Profile: www.instagram.com/{p.username}"
+            text_file = open(f"{username}'s_followers_list.txt", mode='w', encoding='utf-8')
             text_file.write(followers)
             text_file.close()
             m.delete()
-            bot.send_document(chat_id=chat_id, document=open(
-                f"{username}'s followers.txt", "rb"))
-            os.remove(f"./{username}'s followers.txt")
+            bot.send_document(chat_id=chat_id, document=open(f"{username}'s_followers_list.txt", 'rb'), caption=f"Followers List for {name}")
+            os.remove(f"{username}'s_followers_list.txt")
+            LOGGER.info("followers list removed")
         except:
             bot.send_message(chat_id=chat_id, text=f"Error Occured")
             return
@@ -225,17 +224,16 @@ def cb_handler(update, context):
         chat_id = query.message.chat.id
         m = bot.send_message(chat_id, f"Fetching Following list of {name}")
         try:
-            followees = f"**Following List for {name}**\n\n"
+            followees=f"**Following List for {name}**\n\n"
             f = profile.get_followees()
             for p in f:
-                followees += f"\nName: {p.username} : Link to Profile: www.instagram.com/{p.username}"
-            text_file = open(f"{username}'s following.txt", "w")
+                followees += f"\nName: {p.username} :     Link to Profile: www.instagram.com/{p.username}"
+            text_file = open(f"{username}'s_following_list.txt", mode='w', encoding='utf-8')
             text_file.write(followees)
             text_file.close()
             m.delete()
-            bot.send_document(chat_id=chat_id, document=open(
-                f"{username}'s following.txt", 'rb'), caption=f"<b>{name}'s following</b>", parse_mode='HTML')
-            os.remove(f"./{username}'s following.txt")
+            bot.send_document(chat_id=chat_id, document=open(f"{username}'s_following_list.txt", 'rb'), caption=f"Following List for {name}")
+            os.remove(f"{username}'s_following_list.txt")
             LOGGER.info("following list removed")
         except:
             bot.send_message(chat_id=chat_id, text=f"Error Occured")

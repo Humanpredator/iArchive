@@ -23,6 +23,8 @@ def download_insta(command, m, dir, username, chat_id, fetch):
             output = process.stdout.readline()
             if output == b'':
                 print("Finished Output")
+                subfolder(dir)
+                gup(dir, m, username, fetch)
                 break
             if output:
                 datetime_ist = datetime.now(IST)
@@ -56,8 +58,6 @@ def download_insta(command, m, dir, username, chat_id, fetch):
                     pass
                 return True
         LOGGER.info(f"Download Completed-{dir}")
-        subfolder(dir)
-        gup(dir, m, username, fetch)
         if TG_UPLOAD:
             tgup(chat_id, dir)
         else:

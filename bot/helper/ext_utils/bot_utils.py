@@ -24,10 +24,10 @@ def fcount(dir):
     totalFiles = 0
     totalDir = 0
     for base, dirs, files in os.walk(APP_FOLDER):
-        print('Searching in : ', base)
-        for directories in dirs:
+
+        for _ in dirs:
             totalDir += 1
-        for Files in files:
+        for _ in files:
             totalFiles += 1
     LOGGER.info(f'Total Files: {totalFiles}')
     return totalFiles
@@ -35,8 +35,8 @@ def fcount(dir):
 
 def fsize(dir):
     size = 0
-    Folderpath = dir
-    for ele in os.scandir(Folderpath):
+    folderpath = dir
+    for ele in os.scandir(folderpath):
         size += os.stat(ele).st_size
     return size
 
@@ -84,14 +84,14 @@ def usercheck():
 
 
 def acc_type(val):
-    if(val):
+    if val:
         return "🔒Private🔒"
     else:
         return "🔓Public🔓"
 
 
 def yes_or_no(val):
-    if(val):
+    if val:
         return "Yes"
     else:
         return "No"

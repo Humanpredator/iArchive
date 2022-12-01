@@ -1,14 +1,17 @@
-import pytz
 import subprocess
-import time
-from bot.helper.ext_utils.fs_utils import clean_download, subfolder
-from bot.helper.upload_utilis.gdrive import gup
-from bot.helper.telegram_helper.message_utils import *
-from datetime import datetime
 import threading
-from bot.helper.ext_utils.bot_utils import usercheck
+import time
+from datetime import datetime
+
+import pytz
+
 from bot import DOWNLOAD_STATUS_UPDATE_INTERVAL, TG_UPLOAD
+from bot.helper.ext_utils.bot_utils import usercheck
+from bot.helper.ext_utils.fs_utils import clean_download, subfolder
+from bot.helper.telegram_helper.message_utils import *
+from bot.helper.upload_utilis.gdrive import gup
 from bot.helper.upload_utilis.tg_upload import tgup
+
 IST = pytz.timezone('Asia/Kolkata')
 
 
@@ -22,7 +25,7 @@ def download_insta(command, m, dir, username, chat_id, fetch):
         while True:
             output = process.stdout.readline()
             if output == b'':
-                print("Finished Output")
+
                 subfolder(dir)
                 gup(dir, m, username, fetch)
                 break
@@ -41,7 +44,7 @@ def download_insta(command, m, dir, username, chat_id, fetch):
         while True:
             error = process.stderr.readline()
             if error == b'':
-                print("Finished No error")
+
                 break
             if error:
                 datetime_ist = datetime.now(IST)
@@ -61,8 +64,9 @@ def download_insta(command, m, dir, username, chat_id, fetch):
         if TG_UPLOAD:
             tgup(chat_id, dir)
         else:
-            print("TG_UPLOAD is disabled")
+
             pass
         clean_download(dir)
+
     threading.Thread(target=download, args=(command, m, dir, fetch)).start()
     return True

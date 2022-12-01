@@ -1,19 +1,21 @@
+import faulthandler
 import logging
 import os
-import time
 import random
+import socket
 import string
-import requests
+import subprocess
 import time
+
+import psycopg2
+import requests
 import telegram.ext as tg
 from dotenv import load_dotenv
+from instaloader import Instaloader
+from psycopg2 import Error
 from pyrogram import Client
 from telegraph import Telegraph
-import psycopg2
-from psycopg2 import Error
-import socket
-import faulthandler
-from instaloader import Instaloader
+
 faulthandler.enable()
 socket.setdefaulttimeout(600)
 
@@ -79,14 +81,14 @@ try:
     achats = achats.split(" ")
     for chats in achats:
         AUTHORIZED_CHATS.add(int(chats))
-except:
+except KeyError:
     pass
 try:
     schats = getConfig('SUDO_USERS')
     schats = schats.split(" ")
     for chats in schats:
         SUDO_USERS.add(int(chats))
-except:
+except KeyError:
     pass
 try:
     BOT_TOKEN = getConfig('BOT_TOKEN')
@@ -96,7 +98,7 @@ try:
     OWNER_ID = int(getConfig('OWNER_ID'))
     TELEGRAM_API = getConfig('TELEGRAM_API')
     TELEGRAM_HASH = getConfig('TELEGRAM_HASH')
-except KeyError as e:
+except KeyError:
     LOGGER.error("One or more env variables missing! Exiting now")
     exit(1)
 try:
@@ -128,12 +130,12 @@ if DB_URI is not None:
 
 LOGGER.info("Generating USER_SESSION_STRING")
 app = Client('insta_scrap', api_id=int(TELEGRAM_API),
-             api_hash=TELEGRAM_HASH, bot_token=BOT_TOKEN,)
+             api_hash=TELEGRAM_HASH, bot_token=BOT_TOKEN)
 
 # IG CONFIG
 S = "0"
-STATUS = set(int(x) for x in (S).split())
-L = Instaloader()
+STATUS = set(int(x) for x in S.split())
+INSTA = Instaloader()
 
 # Generate Telegraph Token
 sname = ''.join(random.SystemRandom().choices(string.ascii_letters, k=8))
@@ -149,13 +151,13 @@ except KeyError:
     IGNORE_PENDING_REQUESTS = False
 try:
     INDEX_URL = getConfig("INDEX_URL")
-except:
+except KeyError:
     INDEX_URL = False
 
 try:
     TG_UPLOAD = getConfig("TG_UPLOAD")
     TG_UPLOAD = TG_UPLOAD.lower() == 'true'
-except:
+except KeyError:
     TG_UPLOAD = False
 
 updater = tg.Updater(token=BOT_TOKEN)

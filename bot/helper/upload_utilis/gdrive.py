@@ -1,13 +1,14 @@
+import os
+from os import path
+
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
-import os
-import time
-from bot import LOGGER, parent_id, INDEX_URL
-from os import path
-from pyrogram import *
+
+from bot import parent_id, INDEX_URL
 from bot.helper.ext_utils.bot_utils import fcount, get_readable_file_size, fsize, progress_bar
-from bot.helper.telegram_helper.message_utils import *
 from bot.helper.telegram_helper import button_build
+from bot.helper.telegram_helper.message_utils import *
+
 DRIVE = parent_id
 
 
@@ -37,8 +38,8 @@ def gup(dir, m, username, fetch):
         # Get list the Files in Given gUserFolderID
         gListFolderstr = "\'" + gFolderID + "\'" + " in parents and trashed=false"
         gfile_list = drive.ListFile({'q': gListFolderstr, 'supportsAllDrives': True,
-                                    'includeItemsFromAllDrives': True}).GetList()  # List the Files using gListFolderstr
-        if gfile_list == []:
+                                     'includeItemsFromAllDrives': True}).GetList()  # List the Files using gListFolderstr
+        if not gfile_list:
             folderid = None
             foldername = None
         else:
@@ -70,9 +71,9 @@ def gup(dir, m, username, fetch):
 
             # compare files in matchFolderId with Local Files
             gcmpListFolderstr = "\'" + matchedFolderID + "\'" + \
-                " in parents and trashed=false"  # get list the Files in Given MatchedFolderID
+                                " in parents and trashed=false"  # get list the Files in Given MatchedFolderID
             gcmpfile_list = drive.ListFile({'q': gcmpListFolderstr, 'supportsAllDrives': True,
-                                           'includeItemsFromAllDrives': True}).GetList()  # list the Files using gListFolderstr
+                                            'includeItemsFromAllDrives': True}).GetList()  # list the Files using gListFolderstr
 
             # get list Of Files in both Dir
             for gfilelist in gcmpfile_list:
@@ -93,10 +94,10 @@ def gup(dir, m, username, fetch):
                             file1.Delete()
                             LOGGER.info(
                                 f'File {tfile} is Successfully deleted')
-                except:
+                except FileNotFoundError:
                     pass
 
-            # Upload the Deleted Files
+                # Upload the Deleted Files
                 # filename allocation
                 filename = os.path.join(directory, localfilelist)
                 # where the files will be uploaded
@@ -105,16 +106,16 @@ def gup(dir, m, username, fetch):
                 gfile.SetContentFile(filename)  # set gfilename
                 count += 1
                 msg = f'''
-<b>Uploading: </b><code>{progress_bar(count,fcount(dir))}</code>                
+<b>Uploading: </b><code>{progress_bar(count, fcount(dir))}</code>                
 <b>Files: </b><code>0{count}/{fcount(dir)}</code>
 <b>File Name: </b><code>{localfilelist}</code>
 <b>Folder Size: </b><code>{get_readable_file_size(fsize(dir))}</code>
 '''
                 gfile.Upload()  # upload
                 try:
-                    time.sleep(3)
                     editMessage(msg, m)
-                except:
+                except Exception as e:
+                    LOGGER.info(e)
                     pass
                 LOGGER.info(f'File {localfilelist} is Successfully Uploaded')
             msg = f'''
@@ -133,10 +134,10 @@ def gup(dir, m, username, fetch):
             LOGGER.info(f'Uploaded Completed: {username}')
             editMessage(msg, m, markup)
             return True
-    # else part To Create New GFolde for the Dir And Upload the Files...!
+        # else part To Create New GFolde for the Dir And Upload the Files...!
         else:
             # Create folder for the title dir
-            folder_metadata = {'title': dir, "parents":  [
+            folder_metadata = {'title': dir, "parents": [
                 {"id": gFolderID}], 'mimeType': 'application/vnd.google-apps.folder'}  # meta data for gfolder
             gFolderCreate = drive.CreateFile(
                 folder_metadata)  # set gfolderename
@@ -156,16 +157,16 @@ def gup(dir, m, username, fetch):
                 gfile.SetContentFile(filename)  # set gfilename
                 count += 1
                 msg = f'''
-<b>Uploading: </b><code>{progress_bar(count,fcount(dir))}</code>                
+<b>Uploading: </b><code>{progress_bar(count, fcount(dir))}</code>                
 <b>Files: </b><code>0{count}/{fcount(dir)}</code>
 <b>File Name: </b><code>{localfilelist}</code>
 <b>Folder Size: </b><code>{get_readable_file_size(fsize(dir))}</code>
 '''
                 gfile.Upload()  # upload
                 try:
-                    time.sleep(3)
                     editMessage(msg, m)
-                except:
+                except Exception as e:
+                    LOGGER.info(e)
                     pass
                 LOGGER.info(f'File {localfilelist} is Successfully Uploaded')
             LOGGER.info(f'All Files was Successfully Uploaded')

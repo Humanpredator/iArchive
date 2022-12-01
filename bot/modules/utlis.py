@@ -3,12 +3,12 @@ from bot.helper.ext_utils.bot_utils import usercheck, acc_type, yes_or_no
 from instaloader import Profile
 from bot.helper.telegram_helper.message_utils import *
 from bot.helper.telegram_helper.filters import CustomFilters
-from bot import dispatcher, L, STATUS
+from bot import dispatcher, INSTA, STATUS
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from telegram.ext import CommandHandler
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton
 from bot.helper.down_utilis.insta_down import download_insta
-insta = L
+
 
 
 def account(update, context):
@@ -16,13 +16,13 @@ def account(update, context):
         m = sendMessage("Getting your data, please wait...!",
                         context.bot, update)
         try:
-            profile = Profile.own_profile(insta.context)
-            mediacount = profile.mediacount
+            profile = Profile.own_profile(INSTA.context)
+            media_count = profile.mediacount
             name = profile.full_name
             bio = profile.biography
-            profilepic = profile.profile_pic_url
+            ppic = profile.profile_pic_url
             username = profile.username
-            igtvcount = profile.igtvcount
+            igtv_count = profile.igtvcount
             followers = profile.followers
             following = profile.followees
             reply_markup = InlineKeyboardMarkup(
@@ -69,8 +69,8 @@ def account(update, context):
             deleteMessage(context.bot, m)
             bot.send_photo(
                 chat_id=update.message.chat.id,
-                photo=profilepic,
-                caption=f"You are already logged in as {name}\n\n<b>Your Account Details</b>\n\n🏷 <b>Name</b>: {name}\n🔖 <b>Username</b>: {profile.username}\n📝 <b>Bio</b>: {bio}\n📍 <b>Account Type</b>: {acc_type(profile.is_private)}\n🏭 <b>Is Business Account?</b>: {yes_or_no(profile.is_business_account)}\n👥 <b>Total Followers</b>: {followers}\n👥 <b>Total Following</b>: {following}\n📸 <b>Total Posts</b>: {mediacount}\n📺 <b>IGTV Videos</b>: {igtvcount}", parse_mode="HTML",
+                photo=ppic,
+                caption=f"You are already logged in as {name}\n\n<b>Your Account Details</b>\n\n🏷 <b>Name</b>: {name}\n🔖 <b>Username</b>: {profile.username}\n📝 <b>Bio</b>: {bio}\n📍 <b>Account Type</b>: {acc_type(profile.is_private)}\n🏭 <b>Is Business Account?</b>: {yes_or_no(profile.is_business_account)}\n👥 <b>Total Followers</b>: {followers}\n👥 <b>Total Following</b>: {following}\n📸 <b>Total Posts</b>: {media_count}\n📺 <b>IGTV Videos</b>: {igtv_count}", parse_mode="HTML",
                 reply_markup=reply_markup
             )
         except Exception as e:
@@ -128,15 +128,15 @@ def mirror(update, context):
                 download_insta(command, m, dir, username,
                                chat_id, fetch='posts')
             except Exception as e:
-                print(e)
-                editMessage(f"Error: {e}", m)
+                LOGGER.error(e)
+                editMessage(f"Error Occurred: {e}", m)
                 pass
         else:
             msg = "Unsupported Format"
             editMessage(msg, m)
             return
     else:
-        sendMessage("send insta post links after /mirror ",
+        sendMessage("Send insta post links after /mirror ",
                     context.bot, update)
 
 
@@ -155,19 +155,18 @@ def ig(update, context):
             msg = f"Fetching details for <code>@{username}</code>\nWait for a while🔗"
             editMessage(msg, m)
             try:
-                profile = Profile.from_username(insta.context, username)
-                mediacount = profile.mediacount
+                profile = Profile.from_username(INSTA.context, username)
+                media_count = profile.mediacount
                 name = profile.full_name
-                profilepic = profile.profile_pic_url
-                igtvcount = profile.igtvcount
+                ppic = profile.profile_pic_url
+                igtv_count = profile.igtvcount
                 bio = profile.biography
                 followers = profile.followers
                 following = profile.followees
                 is_followed = yes_or_no(profile.followed_by_viewer)
                 is_following = yes_or_no(profile.follows_viewer)
-                type = acc_type(profile.is_private)
-                if type == "🔒Private🔒" and is_followed == "No":
-                    print("reached")
+                ac_type = acc_type(profile.is_private)
+                if ac_type == "🔒Private🔒" and is_followed == "No":
                     reply_markup = InlineKeyboardMarkup(
                         [
                             [
@@ -213,34 +212,34 @@ def ig(update, context):
                 try:
                     bot.send_photo(
                         chat_id=update.message.chat.id,
-                        photo=profilepic,
-                        caption=f"🏷 <b>Name</b>: {name}\n🔖 <b>Username</b>: {profile.username}\n📝 <b>Bio</b>: {bio}\n📍 <b>Account Type</b>: {acc_type(profile.is_private)}\n🏭 <b>Is Business Account?</b>: {yes_or_no(profile.is_business_account)}\n👥 <b>Total Followers</b>: {followers}\n👥 <b>Total Following</b>: {following}\n<b>👤 Is {name} Following You?</b>: {is_following}\n<b>👤 Is You Following {name} </b>: {is_followed}\n📸 <b>Total Posts</b>: {mediacount}\n📺 <b>IGTV Videos</b>: {igtvcount}", parse_mode="HTML",
+                        photo=ppic,
+                        caption=f"🏷 <b>Name</b>: {name}\n🔖 <b>Username</b>: {profile.username}\n📝 <b>Bio</b>: {bio}\n📍 <b>Account Type</b>: {acc_type(profile.is_private)}\n🏭 <b>Is Business Account?</b>: {yes_or_no(profile.is_business_account)}\n👥 <b>Total Followers</b>: {followers}\n👥 <b>Total Following</b>: {following}\n<b>👤 Is {name} Following You?</b>: {is_following}\n<b>👤 Is You Following {name} </b>: {is_followed}\n📸 <b>Total Posts</b>: {media_count}\n📺 <b>IGTV Videos</b>: {igtv_count}", parse_mode="HTML",
                         reply_markup=reply_markup
                     )
                 except Exception as e:
-                    print(e)
-                    editMessage(e, m)
+                    LOGGER.error(e)
+                    editMessage(f"Error Occurred: {e}", m)
             except Exception as e:
-                print(e)
-                editMessage(e, m)
+                LOGGER.error(e)
+                editMessage(f"Error Occurred: {e}", m)
                 pass
         else:
             msg = f"Fetching details for <code>@{username}</code>\nWait for a while🔗"
             editMessage(msg, m)
             try:
-                profile = Profile.from_username(insta.context, username)
-                mediacount = profile.mediacount
+                profile = Profile.from_username(INSTA.context, username)
+                media_count = profile.mediacount
                 name = profile.full_name
-                profilepic = profile.profile_pic_url
-                igtvcount = profile.igtvcount
+                ppic = profile.profile_pic_url
+                igtv_count = profile.igtvcount
                 bio = profile.biography
                 followers = profile.followers
                 following = profile.followees
                 is_followed = yes_or_no(profile.followed_by_viewer)
                 is_following = yes_or_no(profile.follows_viewer)
-                type = acc_type(profile.is_private)
-                if type == "🔒Private🔒" and is_followed == "No":
-                    print("reached")
+                ac_type = acc_type(profile.is_private)
+                if ac_type == "🔒Private🔒" and is_followed == "No":
+
                     reply_markup = InlineKeyboardMarkup(
                         [
                             [
@@ -286,16 +285,16 @@ def ig(update, context):
                 try:
                     bot.send_photo(
                         chat_id=update.message.chat.id,
-                        photo=profilepic,
-                        caption=f"🏷 <b>Name</b>: {name}\n🔖 <b>Username</b>: {profile.username}\n📝 <b>Bio</b>: {bio}\n📍 <b>Account Type</b>: {acc_type(profile.is_private)}\n🏭 <b>Is Business Account?</b>: {yes_or_no(profile.is_business_account)}\n👥 <b>Total Followers</b>: {followers}\n👥 <b>Total Following</b>: {following}\n<b>👤 Is {name} Following You?</b>: {is_following}\n<b>👤 Is You Following {name} </b>: {is_followed}\n📸 <b>Total Posts</b>: {mediacount}\n📺 <b>IGTV Videos</b>: {igtvcount}", parse_mode="HTML",
+                        photo=ppic,
+                        caption=f"🏷 <b>Name</b>: {name}\n🔖 <b>Username</b>: {profile.username}\n📝 <b>Bio</b>: {bio}\n📍 <b>Account Type</b>: {acc_type(profile.is_private)}\n🏭 <b>Is Business Account?</b>: {yes_or_no(profile.is_business_account)}\n👥 <b>Total Followers</b>: {followers}\n👥 <b>Total Following</b>: {following}\n<b>👤 Is {name} Following You?</b>: {is_following}\n<b>👤 Is You Following {name} </b>: {is_followed}\n📸 <b>Total Posts</b>: {media_count}\n📺 <b>IGTV Videos</b>: {igtv_count}", parse_mode="HTML",
                         reply_markup=reply_markup
                     )
                 except Exception as e:
-                    print(e)
-                    editMessage(e, m)
+                    LOGGER.error(e)
+                    editMessage(f"Error Occurred: {e}", m)
             except Exception as e:
-                print(e)
-                editMessage(e, m)
+                LOGGER.error(e)
+                editMessage(f"Error Occurred: {e}", m)
                 pass
     else:
         sendMessage("Send username or profile link /ig ", context.bot, update)

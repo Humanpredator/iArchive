@@ -9,15 +9,17 @@ from pyrogram import idle
 from telegram import ParseMode
 from telegram.ext import CommandHandler
 
-from bot import IGNORE_PENDING_REQUESTS, LOGGER, bot, app, dispatcher, updater, botStartTime, OWNER_ID, AUTHORIZED_CHATS, L, STATUS
+from bot import IGNORE_PENDING_REQUESTS, app, dispatcher, updater, botStartTime, OWNER_ID, AUTHORIZED_CHATS, INSTA, \
+    STATUS
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.message_utils import *
 from bot.helper.ext_utils.bot_utils import usercheck
-from .helper.ext_utils.bot_utils import get_readable_file_size, get_readable_time
-from .helper.telegram_helper.filters import CustomFilters
+from bot.helper.ext_utils.bot_utils import get_readable_file_size, get_readable_time
+from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.ext_utils import fs_utils
-from .modules import authorize, shell, speedtest, callback, insta_cmds, login, utlis
-from .start_help import ig_help, start
+
+from bot.modules import authorize, shell, speedtest, callback, insta_cmds, login, utlis
+from bot.start_help import ig_help, start
 
 
 def stats(update, context):
@@ -69,7 +71,7 @@ def main():
     try:
         USER = usercheck()
         os.path.exists(f"./{USER}")
-        L.load_session_from_file(USER, filename=f"./{USER}")
+        INSTA.load_session_from_file(USER, filename=f"./{USER}")
         STATUS.add(1)
         LOGGER.info(f"{USER}-Session file loaded")
     except FileNotFoundError:

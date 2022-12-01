@@ -12,17 +12,16 @@ def subpath(path):
             if it.is_dir():
                 subfolder.append(it.path)
         return subfolder
-    except:
+    except FileNotFoundError:
         pass
 
 
 def rmv(subdir):
     dir = Path(subdir).is_dir()
-    if dir == True:
+    if dir:
         shutil.rmtree(subdir)
-        print("sub folder successfully removed")
     else:
-        print("Path doesn't exists....Skiped!")
+
         pass
 
 
@@ -33,11 +32,9 @@ def subfolder(DIR):
             files = os.listdir(dir)
             for file in files:
                 file_name = os.path.join(dir, file)
-                shutil.move(file_name, DIR + '/'+file)
-                print("Files Moved")
-                print(f'{DIR},{file_name}')
+                shutil.move(file_name, DIR + '/' + file)
             rmv(dir)
-    except:
+    except FileNotFoundError:
         pass
 
 

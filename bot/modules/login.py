@@ -3,11 +3,11 @@ import os
 from instaloader import Profile, TwoFactorAuthRequiredException, BadCredentialsException
 from bot.helper.telegram_helper.message_utils import *
 from bot.helper.telegram_helper.filters import CustomFilters
-from bot import dispatcher, L, STATUS
+from bot import dispatcher, INSTA, STATUS
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from telegram.ext import CommandHandler, MessageHandler, Filters, ConversationHandler
 
-insta = L
+insta = INSTA
 CODE_SAVE = range(2)
 
 
@@ -22,7 +22,7 @@ def user_login(update, context):
             f"Checking given user @{username} and password.\nPlease Wait...!", context.bot, update)
         if 1 in STATUS:
             editMessage(f"@{USER} is already logged in.\nTry to /logout.", m)
-        elif is_link(args[1]) == True:
+        elif is_link(args[1]):
             editMessage("Don't use links...!", m)
         else:
             try:
@@ -33,18 +33,18 @@ def user_login(update, context):
                 editMessage(
                     f"Fetching the details of @{username}\n Please wait...!", m)
                 profile = Profile.from_username(insta.context, username)
-                mediacount = profile.mediacount
+                media_count = profile.mediacount
                 name = profile.full_name
                 bio = profile.biography
-                profilepic = profile.profile_pic_url
-                igtvcount = profile.igtvcount
+                ppic = profile.profile_pic_url
+                igtv_count = profile.igtvcount
                 followers = profile.followers
                 following = profile.followees
                 deleteMessage(context.bot, m)
                 bot.send_photo(
                     chat_id=update.message.chat.id,
-                    caption=f"You are successfully logged in as {name}\n\n<b>Your Account Details</b>\n\n🏷 <b>Name</b>: {name}\n🔖 <b>Username</b>: {profile.username}\n📝 <b>Bio</b>: {bio}\n📍 <b>Account Type</b>: {acc_type(profile.is_private)}\n🏭 <b>Is Business Account?</b>: {yes_or_no(profile.is_business_account)}\n👥 <b>Total Followers</b>: {followers}\n👥 <b>Total Following</b>: {following}\n📸 <b>Total Posts</b>: {mediacount}\n📺 <b>IGTV Videos</b>: {igtvcount}", parse_mode="HTML",
-                    photo=profilepic
+                    caption=f"You are successfully logged in as {name}\n\n<b>Your Account Details</b>\n\n🏷 <b>Name</b>: {name}\n🔖 <b>Username</b>: {profile.username}\n📝 <b>Bio</b>: {bio}\n📍 <b>Account Type</b>: {acc_type(profile.is_private)}\n🏭 <b>Is Business Account?</b>: {yes_or_no(profile.is_business_account)}\n👥 <b>Total Followers</b>: {followers}\n👥 <b>Total Following</b>: {following}\n📸 <b>Total Posts</b>: {media_count}\n📺 <b>IGTV Videos</b>: {igtv_count}", parse_mode="HTML",
+                    photo=ppic
                 )
                 return
 
@@ -72,7 +72,7 @@ def user_login(update, context):
             return
 
 
-def timeout(update, context):
+def timeout(update):
     update.message.reply_text('Oh! TimeOut.\nTry to /login again.')
     return ConversationHandler.END
 
@@ -80,7 +80,7 @@ def timeout(update, context):
 def codei(update, context):
     username = usercheck()
     codei = update.message.text
-    if codei.isdigit() == True:
+    if codei.isdigit():
         codei = int(codei)
         m = sendMessage(
             f"Checking given code.\n please wait...!", context.bot, update)
@@ -90,18 +90,18 @@ def codei(update, context):
             STATUS.add(1)
             editMessage("Fetching details from Instagram..!", m)
             profile = Profile.from_username(insta.context, username)
-            mediacount = profile.mediacount
+            media_count = profile.mediacount
             name = profile.full_name
             bio = profile.biography
-            profilepic = profile.profile_pic_url
-            igtvcount = profile.igtvcount
+            ppic = profile.profile_pic_url
+            igtv_count = profile.igtvcount
             followers = profile.followers
             following = profile.followees
             deleteMessage(context.bot, m)
             bot.send_photo(
                 chat_id=update.message.chat.id,
-                caption=f"You are successfully in as {name}\n\n<b>Your Account Details</b>\n\n🏷 <b>Name</b>: {name}\n🔖 <b>Username</b>: {profile.username}\n📝 <b>Bio</b>: {bio}\n📍 <b>Account Type</b>: {acc_type(profile.is_private)}\n🏭 <b>Is Business Account?</b>: {yes_or_no(profile.is_business_account)}\n👥 <b>Total Followers</b>: {followers}\n👥 <b>Total Following</b>: {following}\n📸 <b>Total Posts</b>: {mediacount}\n📺 <b>IGTV Videos</b>: {igtvcount}", parse_mode="HTML",
-                photo=profilepic
+                caption=f"You are successfully in as {name}\n\n<b>Your Account Details</b>\n\n🏷 <b>Name</b>: {name}\n🔖 <b>Username</b>: {profile.username}\n📝 <b>Bio</b>: {bio}\n📍 <b>Account Type</b>: {acc_type(profile.is_private)}\n🏭 <b>Is Business Account?</b>: {yes_or_no(profile.is_business_account)}\n👥 <b>Total Followers</b>: {followers}\n👥 <b>Total Following</b>: {following}\n📸 <b>Total Posts</b>: {media_count}\n📺 <b>IGTV Videos</b>: {igtv_count}", parse_mode="HTML",
+                photo=ppic
             )
         except BadCredentialsException:
             editMessage("Wrong credentials\n Try to /login again.", m)
@@ -117,7 +117,7 @@ def codei(update, context):
 def logout(update, context):
     USER = usercheck()
     if 1 in STATUS:
-        sendMessage("Your'e successfully logged out.", context.bot, update)
+        sendMessage("You're successfully logged out.", context.bot, update)
         STATUS.remove(1)
         os.remove(f"./{USER}")
         os.remove('username.txt')

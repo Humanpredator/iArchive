@@ -1,35 +1,33 @@
-import time
+import os
+
+
+from instaloader import Profile
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import InlineKeyboardButton
+from telegram.ext import CallbackQueryHandler
+
+from bot import dispatcher, OWNER_ID, INSTA
 from bot.helper.down_utilis.insta_down import download_insta
 from bot.helper.ext_utils.bot_utils import usercheck
-import os
-from instaloader import Profile
 from bot.helper.telegram_helper.message_utils import *
-from bot import dispatcher, OWNER_ID, L
-from telegram.ext import CallbackQueryHandler
-from telegram import InlineKeyboardMarkup, InlineKeyboardButton
-insta = L
 
 
-def cb_handler(update, context):
+def cb_handler(update):
     USER = usercheck()
     session = f"./{USER}"
     query = update.callback_query
     username = query.data.split("#")[1]
-    profile = Profile.from_username(insta.context, username)
-    mediacount = profile.mediacount
-    name = profile.full_name
-    profilepic = profile.profile_pic_url
-    igtvcount = profile.igtvcount
-    followers = profile.followers
-    folllowing = profile.followees
+    profile = Profile.from_username(INSTA.context, username)
+    media_count = profile.mediacount
+    full_name = profile.full_name
+    igtv_count = profile.igtvcount
 
     if query.data.startswith("ppic"):
-        profile = Profile.from_username(insta.context, username)
-        profilepichd = profile.profile_pic_url
+        profile = Profile.from_username(INSTA.context, username)
+        ppic_hd = profile.profile_pic_url
         query.answer()
-        bot.send_document(query.message.chat.id, profilepichd,
-                          caption=f"<b>Name:</b>{name}\n<b>Username:</b>{username}", parse_mode="HTML")
+        bot.send_document(query.message.chat.id, ppic_hd, caption=f"<b>Name:</b>{full_name}\n<b>Username:</b>{username}",
+                          parse_mode="HTML")
 
     elif query.data.startswith("post"):
         query.answer()
@@ -53,8 +51,9 @@ def cb_handler(update, context):
                          reply_markup=reply_markup, parse_mode="HTML")
 
     elif query.data.startswith("photos"):
+        query.answer()
         chat_id = query.message.chat.id
-        if mediacount == 0:
+        if media_count == 0:
             query.edit_message_text("There are no posts by the user")
             return
         else:
@@ -78,8 +77,9 @@ def cb_handler(update, context):
             download_insta(command, m, dir, username, chat_id, fetch='Photos')
 
     elif query.data.startswith("videos"):
+        query.answer()
         chat_id = query.message.chat.id
-        if mediacount == 0:
+        if media_count == 0:
             query.edit_message_text("There are no posts by the user")
             return
         m = query.edit_message_text(
@@ -102,8 +102,9 @@ def cb_handler(update, context):
         download_insta(command, m, dir, username, chat_id, fetch='Videos')
 
     elif query.data.startswith("picandvid"):
+        query.answer()
         chat_id = query.message.chat.id
-        if mediacount == 0:
+        if media_count == 0:
             query.edit_message_text("There are no posts by the user")
             return
         m = query.edit_message_text(
@@ -125,8 +126,9 @@ def cb_handler(update, context):
                        chat_id, fetch='Photos and Videos')
 
     elif query.data.startswith("allposts"):
+        query.answer()
         chat_id = query.message.chat.id
-        if mediacount == 0:
+        if media_count == 0:
             query.edit_message_text("There are no posts by the user")
             return
         m = query.edit_message_text(
@@ -150,7 +152,6 @@ def cb_handler(update, context):
         download_insta(command, m, dir, username, chat_id, fetch='All Posts')
 
     elif query.data.startswith("igtv"):
-        query.delete_message()
         query.answer()
         reply_markup = InlineKeyboardMarkup(
             [
@@ -162,11 +163,12 @@ def cb_handler(update, context):
             ]
         )
         bot.send_message(chat_id=query.message.chat.id,
-                         text=f"Do you want to download IGTV Posts of {name}?", reply_markup=reply_markup)
+                         text=f"Do you want to download IGTV Posts of {full_name}?", reply_markup=reply_markup)
 
     elif query.data.startswith("yes"):
+        query.answer()
         chat_id = query.message.chat.id
-        if igtvcount == 0:
+        if igtv_count == 0:
             query.edit_message_text("There are no IGTV posts by the user")
             return
         m = query.edit_message_text(
@@ -191,58 +193,64 @@ def cb_handler(update, context):
         download_insta(command, m, dir, username, chat_id, fetch='IGTV')
 
     elif query.data.startswith("no"):
-        query.delete_message()
         query.answer()
         m = bot.send_message(chat_id=query.message.chat.id,
                              text=f"Process Cancelled")
-        time.sleep(2)
         bot.delete_message(chat_id=query.message.chat.id,
                            message_id=m.message_id)
 
     elif query.data.startswith("followers"):
-        query.delete_message()
+        query.answer()
         chat_id = query.message.chat.id
-        m = bot.send_message(chat_id, f"Fetching Followers List of {name}")
+        m = bot.send_message(
+            chat_id, f"Fetching Followers List of {full_name}")
         try:
-            followers=f"**Followers List for {name}**\n\n"
+            followers = f"**Followers List for {full_name}**\n\n"
             f = profile.get_followers()
             for p in f:
-                followers += f"\nName: {p.username} :     Link to Profile: www.instagram.com/{p.username}"
-            text_file = open(f"{username}'s_followers_list.txt", mode='w', encoding='utf-8')
+                followers += f"\nName: {p.username}:Link to Profile: www.instagram.com/{p.username}"
+            text_file = open(f"{username}'s_followers_list.txt",
+                             mode='w', encoding='utf-8')
             text_file.write(followers)
             text_file.close()
             m.delete()
-            bot.send_document(chat_id=chat_id, document=open(f"{username}'s_followers_list.txt", 'rb'), caption=f"Followers List for {name}")
+            bot.send_document(chat_id=chat_id, document=open(f"{username}'s_followers_list.txt", 'rb'),
+                              caption=f"Followers List for {full_name}")
             os.remove(f"{username}'s_followers_list.txt")
-            LOGGER.info("followers list removed")
-        except:
-            bot.send_message(chat_id=chat_id, text=f"Error Occured")
+            LOGGER.info(f"Followers list of {full_name} removed")
+        except Exception as e:
+            LOGGER.error(e)
+            bot.send_message(chat_id=chat_id, text=f"Error Occurred: {e}")
             return
 
     elif query.data.startswith("following"):
-        query.delete_message()
+        query.answer()
         chat_id = query.message.chat.id
-        m = bot.send_message(chat_id, f"Fetching Following list of {name}")
+        m = bot.send_message(
+            chat_id, f"Fetching Following list of {full_name}")
         try:
-            followees=f"**Following List for {name}**\n\n"
+            followees = f"**Following List for {full_name}**\n\n"
             f = profile.get_followees()
             for p in f:
-                followees += f"\nName: {p.username} :     Link to Profile: www.instagram.com/{p.username}"
-            text_file = open(f"{username}'s_following_list.txt", mode='w', encoding='utf-8')
+                followees += f"\nName: {p.username}:Link to Profile: www.instagram.com/{p.username}"
+            text_file = open(f"{username}'s_following_list.txt",
+                             mode='w', encoding='utf-8')
             text_file.write(followees)
             text_file.close()
             m.delete()
-            bot.send_document(chat_id=chat_id, document=open(f"{username}'s_following_list.txt", 'rb'), caption=f"Following List for {name}")
+            bot.send_document(chat_id=chat_id, document=open(f"{username}'s_following_list.txt", 'rb'),
+                              caption=f"Following List for {full_name}")
             os.remove(f"{username}'s_following_list.txt")
-            LOGGER.info("following list removed")
-        except:
-            bot.send_message(chat_id=chat_id, text=f"Error Occured")
+            LOGGER.info(f"Following list of {full_name} removed")
+        except Exception as e:
+            LOGGER.error(e)
+            bot.send_message(chat_id=chat_id, text=f"Error Occurred: {e}")
             return
 
     else:
         dir = f"{OWNER_ID}/{username}"
         chat_id = query.message.chat.id
-        query.delete_message()
+        query.answer()
         m = bot.send_message(
             chat_id, "Starting Downloading..\nThis may take longer time Depending upon number of posts.")
         cmd = query.data.split("#")[0]

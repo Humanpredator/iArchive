@@ -1,5 +1,4 @@
 import os
-import maskpass
 from instaloader import Instaloader, TwoFactorAuthRequiredException
 S = "0"
 STATUS = set(int(x) for x in (S).split())
@@ -8,7 +7,7 @@ L = Instaloader()
 
 def generate():
     id = input("Now Enter your Instagram username:")
-    pwd = maskpass.askpass(mask="*")
+    pwd = input("Now Enter your Instagram password:")
     try:
         L.login(id, pwd)
         L.save_session_to_file(filename=f"./{id}")

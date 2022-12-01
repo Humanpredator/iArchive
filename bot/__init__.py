@@ -24,7 +24,7 @@ if os.path.exists('log.txt'):
     with open('log.txt', 'r+') as f:
         f.truncate(0)
 
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+logging.basicConfig(format='%(pastime)s - %(name)s - %(levelness)s - %(message)s',
                     handlers=[logging.FileHandler(
                         'log.txt'), logging.StreamHandler()],
                     level=logging.INFO)
@@ -81,14 +81,14 @@ try:
     achats = achats.split(" ")
     for chats in achats:
         AUTHORIZED_CHATS.add(int(chats))
-except KeyError:
+except:
     pass
 try:
     schats = getConfig('SUDO_USERS')
     schats = schats.split(" ")
     for chats in schats:
         SUDO_USERS.add(int(chats))
-except KeyError:
+except:
     pass
 try:
     BOT_TOKEN = getConfig('BOT_TOKEN')
@@ -98,14 +98,14 @@ try:
     OWNER_ID = int(getConfig('OWNER_ID'))
     TELEGRAM_API = getConfig('TELEGRAM_API')
     TELEGRAM_HASH = getConfig('TELEGRAM_HASH')
-except KeyError:
+except:
     LOGGER.error("One or more env variables missing! Exiting now")
     exit(1)
 try:
     DB_URI = getConfig('DATABASE_URL')
     if len(DB_URI) == 0:
-        raise KeyError
-except KeyError:
+        raise 
+except:
     DB_URI = None
 if DB_URI is not None:
     try:
@@ -130,7 +130,7 @@ if DB_URI is not None:
 
 LOGGER.info("Generating USER_SESSION_STRING")
 app = Client('insta_scrap', api_id=int(TELEGRAM_API),
-             api_hash=TELEGRAM_HASH, bot_token=BOT_TOKEN)
+             api_hash=TELEGRAM_HASH, bot_token=BOT_TOKEN, )
 
 # IG CONFIG
 S = "0"
@@ -147,17 +147,17 @@ telegraph_token = telegraph.get_access_token()
 try:
     IGNORE_PENDING_REQUESTS = getConfig("IGNORE_PENDING_REQUESTS")
     IGNORE_PENDING_REQUESTS = IGNORE_PENDING_REQUESTS.lower() == 'true'
-except KeyError:
+except :
     IGNORE_PENDING_REQUESTS = False
 try:
     INDEX_URL = getConfig("INDEX_URL")
-except KeyError:
+except :
     INDEX_URL = False
 
 try:
     TG_UPLOAD = getConfig("TG_UPLOAD")
     TG_UPLOAD = TG_UPLOAD.lower() == 'true'
-except KeyError:
+except :
     TG_UPLOAD = False
 
 updater = tg.Updater(token=BOT_TOKEN)

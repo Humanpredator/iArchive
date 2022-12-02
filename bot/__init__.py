@@ -104,7 +104,7 @@ except:
 try:
     DB_URI = getConfig('DATABASE_URL')
     if len(DB_URI) == 0:
-        raise 
+        raise KeyError
 except:
     DB_URI = None
 if DB_URI is not None:

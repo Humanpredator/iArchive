@@ -64,7 +64,7 @@ def progress_bar(count, size):
     percent = 100
     bar_length = 20
     pbar = ("\r[{:20s}] {:2.1f}%".format(
-        '#'*int(count/size*bar_length), count/size*percent))
+        '#' * int(count / size * bar_length), count / size * percent))
     return pbar
 
 
@@ -103,3 +103,5 @@ def is_link(args):
         return True
     else:
         return False
+
+

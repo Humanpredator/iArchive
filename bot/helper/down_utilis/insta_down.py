@@ -25,7 +25,6 @@ def download_insta(command, m, dir, username, chat_id, fetch):
         while True:
             output = process.stdout.readline()
             if output == b'':
-
                 subfolder(dir)
                 gup(dir, m, username, fetch)
                 break
@@ -44,7 +43,6 @@ def download_insta(command, m, dir, username, chat_id, fetch):
         while True:
             error = process.stderr.readline()
             if error == b'':
-
                 break
             if error:
                 datetime_ist = datetime.now(IST)
@@ -64,7 +62,6 @@ def download_insta(command, m, dir, username, chat_id, fetch):
         if TG_UPLOAD:
             tgup(chat_id, dir)
         else:
-
             pass
         clean_download(dir)
 

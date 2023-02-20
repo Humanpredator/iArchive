@@ -1,80 +1,80 @@
 import re
-from bot.helper.ext_utils.bot_utils import usercheck, acc_type, yes_or_no
-from instaloader import Profile
-from bot.helper.telegram_helper.message_utils import *
-from bot.helper.telegram_helper.filters import CustomFilters
-from bot import dispatcher, INSTA, STATUS
-from bot.helper.telegram_helper.bot_commands import BotCommands
-from telegram.ext import CommandHandler
-from telegram import InlineKeyboardMarkup, InlineKeyboardButton
-from bot.helper.down_utilis.insta_down import download_insta
 
+from instaloader import Profile
+from telegram import InlineKeyboardButton
+from telegram.ext import CommandHandler
+
+from bot import dispatcher, INSTA, STATUS, OWNER_ID
+from bot.helper.down_utilis.insta_down import download_insta
+from bot.helper.ext_utils.bot_utils import usercheck, acc_type, yes_or_no
+from bot.helper.telegram_helper.bot_commands import BotCommands
+from bot.helper.telegram_helper.filters import CustomFilters
+from bot.helper.telegram_helper.message_utils import *
 
 
 def account(update, context):
     if 1 in STATUS:
         m = sendMessage("Getting your data, please wait...!",
                         context.bot, update)
-        try:
-            profile = Profile.own_profile(INSTA.context)
-            media_count = profile.mediacount
-            name = profile.full_name
-            bio = profile.biography
-            ppic = profile.profile_pic_url
-            username = profile.username
-            igtv_count = profile.igtvcount
-            followers = profile.followers
-            following = profile.followees
-            reply_markup = InlineKeyboardMarkup(
+        profile = Profile.own_profile(INSTA.context)
+        media_count = profile.mediacount
+        name = profile.full_name
+        bio = profile.biography
+        ppic = profile.profile_pic_url
+        username = profile.username
+        igtv_count = profile.igtvcount
+        followers = profile.followers
+        following = profile.followees
+        reply_markup = InlineKeyboardMarkup(
+            [
                 [
-                    [
-                        InlineKeyboardButton(
-                            "Download My Profile Pic", callback_data=f"ppic#{username}"),
-                        InlineKeyboardButton(
-                            "Go To Profile", url=f'https://www.instagram.com/{username}')
-                    ],
-                    [
-                        InlineKeyboardButton(
-                            "My Post", callback_data=f"post#{username}"),
-                        InlineKeyboardButton(
-                            "My Tagged Posts", callback_data=f"tagged#{username}"),
-                        InlineKeyboardButton(
-                            "Posts In My Feed", callback_data=f"feed#{username}")
-                    ],
-                    [
+                    InlineKeyboardButton(
+                        "Download My Profile Pic", callback_data=f"ppic#{username}"),
+                    InlineKeyboardButton(
+                        "Go To Profile", url=f'https://www.instagram.com/{username}')
+                ],
+                [
+                    InlineKeyboardButton(
+                        "My Post", callback_data=f"post#{username}"),
+                    InlineKeyboardButton(
+                        "My Tagged Posts", callback_data=f"tagged#{username}"),
+                    InlineKeyboardButton(
+                        "Posts In My Feed", callback_data=f"feed#{username}")
+                ],
+                [
 
-                        InlineKeyboardButton(
-                            "My Saved Posts", callback_data=f"saved#{username}"),
-                        InlineKeyboardButton(
-                            "My IGTV Posts", callback_data=f"igtv#{username}")
-                    ],
-                    [
+                    InlineKeyboardButton(
+                        "My Saved Posts", callback_data=f"saved#{username}"),
+                    InlineKeyboardButton(
+                        "My IGTV Posts", callback_data=f"igtv#{username}")
+                ],
+                [
 
-                        InlineKeyboardButton(
-                            "My Highlights", callback_data=f"highlights#{username}"),
-                        InlineKeyboardButton(
-                            "My Stories ", callback_data=f"stories#{username}"),
-                        InlineKeyboardButton(
-                            "Stories of My Following", callback_data=f"fstories#{username}")
-                    ],
+                    InlineKeyboardButton(
+                        "My Highlights", callback_data=f"highlights#{username}"),
+                    InlineKeyboardButton(
+                        "My Stories ", callback_data=f"stories#{username}"),
+                    InlineKeyboardButton(
+                        "Stories of My Following", callback_data=f"fstories#{username}")
+                ],
 
-                    [
-                        InlineKeyboardButton(
-                            "List Of My Followers", callback_data=f"followers#{username}"),
-                        InlineKeyboardButton(
-                            "List Of My Following", callback_data=f"following#{username}")
-                    ]
+                [
+                    InlineKeyboardButton(
+                        "List Of My Followers", callback_data=f"followers#{username}"),
+                    InlineKeyboardButton(
+                        "List Of My Following", callback_data=f"following#{username}")
                 ]
-            )
-            deleteMessage(context.bot, m)
-            bot.send_photo(
-                chat_id=update.message.chat.id,
-                photo=ppic,
-                caption=f"You are already logged in as {name}\n\n<b>Your Account Details</b>\n\n🏷 <b>Name</b>: {name}\n🔖 <b>Username</b>: {profile.username}\n📝 <b>Bio</b>: {bio}\n📍 <b>Account Type</b>: {acc_type(profile.is_private)}\n🏭 <b>Is Business Account?</b>: {yes_or_no(profile.is_business_account)}\n👥 <b>Total Followers</b>: {followers}\n👥 <b>Total Following</b>: {following}\n📸 <b>Total Posts</b>: {media_count}\n📺 <b>IGTV Videos</b>: {igtv_count}", parse_mode="HTML",
-                reply_markup=reply_markup
-            )
-        except Exception as e:
-            editMessage(f"Error: {e}", context.bot, m)
+            ]
+        )
+        bot.delete_message(chat_id=update.message.chat.id,
+                           message_id=m.message_id)
+        bot.send_photo(
+            chat_id=update.message.chat_id,
+            photo=ppic,
+            caption=f"You are already logged in as {name}\n\n<b>Your Account Details</b>\n\n🏷 <b>Name</b>: {name}\n🔖 <b>Username</b>: {profile.username}\n📝 <b>Bio</b>: {bio}\n📍 <b>Account Type</b>: {acc_type(profile.is_private)}\n🏭 <b>Is Business Account?</b>: {yes_or_no(profile.is_business_account)}\n👥 <b>Total Followers</b>: {followers}\n👥 <b>Total Following</b>: {following}\n📸 <b>Total Posts</b>: {media_count}\n📺 <b>IGTV Videos</b>: {igtv_count}",
+            parse_mode="HTML",
+            reply_markup=reply_markup
+        )
     else:
         sendMessage("You must /login", context.bot, update)
 
@@ -111,7 +111,7 @@ def mirror(update, context):
             editMessage(f'Fetching {supported} content from Instagram.', m)
             shortcode = result.group(3)
             try:
-                dir = 'Downloads'
+                dir = f'{OWNER_ID}/Downloads'
                 chat_id = update.message.chat.id
                 command = [
                     "instaloader",
@@ -213,7 +213,8 @@ def ig(update, context):
                     bot.send_photo(
                         chat_id=update.message.chat.id,
                         photo=ppic,
-                        caption=f"🏷 <b>Name</b>: {name}\n🔖 <b>Username</b>: {profile.username}\n📝 <b>Bio</b>: {bio}\n📍 <b>Account Type</b>: {acc_type(profile.is_private)}\n🏭 <b>Is Business Account?</b>: {yes_or_no(profile.is_business_account)}\n👥 <b>Total Followers</b>: {followers}\n👥 <b>Total Following</b>: {following}\n<b>👤 Is {name} Following You?</b>: {is_following}\n<b>👤 Is You Following {name} </b>: {is_followed}\n📸 <b>Total Posts</b>: {media_count}\n📺 <b>IGTV Videos</b>: {igtv_count}", parse_mode="HTML",
+                        caption=f"🏷 <b>Name</b>: {name}\n🔖 <b>Username</b>: {profile.username}\n📝 <b>Bio</b>: {bio}\n📍 <b>Account Type</b>: {acc_type(profile.is_private)}\n🏭 <b>Is Business Account?</b>: {yes_or_no(profile.is_business_account)}\n👥 <b>Total Followers</b>: {followers}\n👥 <b>Total Following</b>: {following}\n<b>👤 Is {name} Following You?</b>: {is_following}\n<b>👤 Is You Following {name} </b>: {is_followed}\n📸 <b>Total Posts</b>: {media_count}\n📺 <b>IGTV Videos</b>: {igtv_count}",
+                        parse_mode="HTML",
                         reply_markup=reply_markup
                     )
                 except Exception as e:
@@ -286,7 +287,8 @@ def ig(update, context):
                     bot.send_photo(
                         chat_id=update.message.chat.id,
                         photo=ppic,
-                        caption=f"🏷 <b>Name</b>: {name}\n🔖 <b>Username</b>: {profile.username}\n📝 <b>Bio</b>: {bio}\n📍 <b>Account Type</b>: {acc_type(profile.is_private)}\n🏭 <b>Is Business Account?</b>: {yes_or_no(profile.is_business_account)}\n👥 <b>Total Followers</b>: {followers}\n👥 <b>Total Following</b>: {following}\n<b>👤 Is {name} Following You?</b>: {is_following}\n<b>👤 Is You Following {name} </b>: {is_followed}\n📸 <b>Total Posts</b>: {media_count}\n📺 <b>IGTV Videos</b>: {igtv_count}", parse_mode="HTML",
+                        caption=f"🏷 <b>Name</b>: {name}\n🔖 <b>Username</b>: {profile.username}\n📝 <b>Bio</b>: {bio}\n📍 <b>Account Type</b>: {acc_type(profile.is_private)}\n🏭 <b>Is Business Account?</b>: {yes_or_no(profile.is_business_account)}\n👥 <b>Total Followers</b>: {followers}\n👥 <b>Total Following</b>: {following}\n<b>👤 Is {name} Following You?</b>: {is_following}\n<b>👤 Is You Following {name} </b>: {is_followed}\n📸 <b>Total Posts</b>: {media_count}\n📺 <b>IGTV Videos</b>: {igtv_count}",
+                        parse_mode="HTML",
                         reply_markup=reply_markup
                     )
                 except Exception as e:
@@ -305,9 +307,9 @@ account_handler = CommandHandler(BotCommands.IgAccountCommand, account,
 dispatcher.add_handler(account_handler)
 
 iglink_handler = CommandHandler(BotCommands.IgSearchCommand, ig, CustomFilters.authorized_chat |
-                                CustomFilters.owner_filter | CustomFilters.authorized_user,  run_async=True)
+                                CustomFilters.owner_filter | CustomFilters.authorized_user, run_async=True)
 dispatcher.add_handler(iglink_handler)
 
 mirrorlink_handler = CommandHandler(BotCommands.IgMirrorCommand, mirror, CustomFilters.authorized_chat |
-                                    CustomFilters.owner_filter | CustomFilters.authorized_user,  run_async=True)
+                                    CustomFilters.owner_filter | CustomFilters.authorized_user, run_async=True)
 dispatcher.add_handler(mirrorlink_handler)

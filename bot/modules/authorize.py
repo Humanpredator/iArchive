@@ -1,14 +1,13 @@
-from bot.helper.telegram_helper.message_utils import sendMessage
-from bot import AUTHORIZED_CHATS, SUDO_USERS, dispatcher, DB_URI
 from telegram.ext import CommandHandler
-from bot.helper.telegram_helper.filters import CustomFilters
-from bot.helper.telegram_helper.bot_commands import BotCommands
+
+from bot import AUTHORIZED_CHATS, SUDO_USERS, dispatcher, DB_URI
 from bot.helper.ext_utils.db_handler import DbManger
+from bot.helper.telegram_helper.bot_commands import BotCommands
+from bot.helper.telegram_helper.filters import CustomFilters
+from bot.helper.telegram_helper.message_utils import sendMessage
 
 
 def authorize(update, context):
-    reply_message = None
-    message_ = None
     reply_message = update.message.reply_to_message
     message_ = update.message.text.split(' ')
     if len(message_) == 2:
@@ -51,8 +50,7 @@ def authorize(update, context):
 
 
 def unauthorize(update, context):
-    reply_message = None
-    message_ = None
+
     reply_message = update.message.reply_to_message
     message_ = update.message.text.split(' ')
     if len(message_) == 2:
@@ -95,8 +93,7 @@ def unauthorize(update, context):
 
 
 def addSudo(update, context):
-    reply_message = None
-    message_ = None
+
     reply_message = update.message.reply_to_message
     message_ = update.message.text.split(' ')
     if len(message_) == 2:
@@ -128,8 +125,6 @@ def addSudo(update, context):
 
 
 def removeSudo(update, context):
-    reply_message = None
-    message_ = None
     reply_message = update.message.reply_to_message
     message_ = update.message.text.split(' ')
     if len(message_) == 2:
@@ -167,7 +162,8 @@ def sendAuthChats(update, context):
     user += '\n'.join(str(id) for id in AUTHORIZED_CHATS)
     sudo += '\n'.join(str(id) for id in SUDO_USERS)
     sendMessage(
-        f'<b><u>Authorized Chats</u></b>\n<code>{user}</code>\n<b><u>Sudo Users</u></b>\n<code>{sudo}</code>', context.bot, update)
+        f'<b><u>Authorized Chats</u></b>\n<code>{user}</code>\n<b><u>Sudo Users</u></b>\n<code>{sudo}</code>',
+        context.bot, update)
 
 
 send_auth_handler = CommandHandler(command=BotCommands.AuthorizedUsersCommand, callback=sendAuthChats,

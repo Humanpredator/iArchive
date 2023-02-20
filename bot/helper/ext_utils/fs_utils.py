@@ -1,8 +1,9 @@
-import sys
-import shutil
 import os
-from bot import LOGGER, OWNER_ID
+import shutil
+import sys
 from pathlib import Path
+
+from bot import LOGGER, OWNER_ID
 
 
 def subpath(path):

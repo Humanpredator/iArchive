@@ -7,7 +7,7 @@ from bot import dispatcher, INSTA, STATUS
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from telegram.ext import CommandHandler, MessageHandler, Filters, ConversationHandler
 
-insta = INSTA
+
 CODE_SAVE = range(2)
 
 
@@ -26,13 +26,13 @@ def user_login(update, context):
             editMessage("Don't use links...!", m)
         else:
             try:
-                insta.login(username, password)
-                insta.save_session_to_file(filename=f"./{username}")
+                INSTA.login(username, password)
+                INSTA.save_session_to_file(filename=f"./{username}")
                 STATUS.add(1)
                 usersave(username)
                 editMessage(
                     f"Fetching the details of @{username}\n Please wait...!", m)
-                profile = Profile.from_username(insta.context, username)
+                profile = Profile.from_username(INSTA.context, username)
                 media_count = profile.mediacount
                 name = profile.full_name
                 bio = profile.biography
@@ -85,11 +85,11 @@ def codei(update, context):
         m = sendMessage(
             f"Checking given code.\n please wait...!", context.bot, update)
         try:
-            insta.two_factor_login(codei)
-            insta.save_session_to_file(filename=f"./{username}")
+            INSTA.two_factor_login(codei)
+            INSTA.save_session_to_file(filename=f"./{username}")
             STATUS.add(1)
             editMessage("Fetching details from Instagram..!", m)
-            profile = Profile.from_username(insta.context, username)
+            profile = Profile.from_username(INSTA.context, username)
             media_count = profile.mediacount
             name = profile.full_name
             bio = profile.biography

@@ -5,8 +5,8 @@ import os
 import time
 from sys import executable
 from pyrogram import idle
-
 from telegram import ParseMode
+
 from telegram.ext import CommandHandler
 
 from bot import IGNORE_PENDING_REQUESTS, app, dispatcher, updater, botStartTime, OWNER_ID, AUTHORIZED_CHATS, INSTA, \
@@ -19,7 +19,7 @@ from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.ext_utils import fs_utils
 
 from bot.modules import authorize, shell, speedtest, callback, insta_cmds, login, utlis
-from bot.start_help import ig_help, start
+# from bot.start_help import ig_help, start
 
 
 def stats(update, context):
@@ -47,7 +47,7 @@ def stats(update, context):
 
 def restart(update, context):
     restart_message = sendMessage(
-        "Restarting, Please wait!", context.bot, update)
+        "Restarting Bot, Please wait!", context.bot, update)
     # Save restart message object in order to reply to it after restarting
     with open(".restartmsg", "w") as f:
         f.truncate(0)
@@ -73,7 +73,7 @@ def main():
         os.path.exists(f"./{USER}")
         INSTA.load_session_from_file(USER, filename=f"./{USER}")
         STATUS.add(1)
-        LOGGER.info(f"{USER}-Session file loaded")
+        LOGGER.info(f"{USER} - Session file loaded")
     except FileNotFoundError:
         LOGGER.info("Session file not Found")
     # Check if the bot is restarting

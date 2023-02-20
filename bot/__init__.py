@@ -1,10 +1,7 @@
 import faulthandler
 import logging
 import os
-import random
 import socket
-import string
-import subprocess
 import time
 
 import psycopg2
@@ -14,19 +11,19 @@ from dotenv import load_dotenv
 from instaloader import Instaloader
 from psycopg2 import Error
 from pyrogram import Client
-from telegraph import Telegraph
 
 faulthandler.enable()
 socket.setdefaulttimeout(600)
 
 botStartTime = time.time()
 if os.path.exists('log.txt'):
-    with open('log.txt', 'r+') as f:
+    with open('log.txt', 'a+') as f:
         f.truncate(0)
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     handlers=[logging.FileHandler(
                         'log.txt'), logging.StreamHandler()],
+                    datefmt='%d-%b-%y %H:%M:%S',
                     level=logging.INFO)
 
 LOGGER = logging.getLogger(__name__)
@@ -129,7 +126,7 @@ if DB_URI is not None:
         conn.close()
 
 LOGGER.info("Generating USER_SESSION_STRING")
-app = Client('insta_scrap', api_id=int(TELEGRAM_API),
+app = Client('Insta_Scrap', api_id=int(TELEGRAM_API),
              api_hash=TELEGRAM_HASH, bot_token=BOT_TOKEN, )
 
 # IG CONFIG
@@ -138,26 +135,26 @@ STATUS = set(int(x) for x in S.split())
 INSTA = Instaloader()
 
 # Generate Telegraph Token
-sname = ''.join(random.SystemRandom().choices(string.ascii_letters, k=8))
-LOGGER.info("Generating TELEGRAPH_TOKEN using '" + sname + "' name")
-telegraph = Telegraph()
-telegraph.create_account(short_name=sname)
-telegraph_token = telegraph.get_access_token()
+# sname = ''.join(random.SystemRandom().choices(string.ascii_letters, k=9))
+# LOGGER.info("Generating TELEGRAPH_TOKEN using '" + sname + "' name")
+# telegraph = Telegraph()
+# telegraph_token = telegraph.create_account(short_name=sname).get_access_token()
+
 
 try:
     IGNORE_PENDING_REQUESTS = getConfig("IGNORE_PENDING_REQUESTS")
     IGNORE_PENDING_REQUESTS = IGNORE_PENDING_REQUESTS.lower() == 'true'
-except :
+except:
     IGNORE_PENDING_REQUESTS = False
 try:
     INDEX_URL = getConfig("INDEX_URL")
-except :
-    INDEX_URL = False
+except:
+    INDEX_URL = "drive.teamplague.com"
 
 try:
     TG_UPLOAD = getConfig("TG_UPLOAD")
     TG_UPLOAD = TG_UPLOAD.lower() == 'true'
-except :
+except:
     TG_UPLOAD = False
 
 updater = tg.Updater(token=BOT_TOKEN)

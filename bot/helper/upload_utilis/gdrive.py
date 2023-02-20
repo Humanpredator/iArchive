@@ -3,18 +3,25 @@ from os import path
 
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
+from telegram import InlineKeyboardMarkup
 
-from bot import parent_id, INDEX_URL
+from bot import parent_id, INDEX_URL, LOGGER
 from bot.helper.ext_utils.bot_utils import fcount, get_readable_file_size, fsize, progress_bar
 from bot.helper.telegram_helper import button_build
-from bot.helper.telegram_helper.message_utils import *
+from bot.helper.telegram_helper.message_utils import editMessage
 
 DRIVE = parent_id
 
 
 # gdrive upload function
-def gup(dir, m, username, fetch):
+def gup(dir: str, m, username, fetch):
     # Route the modules
+    global folderid, foldername
+
+    # Main gfolder id where store all the ig profile archive
+    gFolderID = DRIVE  # Gdrive Folder id to store all the user posts conatining files  Folder
+    directory = dir  # Route the main dir to function directory variables
+
     gauth = GoogleAuth()
     # check if the credentials file exists
     if path.exists("credentials.json"):
@@ -30,10 +37,6 @@ def gup(dir, m, username, fetch):
         editMessage(
             f"Drive Upload Starts, Please Wait....!\nThis may take longer time Depending upon number of posts.", m)
 
-        # Main gfolder id where store all the ig profile archive
-        gFolderID = DRIVE  # Gdrive Folder id to store all the user posts conatining files  Folder
-        directory = dir  # Route the main dir to function directory variables
-
         # Getting Gdrive Details
         # Get list the Files in Given gUserFolderID
         gListFolderstr = "\'" + gFolderID + "\'" + " in parents and trashed=false"
@@ -48,7 +51,7 @@ def gup(dir, m, username, fetch):
                 LOGGER.info(
                     f'All Folder Title in Given GDrive Folder ID: {glistfile["title"]}')
                 # Intial check Whether the user dir is already present.
-                if glistfile['title'] == dir:
+                if glistfile['title'] == dir.split('/')[1]:
                     # Store already presented user gfolder id
                     folderid = glistfile['id']
                     # Store already presented user gfolder title
@@ -65,7 +68,7 @@ def gup(dir, m, username, fetch):
         matchedFoldername = foldername
 
         # upload section
-        if matchedFoldername == dir:  # validate Again
+        if matchedFoldername == dir.split('/')[1]:  # validate Again
             LOGGER.info(
                 f'The matched Folder is: {matchedFoldername} : {matchedFolderID}')
 
@@ -126,18 +129,15 @@ def gup(dir, m, username, fetch):
 <b>Type: </b><code>{fetch}</code>
 '''
             buttons = button_build.ButtonMaker()
-            buttons.buildbutton(
-                "Drive Link", f'https://drive.google.com/drive/u/1/folders/{matchedFolderID}')
-            buttons.buildbutton("Index Link", INDEX_URL)
-            buttons.buildbutton("IG Link", f"https://instagram.com/{username}")
-            markup = InlineKeyboardMarkup(buttons.build_menu(3))
+            buttons.buildbutton('Drive Link', f'https://drive.google.com/drive/u/1/folders/{matchedFolderID}')
+            markup = InlineKeyboardMarkup(buttons.build_menu(1))
             LOGGER.info(f'Uploaded Completed: {username}')
             editMessage(msg, m, markup)
             return True
         # else part To Create New GFolde for the Dir And Upload the Files...!
         else:
             # Create folder for the title dir
-            folder_metadata = {'title': dir, "parents": [
+            folder_metadata = {'title': dir.split('/')[1], "parents": [
                 {"id": gFolderID}], 'mimeType': 'application/vnd.google-apps.folder'}  # meta data for gfolder
             gFolderCreate = drive.CreateFile(
                 folder_metadata)  # set gfolderename
@@ -178,13 +178,11 @@ def gup(dir, m, username, fetch):
 <b>Type: </b><code>{fetch}</code>
 '''
             buttons = button_build.ButtonMaker()
-            buttons.buildbutton(
-                "Drive Link", f'https://drive.google.com/drive/u/1/folders/{matchedFolderID}')
-            buttons.buildbutton("Index Link", INDEX_URL)
-            buttons.buildbutton("IG Link", f"https://instagram.com/{username}")
-            markup = InlineKeyboardMarkup(buttons.build_menu(3))
+            buttons.buildbutton('Drive Link', f'https://drive.google.com/drive/u/1/folders/{matchedFolderID}')
+            markup = InlineKeyboardMarkup(buttons.build_menu(1))
             LOGGER.info(f'Uploaded Completed: {username}')
             editMessage(msg, m, markup)
             return True
     else:
+        editMessage("No Credentials File Found..Upload stopped", m)
         LOGGER.warning("No Credentials File Found..Upload stopped")

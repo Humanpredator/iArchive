@@ -32,7 +32,6 @@ def tgup(chat_id, dir):
         except Exception as e:
             GIF.append(video)
             LOGGER.error(e)
-            pass
     PIC = glob.glob(f"{dir}/*.jpg")
 
     totalpics = len(PIC)
@@ -62,7 +61,6 @@ def tgup(chat_id, dir):
                 bot.send_media_group(chat_id=chat_id, media=media)
             except Exception as e:
                 LOGGER.error(e)
-                pass
             msg = f'''
 <b>Uploading: </b><code>{progress_bar(up, total)}</code>
 <b>Files uploaded: </b><code>0{up}/{total}</code>
@@ -91,7 +89,6 @@ def tgup(chat_id, dir):
                 rm -= 1
             except Exception as e:
                 LOGGER.error(e)
-                pass
             msg = f'''
 <b>Uploading: </b><code>{progress_bar(up, total)}</code>
 <b>Files uploaded: </b><code>0{up}/{total}</code>
@@ -136,7 +133,6 @@ def tgup(chat_id, dir):
                 editMessage(msg, m)
             except Exception as e:
                 LOGGER.error(e)
-                pass
 
     editMessage("Telegram Upload Completed", m)
     LOGGER.info(f"Telegram Upload Completed")

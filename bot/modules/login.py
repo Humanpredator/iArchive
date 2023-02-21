@@ -103,10 +103,8 @@ def codei(update, context):
             )
         except BadCredentialsException:
             editMessage("Wrong credentials\n Try to /login again.", m)
-            pass
         except Exception as e:
             editMessage(f"{e}\nTry to /login again.", m)
-            pass
     else:
         sendMessage("Please enter a valid code.", context.bot, update)
     return ConversationHandler.END

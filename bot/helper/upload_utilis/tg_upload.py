@@ -11,9 +11,8 @@ from bot.helper.ext_utils.bot_utils import progress_bar, usercheck
 from bot.helper.telegram_helper.message_utils import *
 
 USER = usercheck()
-IST = pytz.timezone('Asia/Kolkata')
+IST = pytz.timezone("Asia/Kolkata")
 session = f"./{USER}"
-
 
 # A functionUpload Content to Telegram
 
@@ -45,14 +44,13 @@ def tgup(chat_id, dir):
         return
     if totalpics > 0:
         for i in range(0, len(PIC), 10):
-            chunk = PIC[i:i + 10]
+            chunk = PIC[i: i + 10]
             media = []
             for photo in chunk:
-                media.append(InputMediaPhoto(open(photo, 'rb')))
+                media.append(InputMediaPhoto(open(photo, "rb")))
                 up += 1
                 rm -= 1
             try:
-
                 time.sleep(DOWNLOAD_STATUS_UPDATE_INTERVAL)
                 bot.send_media_group(chat_id=chat_id, media=media)
             except FloodWait as e:
@@ -60,23 +58,23 @@ def tgup(chat_id, dir):
                 bot.send_media_group(chat_id=chat_id, media=media)
             except Exception as e:
                 LOGGER.error(e)
-            msg = f'''
+            msg = f"""
 <b>Uploading: </b><code>{progress_bar(up, total)}</code>
 <b>Files uploaded: </b><code>0{up}/{total}</code>
 <b>Files remaining: </b><code>0{rm}/{total}</code>
 <b>Total Files : </b><code>{total}</code>
 <b>Last Updated : </b><code>{ISTIME}</code>
 <b>Currently Uploading: </b><code>Pictures</code>
-'''
+"""
             editMessage(msg, m)
 
     if totalvideo > 0:
         for i in range(0, len(VDO), 10):
-            chunk = VDO[i:i + 10]
+            chunk = VDO[i: i + 10]
 
             media = []
             for video in chunk:
-                media.append(InputMediaVideo(media=open(video, 'rb')))
+                media.append(InputMediaVideo(media=open(video, "rb")))
                 up += 1
                 rm -= 1
             try:
@@ -88,14 +86,14 @@ def tgup(chat_id, dir):
                 rm -= 1
             except Exception as e:
                 LOGGER.error(e)
-            msg = f'''
+            msg = f"""
 <b>Uploading: </b><code>{progress_bar(up, total)}</code>
 <b>Files uploaded: </b><code>0{up}/{total}</code>
 <b>Files remaining: </b><code>0{rm}/{total}</code>
 <b>Total Files : </b><code>{total}</code>
 <b>Last Updated : </b><code>{ISTIME}</code>
 <b>Currently Uploading: </b><code>Videos</code>
-'''
+"""
             editMessage(msg, m)
 
     if totalgif > 0:
@@ -105,30 +103,30 @@ def tgup(chat_id, dir):
                 ISTIME = datetime_ist.strftime("%I:%M:%S %p - %d %B %Y")
                 up += 1
                 time.sleep(DOWNLOAD_STATUS_UPDATE_INTERVAL)
-                bot.send_animation(chat_id=chat_id, animation=open(gif, 'rb'))
+                bot.send_animation(chat_id=chat_id, animation=open(gif, "rb"))
                 rm -= 1
-                msg = f'''
+                msg = f"""
 <b>Uploading: </b><code>{progress_bar(up, total)}</code>
 <b>Files uploaded: </b><code>0{up}/{total}</code>
 <b>Files remaining: </b><code>0{rm}/{total}</code>
 <b>Total Files : </b><code>{total}</code>
 <b>Last Updated : </b><code>{ISTIME}</code>
 <b>Currently Uploading: </b><code>GIFS</code>
-'''
+"""
                 editMessage(msg, m)
             except FloodWait as e:
                 up += 1
                 time.sleep(e.x)
-                bot.send_animation(chat_id=chat_id, animation=open(gif, 'rb'))
+                bot.send_animation(chat_id=chat_id, animation=open(gif, "rb"))
                 rm -= 1
-                msg = f'''
+                msg = f"""
 <b>Uploading: </b><code>{progress_bar(up, total)}</code>
 <b>Files uploaded: </b><code>0{up}/{total}</code>
 <b>Files remaining: </b><code>0{rm}/{total}</code>
 <b>Total Files : </b><code>{total}</code>
 <b>Last Updated : </b><code>{ISTIME}</code>
 <b>Currently Uploading: </b><code>GIFS</code>
-'''
+"""
                 editMessage(msg, m)
             except Exception as e:
                 LOGGER.error(e)

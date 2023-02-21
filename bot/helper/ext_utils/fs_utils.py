@@ -22,7 +22,6 @@ def rmv(subdir):
     if dir:
         shutil.rmtree(subdir)
     else:
-
         pass
 
 
@@ -33,7 +32,7 @@ def subfolder(DIR):
             files = os.listdir(dir)
             for file in files:
                 file_name = os.path.join(dir, file)
-                shutil.move(file_name, DIR + '/' + file)
+                shutil.move(file_name, DIR + "/" + file)
             rmv(dir)
     except FileNotFoundError:
         pass
@@ -64,9 +63,10 @@ def clean_all():
 def exit_clean_up(signal, frame):
     try:
         LOGGER.info(
-            "Please wait, while we clean up the downloads and stop running downloads")
+            "Please wait, while we clean up the downloads and stop running downloads"
+        )
         clean_all()
-        os.remove('username.txt')
+        os.remove("username.txt")
         sys.exit(0)
     except KeyboardInterrupt:
         LOGGER.warning("Force Exiting before the cleanup finishes!")

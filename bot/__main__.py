@@ -13,12 +13,14 @@ from bot import (
     AUTHORIZED_CHATS,
     IGNORE_PENDING_REQUESTS,
     INSTA,
+    LOGGER,
     OWNER_ID,
     STATUS,
     app,
     botStartTime,
     dispatcher,
     updater,
+    bot
 )
 from bot.helper.ext_utils import fs_utils
 from bot.helper.ext_utils.bot_utils import (
@@ -28,28 +30,29 @@ from bot.helper.ext_utils.bot_utils import (
 )
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.filters import CustomFilters
-from bot.helper.telegram_helper.message_utils import *
+from bot.helper.telegram_helper.message_utils import editMessage, sendMessage, sendLogFile
 
 
-def stats(update, context):
-    currentTime = get_readable_time(time.time() - botStartTime)
+
+def stats_(update, context):
+    current_time = get_readable_time(time.time() - botStartTime)
     total, used, free = shutil.disk_usage(".")
     total = get_readable_file_size(total)
     used = get_readable_file_size(used)
     free = get_readable_file_size(free)
     sent = get_readable_file_size(psutil.net_io_counters().bytes_sent)
     recv = get_readable_file_size(psutil.net_io_counters().bytes_recv)
-    cpuUsage = psutil.cpu_percent(interval=0.5)
+    cpu_usage = psutil.cpu_percent(interval=0.5)
     memory = psutil.virtual_memory().percent
     disk = psutil.disk_usage("/").percent
     stats = (
-        f"<b>Bot Uptime:</b> <code>{currentTime}</code>\n"
+        f"<b>Bot Uptime:</b> <code>{current_time}</code>\n"
         f"<b>Total Disk Space:</b> <code>{total}</code>\n"
         f"<b>Used:</b> <code>{used}</code> "
         f"<b>Free:</b> <code>{free}</code>\n\n"
         f"<b>Upload:</b> <code>{sent}</code>\n"
         f"<b>Download:</b> <code>{recv}</code>\n\n"
-        f"<b>CPU:</b> <code>{cpuUsage}%</code> "
+        f"<b>CPU:</b> <code>{cpu_usage}%</code> "
         f"<b>RAM:</b> <code>{memory}%</code> "
         f"<b>DISK:</b> <code>{disk}%</code>"
     )
@@ -60,7 +63,7 @@ def restart(update, context):
     restart_message = sendMessage(
         "Restarting Bot, Please wait!", context.bot, update)
     # Save restart message object in order to reply to it after restarting
-    with open(".restartmsg", "w") as f:
+    with open(".restartmsg", "w",encoding="UTF-8") as f:
         f.truncate(0)
         f.write(f"{restart_message.chat.id}\n{restart_message.message_id}\n")
     os.execl(executable, executable, "-m", "bot")
@@ -80,17 +83,17 @@ def log(update, context):
 def main():
     fs_utils.start_cleanup()
     try:
-        USER = usercheck()
-        os.path.exists(f"./{USER}")
-        INSTA.load_session_from_file(USER, filename=f"./{USER}")
+        user = usercheck()
+        os.path.exists(f"./{user}")
+        INSTA.load_session_from_file(user, filename=f"./{user}")
         STATUS.add(1)
-        LOGGER.info(f"{USER} - Session file loaded")
+        LOGGER.info("Session file loaded successfully- %s", user)
     except FileNotFoundError:
         LOGGER.info("Session file not Found")
     # Check if the bot is restarting
     if os.path.isfile(".restartmsg"):
-        with open(".restartmsg") as f:
-            chat_id, msg_id = map(int, f)
+        with open(".restartmsg",encoding="UTF-8") as file_:
+            chat_id, msg_id = map(int, file_)
         bot.edit_message_text("Restarted successfully!", chat_id, msg_id)
         os.remove(".restartmsg")
     elif OWNER_ID:
@@ -102,8 +105,8 @@ def main():
                 for i in AUTHORIZED_CHATS:
                     bot.sendMessage(chat_id=i, text=text,
                                     parse_mode=ParseMode.HTML)
-        except Exception as e:
-            LOGGER.warning(e)
+        except Exception as error:
+            LOGGER.warning(error)
 
     ping_handler = CommandHandler(
         BotCommands.PingCommand,
@@ -119,7 +122,7 @@ def main():
     )
     stats_handler = CommandHandler(
         BotCommands.StatsCommand,
-        stats,
+        stats_,
         filters=CustomFilters.authorized_chat | CustomFilters.authorized_user,
         run_async=True,
     )

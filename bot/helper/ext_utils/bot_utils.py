@@ -99,9 +99,6 @@ def yes_or_no(val):
 
 def is_link(args):
     iglink = r'^https://www\.instagram\.com/([A-Za-z0-9._]+/)?(p|tv|reel)/([A-Za-z0-9\-_]*)'
-    if re.search(iglink, args):
-        return True
-    else:
-        return False
+    return bool(re.search(iglink, args))
 
 

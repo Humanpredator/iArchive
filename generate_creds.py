@@ -1,6 +1,7 @@
 from pydrive.auth import GoogleAuth
 from os import path
 import os
+import sys
 
 if path.exists("client_secrets.json"):
     gauth = GoogleAuth()
@@ -16,4 +17,4 @@ if path.exists("client_secrets.json"):
     os.remove("client_secrets.json")
 else:
     print("client_secrets.json file not found")
-    exit()
+    sys.exit()

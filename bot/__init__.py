@@ -2,6 +2,7 @@ import faulthandler
 import logging
 import os
 import socket
+import sys
 import time
 
 import psycopg2
@@ -55,7 +56,7 @@ def mktable():
         logging.info("Table Created!")
     except Error as e:
         logging.error(e)
-        exit(1)
+        sys.exit(1)
 
 
 BOT_TOKEN = None
@@ -97,7 +98,7 @@ try:
     TELEGRAM_HASH = getConfig('TELEGRAM_HASH')
 except:
     LOGGER.error("One or more env variables missing! Exiting now")
-    exit(1)
+    sys.exit(1)
 try:
     DB_URI = getConfig('DATABASE_URL')
     if len(DB_URI) == 0:
@@ -120,7 +121,7 @@ if DB_URI is not None:
             mktable()
         else:
             LOGGER.error(e)
-            exit(1)
+            sys.exit(1)
     finally:
         cur.close()
         conn.close()

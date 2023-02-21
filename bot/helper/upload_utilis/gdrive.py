@@ -133,55 +133,53 @@ def gup(dir: str, m, username, fetch):
             LOGGER.info(f'Uploaded Completed: {username}')
             editMessage(msg, m, markup)
             return True
-        # else part To Create New GFolde for the Dir And Upload the Files...!
-        else:
-            # Create folder for the title dir
-            folder_metadata = {'title': dir.split('/')[1], "parents": [
-                {"id": gFolderID}], 'mimeType': 'application/vnd.google-apps.folder'}  # meta data for gfolder
-            gFolderCreate = drive.CreateFile(
-                folder_metadata)  # set gfolderename
-            gFolderCreate.Upload()  # upload
+        # Create folder for the title dir
+        folder_metadata = {'title': dir.split('/')[1], "parents": [
+            {"id": gFolderID}], 'mimeType': 'application/vnd.google-apps.folder'}  # meta data for gfolder
+        gFolderCreate = drive.CreateFile(
+            folder_metadata)  # set gfolderename
+        gFolderCreate.Upload()  # upload
 
-            # Get new folder id
-            newgFolderID = gFolderCreate['id']
-            LOGGER.info(f'{gFolderCreate["title"]} -->Successfully created')
+        # Get new folder id
+        newgFolderID = gFolderCreate['id']
+        LOGGER.info(f'{gFolderCreate["title"]} -->Successfully created')
 
-            # Upload all the new files to the newly created gfolder
-            for localfilelist in os.listdir(directory):
-                # filename allocation
-                filename = os.path.join(directory, localfilelist)
-                # where the files will be uploaded
-                gfile = drive.CreateFile(
-                    {'parents': [{'id': newgFolderID}], 'title': localfilelist})
-                gfile.SetContentFile(filename)  # set gfilename
-                count += 1
-                msg = f'''
+        # Upload all the new files to the newly created gfolder
+        for localfilelist in os.listdir(directory):
+            # filename allocation
+            filename = os.path.join(directory, localfilelist)
+            # where the files will be uploaded
+            gfile = drive.CreateFile(
+                {'parents': [{'id': newgFolderID}], 'title': localfilelist})
+            gfile.SetContentFile(filename)  # set gfilename
+            count += 1
+            msg = f'''
 <b>Uploading: </b><code>{progress_bar(count, fcount(dir))}</code>                
 <b>Files: </b><code>0{count}/{fcount(dir)}</code>
 <b>File Name: </b><code>{localfilelist}</code>
 <b>Folder Size: </b><code>{get_readable_file_size(fsize(dir))}</code>
 '''
-                gfile.Upload()  # upload
-                try:
-                    editMessage(msg, m)
-                except Exception as e:
-                    LOGGER.info(e)
-                    pass
-                LOGGER.info(f'File {localfilelist} is Successfully Uploaded')
-            LOGGER.info(f'All Files was Successfully Uploaded')
-            msg = f'''
+            gfile.Upload()  # upload
+            try:
+                editMessage(msg, m)
+            except Exception as e:
+                LOGGER.info(e)
+                pass
+            LOGGER.info(f'File {localfilelist} is Successfully Uploaded')
+        LOGGER.info(f'All Files was Successfully Uploaded')
+        msg = f'''
 <b>Upload Completed: </b><code>{username}</code>
 <b>Directory: </b><code>{dir}</code>
 <b>Total Files: </b><code>{fcount(dir)}</code>
 <b>Folder Size: </b><code>{get_readable_file_size(fsize(dir))}</code>
 <b>Type: </b><code>{fetch}</code>
 '''
-            buttons = button_build.ButtonMaker()
-            buttons.buildbutton('Drive Link', f'https://drive.google.com/drive/u/1/folders/{matchedFolderID}')
-            markup = InlineKeyboardMarkup(buttons.build_menu(1))
-            LOGGER.info(f'Uploaded Completed: {username}')
-            editMessage(msg, m, markup)
-            return True
+        buttons = button_build.ButtonMaker()
+        buttons.buildbutton('Drive Link', f'https://drive.google.com/drive/u/1/folders/{matchedFolderID}')
+        markup = InlineKeyboardMarkup(buttons.build_menu(1))
+        LOGGER.info(f'Uploaded Completed: {username}')
+        editMessage(msg, m, markup)
+        return True
     else:
         editMessage("No Credentials File Found..Upload stopped", m)
         LOGGER.warning("No Credentials File Found..Upload stopped")

@@ -17,8 +17,6 @@ from bot.helper.ext_utils.bot_utils import usercheck
 from bot.helper.ext_utils.bot_utils import get_readable_file_size, get_readable_time
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.ext_utils import fs_utils
-
-from bot.modules import authorize, shell, speedtest, callback, insta_cmds, login, utlis
 # from bot.start_help import ig_help, start
 
 

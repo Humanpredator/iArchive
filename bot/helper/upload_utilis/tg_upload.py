@@ -5,7 +5,6 @@ from datetime import datetime
 import pytz
 from pyrogram.errors import FloodWait
 from telegram import InputMediaPhoto, InputMediaVideo
-from videoprops import get_audio_properties
 
 from bot import DOWNLOAD_STATUS_UPDATE_INTERVAL, LOGGER
 from bot.helper.ext_utils.bot_utils import progress_bar, usercheck

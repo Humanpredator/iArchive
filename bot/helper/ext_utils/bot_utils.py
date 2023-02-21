@@ -86,15 +86,13 @@ def usercheck():
 def acc_type(val):
     if val:
         return "🔒Private🔒"
-    else:
-        return "🔓Public🔓"
+    return "🔓Public🔓"
 
 
 def yes_or_no(val):
     if val:
         return "Yes"
-    else:
-        return "No"
+    return "No"
 
 
 def is_link(args):

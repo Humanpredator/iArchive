@@ -66,10 +66,9 @@ def user_login(update, context):
             sendMessage(
                 f"@{USER} is already logged in.\n Try to /logout.\n Use /account to see current logged in user.", context.bot, update)
             return
-        else:
-            sendMessage(
-                f'Send /login <b>username</b> <b>password</b>', context.bot, update)
-            return
+        sendMessage(
+            f'Send /login <b>username</b> <b>password</b>', context.bot, update)
+        return
 
 
 def timeout(update):

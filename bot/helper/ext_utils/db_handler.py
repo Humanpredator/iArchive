@@ -52,13 +52,12 @@ class DbManger:
             self.disconnect()
             SUDO_USERS.add(chat_id)
             return 'Successfully promoted as Sudo'
-        else:
-            sql = 'INSERT INTO users VALUES ({},TRUE);'.format(chat_id)
-            self.cur.execute(sql)
-            self.conn.commit()
-            self.disconnect()
-            SUDO_USERS.add(chat_id)
-            return 'Successfully Authorized and promoted as Sudo'
+        sql = 'INSERT INTO users VALUES ({},TRUE);'.format(chat_id)
+        self.cur.execute(sql)
+        self.conn.commit()
+        self.disconnect()
+        SUDO_USERS.add(chat_id)
+        return 'Successfully Authorized and promoted as Sudo'
 
     def db_rmsudo(self, chat_id: int):
         self.connect()

@@ -29,7 +29,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 
 LOGGER = logging.getLogger(__name__)
 
-CONFIG_FILE_URL = os.environ.get('CONFIG_FILE_URL', None)
+CONFIG_FILE_URL = os.environ.get('CONFIG_FILE_URL')
 if CONFIG_FILE_URL is not None:
     res = requests.get(CONFIG_FILE_URL)
     if res.status_code == 200:

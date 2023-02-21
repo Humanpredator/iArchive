@@ -1,7 +1,7 @@
 import os
 from instaloader import Instaloader, TwoFactorAuthRequiredException
 S = "0"
-STATUS = set(int(x) for x in (S).split())
+STATUS = {int(x) for x in (S).split()}
 L = Instaloader()
 
 

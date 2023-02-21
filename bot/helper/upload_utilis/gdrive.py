@@ -5,7 +5,7 @@ from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 from telegram import InlineKeyboardMarkup
 
-from bot import parent_id, INDEX_URL, LOGGER
+from bot import parent_id, LOGGER
 from bot.helper.ext_utils.bot_utils import fcount, get_readable_file_size, fsize, progress_bar
 from bot.helper.telegram_helper import button_build
 from bot.helper.telegram_helper.message_utils import editMessage

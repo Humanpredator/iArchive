@@ -131,7 +131,7 @@ app = Client('Insta_Scrap', api_id=int(TELEGRAM_API),
 
 # IG CONFIG
 S = "0"
-STATUS = set(int(x) for x in S.split())
+STATUS = {int(x) for x in S.split()}
 INSTA = Instaloader()
 
 # Generate Telegraph Token

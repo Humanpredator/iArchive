@@ -2,7 +2,6 @@ import os
 
 from instaloader import Profile
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from telegram import InlineKeyboardButton
 from telegram.ext import CallbackQueryHandler
 
 from bot import INSTA, OWNER_ID, dispatcher

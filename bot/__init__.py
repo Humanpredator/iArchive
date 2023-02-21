@@ -17,29 +17,30 @@ faulthandler.enable()
 socket.setdefaulttimeout(600)
 
 botStartTime = time.time()
-if os.path.exists('log.txt'):
-    with open('log.txt', 'a+') as f:
+if os.path.exists("log.txt"):
+    with open("log.txt", "a+") as f:
         f.truncate(0)
 
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    handlers=[logging.FileHandler(
-                        'log.txt'), logging.StreamHandler()],
-                    datefmt='%d-%b-%y %H:%M:%S',
-                    level=logging.INFO)
+logging.basicConfig(
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    handlers=[logging.FileHandler("log.txt"), logging.StreamHandler()],
+    datefmt="%d-%b-%y %H:%M:%S",
+    level=logging.INFO,
+)
 
 LOGGER = logging.getLogger(__name__)
 
-CONFIG_FILE_URL = os.environ.get('CONFIG_FILE_URL')
+CONFIG_FILE_URL = os.environ.get("CONFIG_FILE_URL")
 if CONFIG_FILE_URL is not None:
     res = requests.get(CONFIG_FILE_URL)
     if res.status_code == 200:
-        with open('config.env', 'wb+') as f:
+        with open("config.env", "wb+") as f:
             f.write(res.content)
             f.close()
     else:
         logging.error(res.status_code)
 
-load_dotenv('config.env')
+load_dotenv("config.env")
 
 
 def getConfig(name: str):
@@ -64,43 +65,43 @@ BOT_TOKEN = None
 AUTHORIZED_CHATS = set()
 SUDO_USERS = set()
 
-if os.path.exists('authorized_chats.txt'):
-    with open('authorized_chats.txt', 'r+') as f:
+if os.path.exists("authorized_chats.txt"):
+    with open("authorized_chats.txt", "r+") as f:
         lines = f.readlines()
         for line in lines:
             AUTHORIZED_CHATS.add(int(line.split()[0]))
-if os.path.exists('sudo_users.txt'):
-    with open('sudo_users.txt', 'r+') as f:
+if os.path.exists("sudo_users.txt"):
+    with open("sudo_users.txt", "r+") as f:
         lines = f.readlines()
         for line in lines:
             SUDO_USERS.add(int(line.split()[0]))
 try:
-    achats = getConfig('AUTHORIZED_CHATS')
+    achats = getConfig("AUTHORIZED_CHATS")
     achats = achats.split(" ")
     for chats in achats:
         AUTHORIZED_CHATS.add(int(chats))
 except:
     pass
 try:
-    schats = getConfig('SUDO_USERS')
+    schats = getConfig("SUDO_USERS")
     schats = schats.split(" ")
     for chats in schats:
         SUDO_USERS.add(int(chats))
 except:
     pass
 try:
-    BOT_TOKEN = getConfig('BOT_TOKEN')
-    parent_id = getConfig('GDRIVE_FOLDER_ID')
+    BOT_TOKEN = getConfig("BOT_TOKEN")
+    parent_id = getConfig("GDRIVE_FOLDER_ID")
     DOWNLOAD_STATUS_UPDATE_INTERVAL = int(
-        getConfig('DOWNLOAD_STATUS_UPDATE_INTERVAL'))
-    OWNER_ID = int(getConfig('OWNER_ID'))
-    TELEGRAM_API = getConfig('TELEGRAM_API')
-    TELEGRAM_HASH = getConfig('TELEGRAM_HASH')
+        getConfig("DOWNLOAD_STATUS_UPDATE_INTERVAL"))
+    OWNER_ID = int(getConfig("OWNER_ID"))
+    TELEGRAM_API = getConfig("TELEGRAM_API")
+    TELEGRAM_HASH = getConfig("TELEGRAM_HASH")
 except:
     LOGGER.error("One or more env variables missing! Exiting now")
     sys.exit(1)
 try:
-    DB_URI = getConfig('DATABASE_URL')
+    DB_URI = getConfig("DATABASE_URL")
     if len(DB_URI) == 0:
         raise KeyError
 except:
@@ -127,8 +128,12 @@ if DB_URI is not None:
         conn.close()
 
 LOGGER.info("Generating USER_SESSION_STRING")
-app = Client('Insta_Scrap', api_id=int(TELEGRAM_API),
-             api_hash=TELEGRAM_HASH, bot_token=BOT_TOKEN, )
+app = Client(
+    "Insta_Scrap",
+    api_id=int(TELEGRAM_API),
+    api_hash=TELEGRAM_HASH,
+    bot_token=BOT_TOKEN,
+)
 
 # IG CONFIG
 S = "0"
@@ -141,10 +146,9 @@ INSTA = Instaloader()
 # telegraph = Telegraph()
 # telegraph_token = telegraph.create_account(short_name=sname).get_access_token()
 
-
 try:
     IGNORE_PENDING_REQUESTS = getConfig("IGNORE_PENDING_REQUESTS")
-    IGNORE_PENDING_REQUESTS = IGNORE_PENDING_REQUESTS.lower() == 'true'
+    IGNORE_PENDING_REQUESTS = IGNORE_PENDING_REQUESTS.lower() == "true"
 except:
     IGNORE_PENDING_REQUESTS = False
 try:
@@ -154,7 +158,7 @@ except:
 
 try:
     TG_UPLOAD = getConfig("TG_UPLOAD")
-    TG_UPLOAD = TG_UPLOAD.lower() == 'true'
+    TG_UPLOAD = TG_UPLOAD.lower() == "true"
 except:
     TG_UPLOAD = False
 

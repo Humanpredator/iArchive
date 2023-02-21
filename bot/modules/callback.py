@@ -55,7 +55,7 @@ def cb_handler(update, context):
         chat_id = query.message.chat.id
         if media_count == 0:
             query.edit_message_text("There are no posts by the user")
-            
+
         else:
             m = query.edit_message_text(
                 "Starting Downloading..\nThis may take time depending upon number of Posts.")
@@ -81,7 +81,7 @@ def cb_handler(update, context):
         chat_id = query.message.chat.id
         if media_count == 0:
             query.edit_message_text("There are no posts by the user")
-            
+
         m = query.edit_message_text(
             "Starting Downloading..\nThis may take time depending upon number of Posts.")
         dir = f"{OWNER_ID}/{username}"
@@ -106,7 +106,7 @@ def cb_handler(update, context):
         chat_id = query.message.chat.id
         if media_count == 0:
             query.edit_message_text("There are no posts by the user")
-            
+
         m = query.edit_message_text(
             "Starting Downloading..\nThis may take time depending upon number of Posts.")
         dir = f"{OWNER_ID}/{username}"
@@ -130,7 +130,7 @@ def cb_handler(update, context):
         chat_id = query.message.chat.id
         if media_count == 0:
             query.edit_message_text("There are no posts by the user")
-            
+
         m = query.edit_message_text(
             "Starting Downloading..\nThis may take longer time Depending upon number of posts.")
         dir = f"{OWNER_ID}/{username}"
@@ -170,7 +170,7 @@ def cb_handler(update, context):
         chat_id = query.message.chat.id
         if igtv_count == 0:
             query.edit_message_text("There are no IGTV posts by the user")
-            
+
         m = query.edit_message_text(
             "Starting Downloading..\nThis may take longer time Depending upon number of posts.")
         dir = f"{OWNER_ID}/{username}"
@@ -221,7 +221,7 @@ def cb_handler(update, context):
         except Exception as e:
             LOGGER.error(e)
             bot.send_message(chat_id=chat_id, text=f"Error Occurred: {e}")
-            
+
 
     elif query.data.startswith("following"):
         query.answer()
@@ -245,7 +245,7 @@ def cb_handler(update, context):
         except Exception as e:
             LOGGER.error(e)
             bot.send_message(chat_id=chat_id, text=f"Error Occurred: {e}")
-            
+
 
     else:
         dir = f"{OWNER_ID}/{username}"

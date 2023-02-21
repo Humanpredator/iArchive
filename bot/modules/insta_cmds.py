@@ -18,7 +18,7 @@ def post(update, context):
         m = sendMessage("Checking the given username, please wait...!", context.bot, update)
         if 1 not in STATUS:
             editMessage("You must /login ", m)
-            
+
         elif is_link(args[1]):
             editMessage("Please send a username only...!", m)
         else:
@@ -30,7 +30,7 @@ def post(update, context):
                 editMessage(
                     f"Sorry!\nI can't fetch details from that account.\nSince its a private account and you are not following <code>@{username}</code>.",
                     m)
-                
+
             else:
                 reply_markup = InlineKeyboardMarkup(
                     [
@@ -45,7 +45,7 @@ def post(update, context):
                     ]
                 )
                 editMessage("Select the type of posts you want to fetch?", m, reply_markup=reply_markup)
-                
+
     else:
         sendMessage("Please send a username...!", context.bot, update)
 
@@ -57,7 +57,7 @@ def igtv(update, context):
         m = sendMessage("Checking the given username, please wait...!", context.bot, update)
         if 1 not in STATUS:
             editMessage("You must login  /login ", m)
-            
+
         elif is_link(args[1]):
             editMessage("Please send a username only...!", m)
         else:
@@ -68,7 +68,7 @@ def igtv(update, context):
                 editMessage(
                     f"Sorry!\nI can't fetch details from that account.\nSince its a private account and you are not following <code>@{username}</code>.",
                     m)
-                
+
         editMessage(f"Fetching IGTV from <code>@{username}</code>", m)
         profile = Profile.from_username(INSTA.context, username)
         igtv_count = profile.igtvcount
@@ -93,7 +93,7 @@ def followers(update, context):
         m = sendMessage("Checking the given username, please wait...!", context.bot, update)
         if 1 not in STATUS:
             editMessage("You must /login ", m)
-            
+
         elif is_link(args[1]):
             editMessage("Please send a username only...!", m)
         else:
@@ -105,7 +105,7 @@ def followers(update, context):
                 editMessage(
                     f"Sorry!\nI can't fetch details from that account.\nSince its a private account and you are not following <code>@{username}</code>.",
                     m)
-                
+
         profile = Profile.from_username(INSTA.context, username)
         name = profile.full_name
         editMessage(
@@ -138,7 +138,7 @@ def following(update, context):
         m = sendMessage("Checking the given username, please wait...!", context.bot, update)
         if 1 not in STATUS:
             editMessage("You must /login ", m)
-            
+
         elif is_link(args[1]):
             editMessage("Please send a username only...!", m)
         else:
@@ -149,7 +149,7 @@ def following(update, context):
                 editMessage(
                     f"Sorry!\nI can't fetch details from that account.\nSince its a private account and you are not following <code>@{username}</code>.",
                     m)
-                
+
         profile = Profile.from_username(INSTA.context, username)
         full_name = profile.full_name
         editMessage(
@@ -182,7 +182,7 @@ def fans(update, context):
         username = args[1]
         if 1 not in STATUS:
             editMessage("You must /login ", m)
-            
+
         elif is_link(args[1]):
             editMessage("Please send a username only...!", m)
         else:
@@ -193,7 +193,7 @@ def fans(update, context):
                 editMessage(
                     f"Sorry!\nI can't fetch details from that account.\nSince its a private account and you are not following <code>@{username}</code>.",
                     m)
-                
+
         profile = Profile.from_username(INSTA.context, username)
         full_name = profile.full_name
         editMessage(f"Fetching fans list of <code>@{username}</code>\n It may take few minutes, pls be patient...!", m)
@@ -240,7 +240,7 @@ def not_following(update, context):
         username = args[1]
         if 1 not in STATUS:
             editMessage("You must /login ", m)
-            
+
         elif is_link(args[1]):
             editMessage("Please send a username only...!", m)
         else:
@@ -251,7 +251,7 @@ def not_following(update, context):
                 editMessage(
                     f"Sorry!\nI can't fetch details from that account.\nSince its a private account and you are not following <code>@{username}</code>.",
                     m)
-                
+
         profile = Profile.from_username(INSTA.context, username)
         full_name = profile.full_name
         editMessage(
@@ -303,7 +303,7 @@ def feed(update, context):
             count = args[1]
             if 1 not in STATUS:
                 editMessage("You must /login ", m)
-                
+
             editMessage(f"Fetching {count} posts from <code>@{USER}</code>'s feed.", m)
             editMessage("Starting downloading..\nThis may take longer time depending upon number of posts.", m)
             command = [
@@ -356,7 +356,7 @@ def saved(update, context):
 
         if 1 not in STATUS:
             editMessage("You must /login ", m)
-            
+
         if args[1].isdigit():
             count = args[1]
             editMessage(f"Fetching {count} posts from saved.", m)
@@ -410,7 +410,7 @@ def tagged(update, context):
         username = args[1]
         if 1 not in STATUS:
             editMessage("You must /login ", m)
-            
+
         elif is_link(args[1]):
             editMessage("Please send a username only...!", m)
         else:
@@ -419,7 +419,7 @@ def tagged(update, context):
             ac_type = acc_type(profile.is_private)
             if ac_type == "🔒Private🔒" and is_followed == "No":
                 editMessage(f"This account is private and you are not following {username}.", m)
-                
+
         editMessage(f"Fetching posts from <code>@{username}</code>'s tagged", m)
         editMessage("Starting downloading..\nThis may take longer time depending upon number of posts.", m)
         command = [
@@ -453,7 +453,7 @@ def story(update, context):
         dir = f"{OWNER_ID}/{username}"
         if 1 not in STATUS:
             editMessage("You must /login ", m)
-            
+
         elif is_link(args[1]):
             editMessage("Please send a username only...!", m)
         else:
@@ -462,7 +462,7 @@ def story(update, context):
             ac_type = acc_type(profile.is_private)
             if ac_type == "🔒Private🔒" and is_followed == "No":
                 editMessage(f"This account is private and you are not following {username}.", m)
-                
+
         editMessage(f"Fetching posts from <code>@{username}</code>'s story.", m)
         editMessage("Starting downloading..\nThis may take longer time depending upon number of posts.", m)
         command = [
@@ -497,7 +497,7 @@ def stories(update, context):
         m = sendMessage("Checking the details, Please wait...!", context.bot, update)
         if 1 not in STATUS:
             editMessage("You must /login ", m)
-            
+
         editMessage(f"Fetching posts from your stories.", m)
         editMessage("Starting downloading..\nThis may take longer time depending upon number of posts.", m)
         command = [
@@ -531,7 +531,7 @@ def highlights(update, context):
         dir = f"{OWNER_ID}/{username}"
         if 1 not in STATUS:
             editMessage("You must /login ", m)
-            
+
         elif is_link(args[1]):
             editMessage("Please send a username only...!", m)
         else:
@@ -540,7 +540,7 @@ def highlights(update, context):
             ac_type = acc_type(profile.is_private)
             if ac_type == "🔒Private🔒" and is_followed == "No":
                 editMessage(f"This account is private and you are not following {username}.", m)
-                
+
         editMessage(f"Fetching posts from <code>@{username}</code>'s highlights.", m)
         editMessage("Starting downloading..\nThis may take longer time depending upon number of posts.", m)
         command = [

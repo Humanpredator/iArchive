@@ -1,7 +1,8 @@
-from pydrive.auth import GoogleAuth
-from os import path
 import os
 import sys
+from os import path
+
+from pydrive.auth import GoogleAuth
 
 if path.exists("client_secrets.json"):
     gauth = GoogleAuth()

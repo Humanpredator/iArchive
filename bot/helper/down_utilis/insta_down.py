@@ -12,7 +12,7 @@ from bot.helper.telegram_helper.message_utils import *
 from bot.helper.upload_utilis.gdrive import gup
 from bot.helper.upload_utilis.tg_upload import tgup
 
-IST = pytz.timezone('Asia/Kolkata')
+IST = pytz.timezone("Asia/Kolkata")
 
 
 # A function to download content from Instagram
@@ -21,10 +21,11 @@ def download_insta(command, m, dir, username, chat_id, fetch):
         USER = usercheck()
         session = f"./{USER}"
         process = subprocess.Popen(
-            command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=False)
+            command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=False
+        )
         while True:
             output = process.stdout.readline()
-            if output == b'':
+            if output == b"":
                 subfolder(dir)
                 gup(dir, m, username, fetch)
                 break
@@ -35,23 +36,26 @@ def download_insta(command, m, dir, username, chat_id, fetch):
                     msg = f'CURRENT_STATUS ⚙️ : <code>{format(output.decode("UTF8"))}</code>\n<b>Last Updated</b> : <code>{ISTIME}</code>\n<b>Directory</b> : <code>{dir}</code>\n<b>session</b> : <code>{session}</code>\n<b>Type</b> : <code>{fetch}</code>'
                     time.sleep(DOWNLOAD_STATUS_UPDATE_INTERVAL)
                     bot.edit_message_text(
-                        msg, m.chat.id, m.message_id, parse_mode="HTML")
+                        msg, m.chat.id, m.message_id, parse_mode="HTML"
+                    )
                     LOGGER.info(f"{output.decode('UTF8')}")
                 except Exception as e:
                     LOGGER.info(f"{e}")
         while True:
             error = process.stderr.readline()
-            if error == b'':
+            if error == b"":
                 break
             if error:
                 datetime_ist = datetime.now(IST)
                 ISTIME = datetime_ist.strftime("%I:%M:%S %p - %d %B %Y")
                 try:
                     ermsg = "ERROR ❌ : <code>{}</code>\nLast Updated : <code>{}</code>".format(
-                        error.decode("UTF8"), ISTIME)
+                        error.decode("UTF8"), ISTIME
+                    )
                     time.sleep(DOWNLOAD_STATUS_UPDATE_INTERVAL)
                     bot.edit_message_text(
-                        ermsg, m.chat.id, m.message_id, parse_mode="HTML")
+                        ermsg, m.chat.id, m.message_id, parse_mode="HTML"
+                    )
                     LOGGER.info(f"{error.decode('UTF8')}")
                 except Exception as e:
                     LOGGER.info(f"{e}")

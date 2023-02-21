@@ -2,21 +2,21 @@ import logging
 import os
 import re
 
-SIZE_UNITS = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']
+SIZE_UNITS = ["B", "KB", "MB", "GB", "TB", "PB"]
 LOGGER = logging.getLogger(__name__)
 
 
 def get_readable_file_size(size_in_bytes) -> str:
     if size_in_bytes is None:
-        return '0B'
+        return "0B"
     index = 0
     while size_in_bytes >= 1024:
         size_in_bytes /= 1024
         index += 1
     try:
-        return f'{round(size_in_bytes, 2)}{SIZE_UNITS[index]}'
+        return f"{round(size_in_bytes, 2)}{SIZE_UNITS[index]}"
     except IndexError:
-        return 'File too large'
+        return "File too large"
 
 
 def fcount(dir):
@@ -24,12 +24,11 @@ def fcount(dir):
     totalFiles = 0
     totalDir = 0
     for base, dirs, files in os.walk(APP_FOLDER):
-
         for _ in dirs:
             totalDir += 1
         for _ in files:
             totalFiles += 1
-    LOGGER.info(f'Total Files: {totalFiles}')
+    LOGGER.info(f"Total Files: {totalFiles}")
     return totalFiles
 
 
@@ -42,29 +41,30 @@ def fsize(dir):
 
 
 def get_readable_time(seconds: int) -> str:
-    result = ''
+    result = ""
     (days, remainder) = divmod(seconds, 86400)
     days = int(days)
     if days != 0:
-        result += f'{days}d'
+        result += f"{days}d"
     (hours, remainder) = divmod(remainder, 3600)
     hours = int(hours)
     if hours != 0:
-        result += f'{hours}h'
+        result += f"{hours}h"
     (minutes, seconds) = divmod(remainder, 60)
     minutes = int(minutes)
     if minutes != 0:
-        result += f'{minutes}m'
+        result += f"{minutes}m"
     seconds = int(seconds)
-    result += f'{seconds}s'
+    result += f"{seconds}s"
     return result
 
 
 def progress_bar(count, size):
     percent = 100
     bar_length = 20
-    pbar = ("\r[{:20s}] {:2.1f}%".format(
-        '#' * int(count / size * bar_length), count / size * percent))
+    pbar = "\r[{:20s}] {:2.1f}%".format(
+        "#" * int(count / size * bar_length), count / size * percent
+    )
     return pbar
 
 
@@ -96,7 +96,7 @@ def yes_or_no(val):
 
 
 def is_link(args):
-    iglink = r'^https://www\.instagram\.com/([A-Za-z0-9._]+/)?(p|tv|reel)/([A-Za-z0-9\-_]*)'
+    iglink = (
+        r"^https://www\.instagram\.com/([A-Za-z0-9._]+/)?(p|tv|reel)/([A-Za-z0-9\-_]*)"
+    )
     return bool(re.search(iglink, args))
-
-

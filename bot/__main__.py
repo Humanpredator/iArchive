@@ -30,7 +30,6 @@ from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.message_utils import *
 
-# from bot.start_help import ig_help, start
 
 
 def stats(update, context):

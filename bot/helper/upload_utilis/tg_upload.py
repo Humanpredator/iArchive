@@ -21,7 +21,7 @@ session = f"./{USER}"
 def tgup(chat_id, dir):
     datetime_ist = datetime.now(IST)
     ISTIME = datetime_ist.strftime("%I:%M:%S %p - %d %B %Y")
-    m = bot.send_message(chat_id, f"Uploading to Telegram, Please wait...")
+    m = bot.send_message(chat_id, "Uploading to Telegram, Please wait...")
     videos = glob.glob(f"{dir}/*.mp4")
     VDO = []
     GIF = []
@@ -134,5 +134,5 @@ def tgup(chat_id, dir):
                 LOGGER.error(e)
 
     editMessage("Telegram Upload Completed", m)
-    LOGGER.info(f"Telegram Upload Completed")
+    LOGGER.info("Telegram Upload Completed")
     return True

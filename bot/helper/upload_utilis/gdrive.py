@@ -179,6 +179,5 @@ def gup(dir: str, m, username, fetch):
         LOGGER.info(f'Uploaded Completed: {username}')
         editMessage(msg, m, markup)
         return True
-    else:
-        editMessage("No Credentials File Found..Upload stopped", m)
-        LOGGER.warning("No Credentials File Found..Upload stopped")
+    editMessage("No Credentials File Found..Upload stopped", m)
+    LOGGER.warning("No Credentials File Found..Upload stopped")

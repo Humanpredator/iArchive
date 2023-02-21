@@ -195,7 +195,7 @@ def cb_handler(update, context):
     elif query.data.startswith("no"):
         query.answer()
         m = bot.send_message(chat_id=query.message.chat.id,
-                             text=f"Process Cancelled")
+                             text="Process Cancelled")
         bot.delete_message(chat_id=query.message.chat.id,
                            message_id=m.message_id)
 

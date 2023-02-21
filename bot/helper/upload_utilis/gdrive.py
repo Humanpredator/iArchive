@@ -35,7 +35,7 @@ def gup(dir: str, m, username, fetch):
 
         count = 0
         editMessage(
-            f"Drive Upload Starts, Please Wait....!\nThis may take longer time Depending upon number of posts.", m)
+            "Drive Upload Starts, Please Wait....!\nThis may take longer time Depending upon number of posts.", m)
 
         # Getting Gdrive Details
         # Get list the Files in Given gUserFolderID
@@ -164,7 +164,7 @@ def gup(dir: str, m, username, fetch):
             except Exception as e:
                 LOGGER.info(e)
             LOGGER.info(f'File {localfilelist} is Successfully Uploaded')
-        LOGGER.info(f'All Files was Successfully Uploaded')
+        LOGGER.info('All Files was Successfully Uploaded')
         msg = f'''
 <b>Upload Completed: </b><code>{username}</code>
 <b>Directory: </b><code>{dir}</code>

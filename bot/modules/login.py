@@ -66,7 +66,7 @@ def user_login(update, context):
                 f"@{USER} is already logged in.\n Try to /logout.\n Use /account to see current logged in user.", context.bot, update)
             return
         sendMessage(
-            f'Send /login <b>username</b> <b>password</b>', context.bot, update)
+            'Send /login <b>username</b> <b>password</b>', context.bot, update)
         return
 
 
@@ -81,7 +81,7 @@ def codei(update, context):
     if codei.isdigit():
         codei = int(codei)
         m = sendMessage(
-            f"Checking given code.\n please wait...!", context.bot, update)
+            "Checking given code.\n please wait...!", context.bot, update)
         try:
             INSTA.two_factor_login(codei)
             INSTA.save_session_to_file(filename=f"./{username}")

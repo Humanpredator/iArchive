@@ -498,7 +498,7 @@ def stories(update, context):
         if 1 not in STATUS:
             editMessage("You must /login ", m)
 
-        editMessage(f"Fetching posts from your stories.", m)
+        editMessage("Fetching posts from your stories.", m)
         editMessage("Starting downloading..\nThis may take longer time depending upon number of posts.", m)
         command = [
             "instaloader",
@@ -558,7 +558,7 @@ def highlights(update, context):
             "--dirname-pattern", dir,
             "--", username
         ]
-        download_insta(command, m, dir, username, chat_id, fetch=f'Highlights')
+        download_insta(command, m, dir, username, chat_id, fetch='Highlights')
     else:
         sendMessage("Please send a username...!", context.bot, update)
 

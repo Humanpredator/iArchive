@@ -118,7 +118,6 @@ def gup(dir: str, m, username, fetch):
                     editMessage(msg, m)
                 except Exception as e:
                     LOGGER.info(e)
-                    pass
                 LOGGER.info(f'File {localfilelist} is Successfully Uploaded')
             msg = f'''
 <b>Upload Completed: </b><code>{username}</code>

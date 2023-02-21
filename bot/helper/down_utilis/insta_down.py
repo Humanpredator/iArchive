@@ -39,7 +39,6 @@ def download_insta(command, m, dir, username, chat_id, fetch):
                     LOGGER.info(f"{output.decode('UTF8')}")
                 except Exception as e:
                     LOGGER.info(f"{e}")
-                    pass
         while True:
             error = process.stderr.readline()
             if error == b'':
@@ -56,7 +55,6 @@ def download_insta(command, m, dir, username, chat_id, fetch):
                     LOGGER.info(f"{error.decode('UTF8')}")
                 except Exception as e:
                     LOGGER.info(f"{e}")
-                    pass
                 return True
         LOGGER.info(f"Download Completed-{dir}")
         if TG_UPLOAD:

@@ -130,7 +130,6 @@ def mirror(update, context):
             except Exception as e:
                 LOGGER.error(e)
                 editMessage(f"Error Occurred: {e}", m)
-                pass
         else:
             msg = "Unsupported Format"
             editMessage(msg, m)
@@ -223,7 +222,6 @@ def ig(update, context):
             except Exception as e:
                 LOGGER.error(e)
                 editMessage(f"Error Occurred: {e}", m)
-                pass
         else:
             msg = f"Fetching details for <code>@{username}</code>\nWait for a while🔗"
             editMessage(msg, m)
@@ -297,7 +295,6 @@ def ig(update, context):
             except Exception as e:
                 LOGGER.error(e)
                 editMessage(f"Error Occurred: {e}", m)
-                pass
     else:
         sendMessage("Send username or profile link /ig ", context.bot, update)
 

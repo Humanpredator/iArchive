@@ -50,7 +50,6 @@ def user_login(update, context):
 
             except BadCredentialsException:
                 editMessage("Wrong credentials\nTry to /login again.", m)
-                pass
                 return
 
             except TwoFactorAuthRequiredException:

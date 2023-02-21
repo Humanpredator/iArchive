@@ -57,9 +57,8 @@ def gup(dir: str, m, username, fetch):
                     # Store already presented user gfolder title
                     foldername = glistfile['title']
                     break  # Break the loop
-                else:
-                    folderid = None
-                    foldername = None
+                folderid = None
+                foldername = None
 
         # set folder variables
         # Store already presented user gfolder id to the matchedFolderID

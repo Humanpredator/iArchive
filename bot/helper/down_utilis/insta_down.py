@@ -1,14 +1,18 @@
+'''A module to download content from Instagram'''
+
 import subprocess
 import threading
 import time
 from datetime import datetime
 
 import pytz
+from telegram import TelegramError
 
-from bot import DOWNLOAD_STATUS_UPDATE_INTERVAL, TG_UPLOAD
+from bot import DOWNLOAD_STATUS_UPDATE_INTERVAL, LOGGER, TG_UPLOAD,bot
+
 from bot.helper.ext_utils.bot_utils import usercheck
 from bot.helper.ext_utils.fs_utils import clean_download, subfolder
-from bot.helper.telegram_helper.message_utils import *
+
 from bot.helper.upload_utilis.gdrive import gup
 from bot.helper.upload_utilis.tg_upload import tgup
 
@@ -16,56 +20,60 @@ IST = pytz.timezone("Asia/Kolkata")
 
 
 # A function to download content from Instagram
-def download_insta(command, m, dir, username, chat_id, fetch):
-    def download(command, m, dir, fetch):
-        USER = usercheck()
-        session = f"./{USER}"
+def download_insta(command, msg, directory, username, chat_id, fetch):
+    '''A function to download content from Instagram'''
+    def download(command, msg, directory, fetch):
+        current_user = usercheck()
+        session = f"./{current_user}"
         process = subprocess.Popen(
             command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=False
         )
         while True:
             output = process.stdout.readline()
             if output == b"":
-                subfolder(dir)
-                gup(dir, m, username, fetch)
+                subfolder(directory)
+                gup(directory, msg, username, fetch)
                 break
             if output:
                 datetime_ist = datetime.now(IST)
-                ISTIME = datetime_ist.strftime("%I:%M:%S %p - %d %B %Y")
+                ist_time = datetime_ist.strftime("%I:%M:%S %p - %d %B %Y")
                 try:
-                    msg = f'CURRENT_STATUS ⚙️ : <code>{format(output.decode("UTF8"))}</code>\n<b>Last Updated</b> : <code>{ISTIME}</code>\n<b>Directory</b> : <code>{dir}</code>\n<b>session</b> : <code>{session}</code>\n<b>Type</b> : <code>{fetch}</code>'
+                    msg = f'CURRENT_STATUS ⚙️: <code>{format(output.decode("UTF8"))}</code>\n\
+                    <b>Last Updated</b> : <code>{ist_time}</code>\n\
+                    <b>directoryectory</b> : <code>{directory}</code>\n\
+                    <b>session</b> : <code>{session}</code>\n\
+                    <b>Type</b> : <code>{fetch}</code>'
                     time.sleep(DOWNLOAD_STATUS_UPDATE_INTERVAL)
                     bot.edit_message_text(
-                        msg, m.chat.id, m.message_id, parse_mode="HTML"
+                        msg, msg.chat.id, msg.message_id, parse_mode="HTML"
                     )
-                    LOGGER.info(f"{output.decode('UTF8')}")
-                except Exception as e:
-                    LOGGER.info(f"{e}")
+                    LOGGER.info(output.decode('UTF8'))
+                except TelegramError as error:
+                    LOGGER.info(error)
         while True:
             error = process.stderr.readline()
             if error == b"":
                 break
             if error:
                 datetime_ist = datetime.now(IST)
-                ISTIME = datetime_ist.strftime("%I:%M:%S %p - %d %B %Y")
+                ist_time = datetime_ist.strftime("%I:%M:%S %p - %d %B %Y")
                 try:
-                    ermsg = "ERROR ❌ : <code>{}</code>\nLast Updated : <code>{}</code>".format(
-                        error.decode("UTF8"), ISTIME
-                    )
+                    ermsg = f"ERROR❌:<code>{error.decode('UTF8')}</code>\n\
+                            Last Updated : <code>{ist_time}</code>"
                     time.sleep(DOWNLOAD_STATUS_UPDATE_INTERVAL)
                     bot.edit_message_text(
-                        ermsg, m.chat.id, m.message_id, parse_mode="HTML"
+                        ermsg, msg.chat.id, msg.message_id, parse_mode="HTML"
                     )
-                    LOGGER.info(f"{error.decode('UTF8')}")
-                except Exception as e:
-                    LOGGER.info(f"{e}")
+                    LOGGER.info(error.decode('UTF8'))
+                except TelegramError as error:
+                    LOGGER.info(error)
                 return True
-        LOGGER.info(f"Download Completed-{dir}")
+        LOGGER.info("Download Completed-%s",directory)
         if TG_UPLOAD:
-            tgup(chat_id, dir)
+            tgup(chat_id, directory)
         else:
             pass
-        clean_download(dir)
+        clean_download(directory)
 
-    threading.Thread(target=download, args=(command, m, dir, fetch)).start()
+    threading.Thread(target=download, args=(command, msg, directory, fetch)).start()
     return True

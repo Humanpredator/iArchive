@@ -1,18 +1,21 @@
-import os
+"""Callback handler for the bot."""
+import json
 
 from instaloader import Profile
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import TelegramError
 from telegram.ext import CallbackQueryHandler
 
-from bot import INSTA, OWNER_ID, dispatcher
+from bot import INSTA, bot, OWNER_ID, LOGGER, dispatcher
 from bot.helper.down_utilis.insta_down import download_insta
 from bot.helper.ext_utils.bot_utils import usercheck
-from bot.helper.telegram_helper.message_utils import *
 
 
+# noinspection PyUnusedLocal
 def cb_handler(update, context):
-    USER = usercheck()
-    session = f"./{USER}"
+    """Callback handler for the bot."""
+    current_user = usercheck()
+    session = f"./{current_user}"
     query = update.callback_query
     username = query.data.split("#")[1]
     profile = Profile.from_username(INSTA.context, username)
@@ -67,10 +70,10 @@ def cb_handler(update, context):
             query.edit_message_text("There are no posts by the user")
 
         else:
-            m = query.edit_message_text(
+            msg = query.edit_message_text(
                 "Starting Downloading..\nThis may take time depending upon number of Posts."
             )
-            dir = f"{OWNER_ID}/{username}"
+            directory = f"{OWNER_ID}/{username}"
             command = [
                 "instaloader",
                 "--no-metadata-json",
@@ -81,15 +84,15 @@ def cb_handler(update, context):
                 "--no-video-thumbnails",
                 "--filename-pattern={profile}_UTC_{date_utc}",
                 "--login",
-                USER,
+                current_user,
                 "-f",
                 session,
                 "--dirname-pattern",
-                dir,
+                directory,
                 "--",
                 username,
             ]
-            download_insta(command, m, dir, username, chat_id, fetch="Photos")
+            download_insta(command, msg, directory, username, chat_id, fetch="Photos")
 
     elif query.data.startswith("videos"):
         query.answer()
@@ -97,10 +100,10 @@ def cb_handler(update, context):
         if media_count == 0:
             query.edit_message_text("There are no posts by the user")
 
-        m = query.edit_message_text(
+        msg = query.edit_message_text(
             "Starting Downloading..\nThis may take time depending upon number of Posts."
         )
-        dir = f"{OWNER_ID}/{username}"
+        directory = f"{OWNER_ID}/{username}"
         command = [
             "instaloader",
             "--no-metadata-json",
@@ -111,15 +114,15 @@ def cb_handler(update, context):
             "--no-video-thumbnails",
             "--filename-pattern={profile}_UTC_{date_utc}",
             "--login",
-            USER,
+            current_user,
             "-f",
             session,
             "--dirname-pattern",
-            dir,
+            directory,
             "--",
             username,
         ]
-        download_insta(command, m, dir, username, chat_id, fetch="Videos")
+        download_insta(command, msg, directory, username, chat_id, fetch="Videos")
 
     elif query.data.startswith("picandvid"):
         query.answer()
@@ -127,10 +130,10 @@ def cb_handler(update, context):
         if media_count == 0:
             query.edit_message_text("There are no posts by the user")
 
-        m = query.edit_message_text(
+        msg = query.edit_message_text(
             "Starting Downloading..\nThis may take time depending upon number of Posts."
         )
-        dir = f"{OWNER_ID}/{username}"
+        directory = f"{OWNER_ID}/{username}"
         command = [
             "instaloader",
             "--no-metadata-json",
@@ -139,15 +142,15 @@ def cb_handler(update, context):
             "--no-video-thumbnails",
             "--filename-pattern={profile}_UTC_{date_utc}",
             "--login",
-            USER,
+            current_user,
             "-f",
             session,
             "--dirname-pattern",
-            dir,
+            directory,
             "--",
             username,
         ]
-        download_insta(command, m, dir, username,
+        download_insta(command, msg, directory, username,
                        chat_id, fetch="Photos and Videos")
 
     elif query.data.startswith("allposts"):
@@ -156,10 +159,10 @@ def cb_handler(update, context):
         if media_count == 0:
             query.edit_message_text("There are no posts by the user")
 
-        m = query.edit_message_text(
+        msg = query.edit_message_text(
             "Starting Downloading..\nThis may take longer time Depending upon number of posts."
         )
-        dir = f"{OWNER_ID}/{username}"
+        directory = f"{OWNER_ID}/{username}"
         command = [
             "instaloader",
             "--no-metadata-json",
@@ -171,15 +174,15 @@ def cb_handler(update, context):
             "--no-video-thumbnails",
             "--filename-pattern={profile}_UTC_{date_utc}",
             "--login",
-            USER,
+            current_user,
             "-f",
             session,
             "--dirname-pattern",
-            dir,
+            directory,
             "--",
             username,
         ]
-        download_insta(command, m, dir, username, chat_id, fetch="All Posts")
+        download_insta(command, msg, directory, username, chat_id, fetch="All Posts")
 
     elif query.data.startswith("igtv"):
         query.answer()
@@ -204,10 +207,10 @@ def cb_handler(update, context):
         if igtv_count == 0:
             query.edit_message_text("There are no IGTV posts by the user")
 
-        m = query.edit_message_text(
+        msg = query.edit_message_text(
             "Starting Downloading..\nThis may take longer time Depending upon number of posts."
         )
-        dir = f"{OWNER_ID}/{username}"
+        directory = f"{OWNER_ID}/{username}"
 
         command = [
             "instaloader",
@@ -220,82 +223,85 @@ def cb_handler(update, context):
             "--no-video-thumbnails",
             "--filename-pattern={profile}_UTC_{date_utc}",
             "--login",
-            USER,
+            current_user,
             "-f",
             session,
-            "--dirname-pattern",
-            dir,
+            '--dirname-pattern',
+            directory,
             "--",
             username,
         ]
-        download_insta(command, m, dir, username, chat_id, fetch="IGTV")
+        download_insta(command, msg, directory, username, chat_id, fetch="IGTV")
 
     elif query.data.startswith("no"):
         query.answer()
-        m = bot.send_message(chat_id=query.message.chat.id,
-                             text="Process Cancelled")
+        msg = bot.send_message(chat_id=query.message.chat.id,
+                               text="Process Cancelled")
         bot.delete_message(chat_id=query.message.chat.id,
-                           message_id=m.message_id)
+                           message_id=msg.message_id)
 
     elif query.data.startswith("followers"):
         query.answer()
         chat_id = query.message.chat.id
-        m = bot.send_message(
+        msg = bot.send_message(
             chat_id, f"Fetching Followers List of {full_name}")
         try:
-            followers = f"**Followers List for {full_name}**\n\n"
-            f = profile.get_followers()
-            for p in f:
-                followers += f"\nName: {p.username}:Link to Profile: www.instagram.com/{p.username}"
-            text_file = open(
-                f"{username}'s_followers_list.txt", mode="w", encoding="utf-8"
-            )
-            text_file.write(followers)
-            text_file.close()
-            m.delete()
-            bot.send_document(
-                chat_id=chat_id,
-                document=open(f"{username}'s_followers_list.txt", "rb"),
-                caption=f"Followers List for {full_name}",
-            )
-            os.remove(f"{username}'s_followers_list.txt")
-            LOGGER.info(f"Followers list of {full_name} removed")
-        except Exception as e:
-            LOGGER.error(e)
-            bot.send_message(chat_id=chat_id, text=f"Error Occurred: {e}")
+            followers_json = {}
+            followers_list = profile.get_followers()
+            for follower in followers_list:
+                followers_json[follower.username] = \
+                    {"full_name": follower.full_name,
+                     "profile_pic_url": follower.profile_pic_url,
+                     "profile_link": f"www.instagram.com/{follower.username}"
+                     }
+            with open(f"{username}_followers.json", "w", encoding="UTF-8") as file:
+                json.dump(followers_json, file)
+            msg.delete()
+            with open(f"{username}_followers.json", "rb") as file:
+                bot.send_document(
+                    chat_id=chat_id,
+                    document=file,
+                    caption=f"Followers List for {full_name}",
+                )
+            LOGGER.info("Followers List for %s sent to %s", full_name, chat_id)
+        except TelegramError as error:
+            LOGGER.error(error)
+            bot.send_message(chat_id=chat_id, text=f"Error Occurred: {error}")
 
     elif query.data.startswith("following"):
         query.answer()
         chat_id = query.message.chat.id
-        m = bot.send_message(
+        msg = bot.send_message(
             chat_id, f"Fetching Following list of {full_name}")
         try:
-            followees = f"**Following List for {full_name}**\n\n"
-            f = profile.get_followees()
-            for p in f:
-                followees += f"\nName: {p.username}:Link to Profile: www.instagram.com/{p.username}"
-            text_file = open(
-                f"{username}'s_following_list.txt", mode="w", encoding="utf-8"
-            )
-            text_file.write(followees)
-            text_file.close()
-            m.delete()
-            bot.send_document(
-                chat_id=chat_id,
-                document=open(f"{username}'s_following_list.txt", "rb"),
-                caption=f"Following List for {full_name}",
-            )
-            os.remove(f"{username}'s_following_list.txt")
-            LOGGER.info(f"Following list of {full_name} removed")
-        except Exception as e:
-            LOGGER.error(e)
-            bot.send_message(chat_id=chat_id, text=f"Error Occurred: {e}")
+            following_json = {}
+            following_list = profile.get_followees()
+            for following in following_list:
+                following_json[following.username] = \
+                    {"full_name": following.full_name,
+                     "profile_pic_url": following.profile_pic_url,
+                     "profile_link": f"www.instagram.com/{following.username}"
+                     }
+            with open(f"{username}_following.json", "w", encoding="UTF-8") as file:
+                json.dump(following_json, file)
+
+            msg.delete()
+            with open(f"{username}_following.json", "rb") as file:
+                bot.send_document(
+                    chat_id=chat_id,
+                    document=file,
+                    caption=f"Following List for {full_name}",
+                )
+            LOGGER.info("Following List for %s sent to %s", full_name, chat_id)
+        except TelegramError as error:
+            LOGGER.error(error)
+            bot.send_message(chat_id=chat_id, text=f"Error Occurred: {error}")
 
     else:
-        dir = f"{OWNER_ID}/{username}"
+        directory = f"{OWNER_ID}/{username}"
         chat_id = query.message.chat.id
         query.answer()
-        m = bot.send_message(
+        msg = bot.send_message(
             chat_id,
             "Starting Downloading..\nThis may take longer time Depending upon number of posts.",
         )
@@ -312,14 +318,14 @@ def cb_handler(update, context):
                 "--no-video-thumbnails",
                 "--filename-pattern={profile}_UTC_{date_utc}",
                 "--login",
-                USER,
+                current_user,
                 "--sessionfile",
                 session,
                 "--dirname-pattern",
-                dir,
+                directory,
                 ":feed",
             ]
-            download_insta(command, m, dir, username, chat_id, fetch="My Feed")
+            download_insta(command, msg, directory, username, chat_id, fetch="My Feed")
 
         elif cmd == "saved":
             command = [
@@ -332,14 +338,14 @@ def cb_handler(update, context):
                 "--no-video-thumbnails",
                 "--filename-pattern={profile}_UTC_{date_utc}",
                 "--login",
-                USER,
+                current_user,
                 "-f",
                 session,
                 "--dirname-pattern",
-                dir,
+                directory,
                 ":saved",
             ]
-            download_insta(command, m, dir, username,
+            download_insta(command, msg, directory, username,
                            chat_id, fetch="My Saved")
 
         elif cmd == "tagged":
@@ -354,15 +360,15 @@ def cb_handler(update, context):
                 "--no-video-thumbnails",
                 "--filename-pattern={profile}_UTC_{date_utc}",
                 "--login",
-                USER,
+                current_user,
                 "-f",
                 session,
                 "--dirname-pattern",
-                dir,
+                directory,
                 "--",
                 username,
             ]
-            download_insta(command, m, dir, username, chat_id, fetch="Tagged")
+            download_insta(command, msg, directory, username, chat_id, fetch="Tagged")
 
         elif cmd == "stories":
             command = [
@@ -376,15 +382,15 @@ def cb_handler(update, context):
                 "--no-video-thumbnails",
                 "--filename-pattern={profile}_UTC_{date_utc}",
                 "--login",
-                USER,
+                current_user,
                 "-f",
                 session,
                 "--dirname-pattern",
-                dir,
+                directory,
                 "--",
                 username,
             ]
-            download_insta(command, m, dir, username, chat_id, fetch="Stories")
+            download_insta(command, msg, directory, username, chat_id, fetch="Stories")
 
         elif cmd == "fstories":
             command = [
@@ -397,15 +403,15 @@ def cb_handler(update, context):
                 "--no-video-thumbnails",
                 "--filename-pattern={profile}_UTC_{date_utc}",
                 "--login",
-                USER,
+                current_user,
                 "-f",
                 session,
                 "--dirname-pattern",
-                dir,
+                directory,
                 ":stories",
             ]
             download_insta(
-                command, m, dir, username, chat_id, fetch="Stories of My Following"
+                command, msg, directory, username, chat_id, fetch="Stories of My Following"
             )
         elif cmd == "highlights":
             command = [
@@ -419,15 +425,15 @@ def cb_handler(update, context):
                 "--no-video-thumbnails",
                 "--filename-pattern={profile}_UTC_{date_utc}",
                 "--login",
-                USER,
+                current_user,
                 "-f",
                 session,
                 "--dirname-pattern",
-                dir,
+                directory,
                 "--",
                 username,
             ]
-            download_insta(command, m, dir, username,
+            download_insta(command, msg, directory, username,
                            chat_id, fetch="Highlights")
 
 

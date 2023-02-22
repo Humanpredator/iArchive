@@ -30,7 +30,7 @@ def shell(update, context):
         reply += f"*Stderr*\n`{stderr}`\n"
         LOGGER.error(f"Shell - {cmd} - {stderr}")
     if len(reply) > 3000:
-        with open("shell_output.txt", "w",encoding="UTF-8") as file:
+        with open("shell_output.txt", "w", encoding="UTF-8") as file:
             file.write(reply)
         with open("shell_output.txt", "rb") as doc:
             context.bot.send_document(

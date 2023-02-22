@@ -1,14 +1,15 @@
 """ Login Module for the userbot. //Simple Module for logging into Instagram"""
 import os
 
-from instaloader import (BadCredentialsException,
-                         Profile,
-                         TwoFactorAuthRequiredException,
-                         InstaloaderException
-                         )
+from instaloader import (
+    BadCredentialsException,
+    InstaloaderException,
+    Profile,
+    TwoFactorAuthRequiredException,
+)
 from telegram.ext import CommandHandler, ConversationHandler, Filters, MessageHandler
 
-from bot import INSTA, STATUS, dispatcher, bot
+from bot import INSTA, STATUS, bot, dispatcher
 from bot.helper.ext_utils.bot_utils import (
     acc_type,
     is_link,
@@ -18,7 +19,11 @@ from bot.helper.ext_utils.bot_utils import (
 )
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.filters import CustomFilters
-from bot.helper.telegram_helper.message_utils import deleteMessage, sendMessage, editMessage
+from bot.helper.telegram_helper.message_utils import (
+    deleteMessage,
+    editMessage,
+    sendMessage,
+)
 
 CODE_SAVE = range(2)
 
@@ -37,7 +42,8 @@ def user_login(update, context):
             update,
         )
         if 1 in STATUS:
-            editMessage(f"@{current_user} is already logged in.\nTry to /logout.", msg)
+            editMessage(
+                f"@{current_user} is already logged in.\nTry to /logout.", msg)
         elif is_link(args[1]):
             editMessage("Don't use links...!", msg)
         else:
@@ -47,7 +53,8 @@ def user_login(update, context):
                 STATUS.add(1)
                 usersave(username)
                 editMessage(
-                    f"Fetching the details of @{username}\n Please wait...!", msg)
+                    f"Fetching the details of @{username}\n Please wait...!", msg
+                )
                 profile = Profile.from_username(INSTA.context, username)
                 media_count = profile.mediacount
                 name = profile.full_name
@@ -112,8 +119,8 @@ def codei_(update, context):
     code = update.message.text
     if code.isdigit():
         code = int(code)
-        msg = sendMessage("Checking given code.\n please wait...!",
-                          context.bot, update)
+        msg = sendMessage(
+            "Checking given code.\n please wait...!", context.bot, update)
         try:
             INSTA.two_factor_login(code)
             INSTA.save_session_to_file(filename=f"./{username}")

@@ -165,13 +165,14 @@ def send_auth_chats(update, context):
     user = sudo = ""
     user += "\n".join(str(id) for id in AUTHORIZED_CHATS)
     sudo += "\n".join(str(id) for id in SUDO_USERS)
-    sendMessage(f"<b><u>Authorized Chats</u></b>\n\
+    sendMessage(
+        f"<b><u>Authorized Chats</u></b>\n\
                 <code>{user}</code>\n\
                 <b><u>Sudo Users</u></b>\n\
                 <code>{sudo}</code>",
-                context.bot,
-                update,
-                )
+        context.bot,
+        update,
+    )
 
 
 send_auth_handler = CommandHandler(

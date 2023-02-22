@@ -17,10 +17,10 @@ from bot import (
     OWNER_ID,
     STATUS,
     app,
+    bot,
     botStartTime,
     dispatcher,
     updater,
-    bot
 )
 from bot.helper.ext_utils import fs_utils
 from bot.helper.ext_utils.bot_utils import (
@@ -30,8 +30,11 @@ from bot.helper.ext_utils.bot_utils import (
 )
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.filters import CustomFilters
-from bot.helper.telegram_helper.message_utils import editMessage, sendMessage, sendLogFile
-
+from bot.helper.telegram_helper.message_utils import (
+    editMessage,
+    sendLogFile,
+    sendMessage,
+)
 
 
 def stats_(update, context):
@@ -63,7 +66,7 @@ def restart(update, context):
     restart_message = sendMessage(
         "Restarting Bot, Please wait!", context.bot, update)
     # Save restart message object in order to reply to it after restarting
-    with open(".restartmsg", "w",encoding="UTF-8") as f:
+    with open(".restartmsg", "w", encoding="UTF-8") as f:
         f.truncate(0)
         f.write(f"{restart_message.chat.id}\n{restart_message.message_id}\n")
     os.execl(executable, executable, "-m", "bot")
@@ -92,7 +95,7 @@ def main():
         LOGGER.info("Session file not Found")
     # Check if the bot is restarting
     if os.path.isfile(".restartmsg"):
-        with open(".restartmsg",encoding="UTF-8") as file_:
+        with open(".restartmsg", encoding="UTF-8") as file_:
             chat_id, msg_id = map(int, file_)
         bot.edit_message_text("Restarted successfully!", chat_id, msg_id)
         os.remove(".restartmsg")

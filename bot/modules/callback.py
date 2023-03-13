@@ -6,7 +6,7 @@ from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram import TelegramError
 from telegram.ext import CallbackQueryHandler
 
-from bot import INSTA, bot, OWNER_ID, LOGGER, dispatcher
+from bot import INSTA, LOGGER, OWNER_ID, bot, dispatcher
 from bot.helper.down_utilis.insta_down import download_insta
 from bot.helper.ext_utils.bot_utils import usercheck
 
@@ -92,7 +92,8 @@ def cb_handler(update, context):
                 "--",
                 username,
             ]
-            download_insta(command, msg, directory, username, chat_id, fetch="Photos")
+            download_insta(command, msg, directory,
+                           username, chat_id, fetch="Photos")
 
     elif query.data.startswith("videos"):
         query.answer()
@@ -122,7 +123,8 @@ def cb_handler(update, context):
             "--",
             username,
         ]
-        download_insta(command, msg, directory, username, chat_id, fetch="Videos")
+        download_insta(command, msg, directory,
+                       username, chat_id, fetch="Videos")
 
     elif query.data.startswith("picandvid"):
         query.answer()
@@ -150,8 +152,9 @@ def cb_handler(update, context):
             "--",
             username,
         ]
-        download_insta(command, msg, directory, username,
-                       chat_id, fetch="Photos and Videos")
+        download_insta(
+            command, msg, directory, username, chat_id, fetch="Photos and Videos"
+        )
 
     elif query.data.startswith("allposts"):
         query.answer()
@@ -182,7 +185,8 @@ def cb_handler(update, context):
             "--",
             username,
         ]
-        download_insta(command, msg, directory, username, chat_id, fetch="All Posts")
+        download_insta(command, msg, directory, username,
+                       chat_id, fetch="All Posts")
 
     elif query.data.startswith("igtv"):
         query.answer()
@@ -226,17 +230,18 @@ def cb_handler(update, context):
             current_user,
             "-f",
             session,
-            '--dirname-pattern',
+            "--dirname-pattern",
             directory,
             "--",
             username,
         ]
-        download_insta(command, msg, directory, username, chat_id, fetch="IGTV")
+        download_insta(command, msg, directory,
+                       username, chat_id, fetch="IGTV")
 
     elif query.data.startswith("no"):
         query.answer()
-        msg = bot.send_message(chat_id=query.message.chat.id,
-                               text="Process Cancelled")
+        msg = bot.send_message(
+            chat_id=query.message.chat.id, text="Process Cancelled")
         bot.delete_message(chat_id=query.message.chat.id,
                            message_id=msg.message_id)
 
@@ -249,11 +254,11 @@ def cb_handler(update, context):
             followers_json = {}
             followers_list = profile.get_followers()
             for follower in followers_list:
-                followers_json[follower.username] = \
-                    {"full_name": follower.full_name,
-                     "profile_pic_url": follower.profile_pic_url,
-                     "profile_link": f"www.instagram.com/{follower.username}"
-                     }
+                followers_json[follower.username] = {
+                    "full_name": follower.full_name,
+                    "profile_pic_url": follower.profile_pic_url,
+                    "profile_link": f"www.instagram.com/{follower.username}",
+                }
             with open(f"{username}_followers.json", "w", encoding="UTF-8") as file:
                 json.dump(followers_json, file)
             msg.delete()
@@ -277,11 +282,11 @@ def cb_handler(update, context):
             following_json = {}
             following_list = profile.get_followees()
             for following in following_list:
-                following_json[following.username] = \
-                    {"full_name": following.full_name,
-                     "profile_pic_url": following.profile_pic_url,
-                     "profile_link": f"www.instagram.com/{following.username}"
-                     }
+                following_json[following.username] = {
+                    "full_name": following.full_name,
+                    "profile_pic_url": following.profile_pic_url,
+                    "profile_link": f"www.instagram.com/{following.username}",
+                }
             with open(f"{username}_following.json", "w", encoding="UTF-8") as file:
                 json.dump(following_json, file)
 
@@ -325,7 +330,8 @@ def cb_handler(update, context):
                 directory,
                 ":feed",
             ]
-            download_insta(command, msg, directory, username, chat_id, fetch="My Feed")
+            download_insta(command, msg, directory, username,
+                           chat_id, fetch="My Feed")
 
         elif cmd == "saved":
             command = [
@@ -368,7 +374,8 @@ def cb_handler(update, context):
                 "--",
                 username,
             ]
-            download_insta(command, msg, directory, username, chat_id, fetch="Tagged")
+            download_insta(command, msg, directory,
+                           username, chat_id, fetch="Tagged")
 
         elif cmd == "stories":
             command = [
@@ -390,7 +397,8 @@ def cb_handler(update, context):
                 "--",
                 username,
             ]
-            download_insta(command, msg, directory, username, chat_id, fetch="Stories")
+            download_insta(command, msg, directory, username,
+                           chat_id, fetch="Stories")
 
         elif cmd == "fstories":
             command = [
@@ -411,7 +419,12 @@ def cb_handler(update, context):
                 ":stories",
             ]
             download_insta(
-                command, msg, directory, username, chat_id, fetch="Stories of My Following"
+                command,
+                msg,
+                directory,
+                username,
+                chat_id,
+                fetch="Stories of My Following",
             )
         elif cmd == "highlights":
             command = [
@@ -433,8 +446,9 @@ def cb_handler(update, context):
                 "--",
                 username,
             ]
-            download_insta(command, msg, directory, username,
-                           chat_id, fetch="Highlights")
+            download_insta(
+                command, msg, directory, username, chat_id, fetch="Highlights"
+            )
 
 
 callback_handler = CallbackQueryHandler(cb_handler)

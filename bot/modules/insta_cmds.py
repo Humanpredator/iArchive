@@ -5,12 +5,16 @@ from instaloader import Profile
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, TelegramError
 from telegram.ext import CommandHandler
 
-from bot import INSTA, OWNER_ID, STATUS, dispatcher, bot, LOGGER
+from bot import INSTA, LOGGER, OWNER_ID, STATUS, bot, dispatcher
 from bot.helper.down_utilis.insta_down import download_insta
 from bot.helper.ext_utils.bot_utils import acc_type, is_link, usercheck, yes_or_no
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.filters import CustomFilters
-from bot.helper.telegram_helper.message_utils import sendMessage, editMessage, deleteMessage
+from bot.helper.telegram_helper.message_utils import (
+    deleteMessage,
+    editMessage,
+    sendMessage,
+)
 
 
 def post(update, context):
@@ -143,15 +147,14 @@ def followers(update, context):
         )
         chat_id = update.message.chat_id
         try:
-
             followers_json = {}
             followers_list = profile.get_followers()
             for follower in followers_list:
-                followers_json[follower.username] = \
-                    {"full_name": follower.full_name,
-                     "profile_pic_url": follower.profile_pic_url,
-                     "profile_link": f"www.instagram.com/{follower.username}"
-                     }
+                followers_json[follower.username] = {
+                    "full_name": follower.full_name,
+                    "profile_pic_url": follower.profile_pic_url,
+                    "profile_link": f"www.instagram.com/{follower.username}",
+                }
             with open(f"{username}_followers.json", "w", encoding="UTF-8") as file:
                 json.dump(followers_json, file)
             deleteMessage(context.bot, msg)
@@ -204,11 +207,11 @@ def following_(update, context):
             following_json = {}
             following_list = profile.get_following()
             for following in following_list:
-                following_json[following.username] = \
-                    {"full_name": following.full_name,
-                     "profile_pic_url": following.profile_pic_url,
-                     "profile_link": f"www.instagram.com/{following.username}"
-                     }
+                following_json[following.username] = {
+                    "full_name": following.full_name,
+                    "profile_pic_url": following.profile_pic_url,
+                    "profile_link": f"www.instagram.com/{following.username}",
+                }
             with open(f"{username}_following.json", "w", encoding="UTF-8") as file:
                 json.dump(following_json, file)
             deleteMessage(context.bot, msg)
@@ -271,10 +274,10 @@ def fans_(update, context):
         try:
             fans_json = {}
             for fan in fans:
-                fans_json[fan] = \
-                    {"user_name": fan,
-                     "profile_link": f"www.instagram.com/{fan}"
-                     }
+                fans_json[fan] = {
+                    "user_name": fan,
+                    "profile_link": f"www.instagram.com/{fan}",
+                }
             with open(f"{username}_fans.json", "w", encoding="UTF-8") as file:
                 json.dump(fans_json, file)
 
@@ -340,10 +343,10 @@ def not_following(update, context):
         try:
             fans_json = {}
             for fan in fans:
-                fans_json[fan] = \
-                    {"user_name": fan,
-                     "profile_link": f"www.instagram.com/{fan}"
-                     }
+                fans_json[fan] = {
+                    "user_name": fan,
+                    "profile_link": f"www.instagram.com/{fan}",
+                }
             with open(f"{username}_not_following.json", "w", encoding="UTF-8") as file:
                 json.dump(fans_json, file)
             deleteMessage(context.bot, msg)
@@ -357,7 +360,8 @@ def not_following(update, context):
                     <b>Total Following:</b>  {len(following_list)}",
                     parse_mode="HTML",
                 )
-            LOGGER.info("Not following list of %s sent to %s", full_name, chat_id)
+            LOGGER.info("Not following list of %s sent to %s",
+                        full_name, chat_id)
         except TelegramError as error:
             LOGGER.error(error)
             editMessage(f"Error occurred: {error}", msg)
@@ -381,7 +385,8 @@ def feed(update, context):
                 editMessage("You must /login ", msg)
 
             editMessage(
-                f"Fetching {count} posts from <code>@{current_user}</code>'s feed.", msg)
+                f"Fetching {count} posts from <code>@{current_user}</code>'s feed.", msg
+            )
             editMessage(
                 "Starting downloading..\nThis may take longer time depending upon number of posts.",
                 msg,
@@ -406,7 +411,9 @@ def feed(update, context):
                 count,
             ]
 
-            download_insta(command, msg, directory, current_user, chat_id, fetch="My Feed")
+            download_insta(
+                command, msg, directory, current_user, chat_id, fetch="My Feed"
+            )
         elif is_link(args[1]):
             editMessage("Please send a username only...!", msg)
         else:
@@ -429,7 +436,8 @@ def feed(update, context):
             directory,
             ":feed",
         ]
-        download_insta(command, msg, directory, current_user, chat_id, fetch="My Feed")
+        download_insta(command, msg, directory, current_user,
+                       chat_id, fetch="My Feed")
 
 
 def saved(update, context):
@@ -471,7 +479,9 @@ def saved(update, context):
                 "--count",
                 count,
             ]
-            download_insta(command, msg, directory, current_user, chat_id, fetch="My Saved")
+            download_insta(
+                command, msg, directory, current_user, chat_id, fetch="My Saved"
+            )
         elif is_link(args[1]):
             editMessage("Please send a username only...!", msg)
         else:
@@ -494,7 +504,8 @@ def saved(update, context):
             directory,
             ":saved",
         ]
-        download_insta(command, msg, directory, current_user, chat_id, fetch="My Saved")
+        download_insta(command, msg, directory, current_user,
+                       chat_id, fetch="My Saved")
 
 
 def tagged(update, context):
@@ -519,7 +530,8 @@ def tagged(update, context):
             ac_type = acc_type(profile.is_private)
             if ac_type == "🔒Private🔒" and is_followed == "No":
                 editMessage(
-                    f"This account is private and you are not following {username}.", msg
+                    f"This account is private and you are not following {username}.",
+                    msg,
                 )
 
         editMessage(
@@ -547,7 +559,8 @@ def tagged(update, context):
             "--",
             username,
         ]
-        download_insta(command, msg, directory, username, chat_id, fetch="Tagged")
+        download_insta(command, msg, directory,
+                       username, chat_id, fetch="Tagged")
     else:
         sendMessage("Please send a username...!", context.bot, update)
 
@@ -574,7 +587,8 @@ def story(update, context):
             ac_type = acc_type(profile.is_private)
             if ac_type == "🔒Private🔒" and is_followed == "No":
                 editMessage(
-                    f"This account is private and you are not following {username}.", msg
+                    f"This account is private and you are not following {username}.",
+                    msg,
                 )
 
         editMessage(
@@ -602,7 +616,8 @@ def story(update, context):
             "--",
             username,
         ]
-        download_insta(command, msg, directory, username, chat_id, fetch="Stories")
+        download_insta(command, msg, directory, username,
+                       chat_id, fetch="Stories")
 
     else:
         sendMessage("Please send a username...!", context.bot, update)
@@ -617,8 +632,8 @@ def stories(update, context):
     directory = f"{OWNER_ID}/{username}"
     args = update.message.text.split(" ", maxsplit=1)
     if len(args) < 1:
-        msg = sendMessage("Checking the details, Please wait...!",
-                          context.bot, update)
+        msg = sendMessage(
+            "Checking the details, Please wait...!", context.bot, update)
         if 1 not in STATUS:
             editMessage("You must /login ", msg)
 
@@ -644,8 +659,9 @@ def stories(update, context):
             directory,
             ":stories",
         ]
-        download_insta(command, msg, directory, username, chat_id,
-                       fetch="My Following Stories")
+        download_insta(
+            command, msg, directory, username, chat_id, fetch="My Following Stories"
+        )
     else:
         sendMessage("Please send command only..!", context.bot, update)
 
@@ -658,8 +674,8 @@ def highlights(update, context):
     args = update.message.text.split(" ", maxsplit=1)
 
     if len(args) > 1:
-        msg = sendMessage("Checking the details, Please wait...!",
-                          context.bot, update)
+        msg = sendMessage(
+            "Checking the details, Please wait...!", context.bot, update)
         username = args[1]
         directory = f"{OWNER_ID}/{username}"
         if 1 not in STATUS:
@@ -673,7 +689,8 @@ def highlights(update, context):
             ac_type = acc_type(profile.is_private)
             if ac_type == "🔒Private🔒" and is_followed == "No":
                 editMessage(
-                    f"This account is private and you are not following {username}.", msg
+                    f"This account is private and you are not following {username}.",
+                    msg,
                 )
 
         editMessage(
@@ -701,7 +718,8 @@ def highlights(update, context):
             "--",
             username,
         ]
-        download_insta(command, msg, directory, username, chat_id, fetch="Highlights")
+        download_insta(command, msg, directory, username,
+                       chat_id, fetch="Highlights")
     else:
         sendMessage("Please send a username...!", context.bot, update)
 

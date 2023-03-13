@@ -20,7 +20,7 @@ socket.setdefaulttimeout(600)
 botStartTime = time.time()
 
 if os.path.exists("log.txt"):
-    with open("log.txt", "a+", encoding='UTF-8') as file:
+    with open("log.txt", "a+", encoding="UTF-8") as file:
         file.truncate(0)
 
 logging.basicConfig(
@@ -70,12 +70,12 @@ AUTHORIZED_CHATS = set()
 SUDO_USERS = set()
 
 if os.path.exists("authorized_chats.txt"):
-    with open("authorized_chats.txt", "r+", encoding='UTF-8') as file:
+    with open("authorized_chats.txt", "r+", encoding="UTF-8") as file:
         lines = file.readlines()
         for line in lines:
             AUTHORIZED_CHATS.add(int(line.split()[0]))
 if os.path.exists("sudo_users.txt"):
-    with open("sudo_users.txt", "r+", encoding='UTF-8') as file:
+    with open("sudo_users.txt", "r+", encoding="UTF-8") as file:
         lines = file.readlines()
         for line in lines:
             SUDO_USERS.add(int(line.split()[0]))

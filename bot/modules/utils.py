@@ -14,8 +14,8 @@ from bot.helper.telegram_helper.message_utils import *
 
 def account(update, context):
     if 1 in STATUS:
-        m = sendMessage("Getting your data, please wait...!",
-                        context.bot, update)
+        m = sendMessage("Getting your data, please wait...!", context.bot,
+                        update)
         profile = Profile.own_profile(INSTA.context)
         media_count = profile.mediacount
         name = profile.full_name
@@ -25,55 +25,43 @@ def account(update, context):
         igtv_count = profile.igtvcount
         followers = profile.followers
         following = profile.followees
-        reply_markup = InlineKeyboardMarkup(
+        reply_markup = InlineKeyboardMarkup([
             [
-                [
-                    InlineKeyboardButton(
-                        "Download My Profile Pic", callback_data=f"ppic#{username}"
-                    ),
-                    InlineKeyboardButton(
-                        "Go To Profile", url=f"https://www.instagram.com/{username}"
-                    ),
-                ],
-                [
-                    InlineKeyboardButton(
-                        "My Post", callback_data=f"post#{username}"),
-                    InlineKeyboardButton(
-                        "My Tagged Posts", callback_data=f"tagged#{username}"
-                    ),
-                    InlineKeyboardButton(
-                        "Posts In My Feed", callback_data=f"feed#{username}"
-                    ),
-                ],
-                [
-                    InlineKeyboardButton(
-                        "My Saved Posts", callback_data=f"saved#{username}"
-                    ),
-                    InlineKeyboardButton(
-                        "My IGTV Posts", callback_data=f"igtv#{username}"
-                    ),
-                ],
-                [
-                    InlineKeyboardButton(
-                        "My Highlights", callback_data=f"highlights#{username}"
-                    ),
-                    InlineKeyboardButton(
-                        "My Stories ", callback_data=f"stories#{username}"
-                    ),
-                    InlineKeyboardButton(
-                        "Stories of My Following", callback_data=f"fstories#{username}"
-                    ),
-                ],
-                [
-                    InlineKeyboardButton(
-                        "List Of My Followers", callback_data=f"followers#{username}"
-                    ),
-                    InlineKeyboardButton(
-                        "List Of My Following", callback_data=f"following#{username}"
-                    ),
-                ],
-            ]
-        )
+                InlineKeyboardButton("Download My Profile Pic",
+                                     callback_data=f"ppic#{username}"),
+                InlineKeyboardButton(
+                    "Go To Profile",
+                    url=f"https://www.instagram.com/{username}"),
+            ],
+            [
+                InlineKeyboardButton("My Post",
+                                     callback_data=f"post#{username}"),
+                InlineKeyboardButton("My Tagged Posts",
+                                     callback_data=f"tagged#{username}"),
+                InlineKeyboardButton("Posts In My Feed",
+                                     callback_data=f"feed#{username}"),
+            ],
+            [
+                InlineKeyboardButton("My Saved Posts",
+                                     callback_data=f"saved#{username}"),
+                InlineKeyboardButton("My IGTV Posts",
+                                     callback_data=f"igtv#{username}"),
+            ],
+            [
+                InlineKeyboardButton("My Highlights",
+                                     callback_data=f"highlights#{username}"),
+                InlineKeyboardButton("My Stories ",
+                                     callback_data=f"stories#{username}"),
+                InlineKeyboardButton("Stories of My Following",
+                                     callback_data=f"fstories#{username}"),
+            ],
+            [
+                InlineKeyboardButton("List Of My Followers",
+                                     callback_data=f"followers#{username}"),
+                InlineKeyboardButton("List Of My Following",
+                                     callback_data=f"following#{username}"),
+            ],
+        ])
         bot.delete_message(chat_id=update.message.chat.id,
                            message_id=m.message_id)
         bot.send_photo(
@@ -92,8 +80,8 @@ def mirror(update, context):
     session = f"./{USER}"
     args = update.message.text.split(" ", maxsplit=1)
     if len(args) > 1:
-        m = sendMessage(
-            "Checking given details, please wait...!", context.bot, update)
+        m = sendMessage("Checking given details, please wait...!", context.bot,
+                        update)
         username = args[1]
         if 1 not in STATUS:
             editMessage("You must /login", m)
@@ -133,8 +121,12 @@ def mirror(update, context):
                     "--",
                     f"-{shortcode}",
                 ]
-                download_insta(command, m, dir, username,
-                               chat_id, fetch="posts")
+                download_insta(command,
+                               m,
+                               dir,
+                               username,
+                               chat_id,
+                               fetch="posts")
             except Exception as e:
                 LOGGER.error(e)
                 editMessage(f"Error Occurred: {e}", m)
@@ -143,15 +135,15 @@ def mirror(update, context):
             editMessage(msg, m)
             return
     else:
-        sendMessage("Send insta post links after /mirror ",
-                    context.bot, update)
+        sendMessage("Send insta post links after /mirror ", context.bot,
+                    update)
 
 
 def ig(update, context):
     args = update.message.text.split(" ", maxsplit=1)
     if len(args) > 1:
-        m = sendMessage(
-            "Checking given details, please wait...!", context.bot, update)
+        m = sendMessage("Checking given details, please wait...!", context.bot,
+                        update)
         if 1 not in STATUS:
             editMessage("You must /login", m)
             return
@@ -174,64 +166,56 @@ def ig(update, context):
                 is_following = yes_or_no(profile.follows_viewer)
                 ac_type = acc_type(profile.is_private)
                 if ac_type == "🔒Private🔒" and is_followed == "No":
-                    reply_markup = InlineKeyboardMarkup(
-                        [
-                            [
-                                InlineKeyboardButton(
-                                    "Download Profile Pic",
-                                    callback_data=f"ppic#{username}",
-                                ),
-                                InlineKeyboardButton(
-                                    "Go To Profile",
-                                    url=f"https://www.instagram.com/{username}",
-                                ),
-                            ]
-                        ]
-                    )
+                    reply_markup = InlineKeyboardMarkup([[
+                        InlineKeyboardButton(
+                            "Download Profile Pic",
+                            callback_data=f"ppic#{username}",
+                        ),
+                        InlineKeyboardButton(
+                            "Go To Profile",
+                            url=f"https://www.instagram.com/{username}",
+                        ),
+                    ]])
                 else:
-                    reply_markup = InlineKeyboardMarkup(
+                    reply_markup = InlineKeyboardMarkup([
                         [
-                            [
-                                InlineKeyboardButton(
-                                    "Profile Pic", callback_data=f"ppic#{username}"
-                                ),
-                                InlineKeyboardButton(
-                                    "Go To Profile",
-                                    url=f"https://www.instagram.com/{username}",
-                                ),
-                            ],
-                            [
-                                InlineKeyboardButton(
-                                    "All Post", callback_data=f"post#{username}"
-                                ),
-                                InlineKeyboardButton(
-                                    "All Tagged Posts",
-                                    callback_data=f"tagged#{username}",
-                                ),
-                            ],
-                            [
-                                InlineKeyboardButton(
-                                    "All IGTV", callback_data=f"igtv#{username}"
-                                ),
-                                InlineKeyboardButton(
-                                    "Stories ", callback_data=f"stories#{username}"
-                                ),
-                                InlineKeyboardButton(
-                                    "Highlights", callback_data=f"highlights#{username}"
-                                ),
-                            ],
-                            [
-                                InlineKeyboardButton(
-                                    f"{name}'s Followers",
-                                    callback_data=f"followers#{username}",
-                                ),
-                                InlineKeyboardButton(
-                                    f"{name}'s Following",
-                                    callback_data=f"following#{username}",
-                                ),
-                            ],
-                        ]
-                    )
+                            InlineKeyboardButton(
+                                "Profile Pic",
+                                callback_data=f"ppic#{username}"),
+                            InlineKeyboardButton(
+                                "Go To Profile",
+                                url=f"https://www.instagram.com/{username}",
+                            ),
+                        ],
+                        [
+                            InlineKeyboardButton(
+                                "All Post", callback_data=f"post#{username}"),
+                            InlineKeyboardButton(
+                                "All Tagged Posts",
+                                callback_data=f"tagged#{username}",
+                            ),
+                        ],
+                        [
+                            InlineKeyboardButton(
+                                "All IGTV", callback_data=f"igtv#{username}"),
+                            InlineKeyboardButton(
+                                "Stories ",
+                                callback_data=f"stories#{username}"),
+                            InlineKeyboardButton(
+                                "Highlights",
+                                callback_data=f"highlights#{username}"),
+                        ],
+                        [
+                            InlineKeyboardButton(
+                                f"{name}'s Followers",
+                                callback_data=f"followers#{username}",
+                            ),
+                            InlineKeyboardButton(
+                                f"{name}'s Following",
+                                callback_data=f"following#{username}",
+                            ),
+                        ],
+                    ])
                 deleteMessage(context.bot, m)
                 try:
                     bot.send_photo(
@@ -263,64 +247,56 @@ def ig(update, context):
                 is_following = yes_or_no(profile.follows_viewer)
                 ac_type = acc_type(profile.is_private)
                 if ac_type == "🔒Private🔒" and is_followed == "No":
-                    reply_markup = InlineKeyboardMarkup(
-                        [
-                            [
-                                InlineKeyboardButton(
-                                    "Download Profile Pic",
-                                    callback_data=f"ppic#{username}",
-                                ),
-                                InlineKeyboardButton(
-                                    "Go To Profile",
-                                    url=f"https://www.instagram.com/{username}",
-                                ),
-                            ]
-                        ]
-                    )
+                    reply_markup = InlineKeyboardMarkup([[
+                        InlineKeyboardButton(
+                            "Download Profile Pic",
+                            callback_data=f"ppic#{username}",
+                        ),
+                        InlineKeyboardButton(
+                            "Go To Profile",
+                            url=f"https://www.instagram.com/{username}",
+                        ),
+                    ]])
                 else:
-                    reply_markup = InlineKeyboardMarkup(
+                    reply_markup = InlineKeyboardMarkup([
                         [
-                            [
-                                InlineKeyboardButton(
-                                    "Profile Pic", callback_data=f"ppic#{username}"
-                                ),
-                                InlineKeyboardButton(
-                                    "Go To Profile",
-                                    url=f"https://www.instagram.com/{username}",
-                                ),
-                            ],
-                            [
-                                InlineKeyboardButton(
-                                    "All Post", callback_data=f"post#{username}"
-                                ),
-                                InlineKeyboardButton(
-                                    "All Tagged Posts",
-                                    callback_data=f"tagged#{username}",
-                                ),
-                            ],
-                            [
-                                InlineKeyboardButton(
-                                    "All IGTV", callback_data=f"igtv#{username}"
-                                ),
-                                InlineKeyboardButton(
-                                    "Stories ", callback_data=f"stories#{username}"
-                                ),
-                                InlineKeyboardButton(
-                                    "Highlights", callback_data=f"highlights#{username}"
-                                ),
-                            ],
-                            [
-                                InlineKeyboardButton(
-                                    f"{name}'s Followers",
-                                    callback_data=f"followers#{username}",
-                                ),
-                                InlineKeyboardButton(
-                                    f"{name}'s Following",
-                                    callback_data=f"following#{username}",
-                                ),
-                            ],
-                        ]
-                    )
+                            InlineKeyboardButton(
+                                "Profile Pic",
+                                callback_data=f"ppic#{username}"),
+                            InlineKeyboardButton(
+                                "Go To Profile",
+                                url=f"https://www.instagram.com/{username}",
+                            ),
+                        ],
+                        [
+                            InlineKeyboardButton(
+                                "All Post", callback_data=f"post#{username}"),
+                            InlineKeyboardButton(
+                                "All Tagged Posts",
+                                callback_data=f"tagged#{username}",
+                            ),
+                        ],
+                        [
+                            InlineKeyboardButton(
+                                "All IGTV", callback_data=f"igtv#{username}"),
+                            InlineKeyboardButton(
+                                "Stories ",
+                                callback_data=f"stories#{username}"),
+                            InlineKeyboardButton(
+                                "Highlights",
+                                callback_data=f"highlights#{username}"),
+                        ],
+                        [
+                            InlineKeyboardButton(
+                                f"{name}'s Followers",
+                                callback_data=f"followers#{username}",
+                            ),
+                            InlineKeyboardButton(
+                                f"{name}'s Following",
+                                callback_data=f"following#{username}",
+                            ),
+                        ],
+                    ])
                 deleteMessage(context.bot, m)
                 try:
                     bot.send_photo(

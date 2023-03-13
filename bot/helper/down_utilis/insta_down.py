@@ -24,9 +24,10 @@ def download_insta(command, msg, directory, username, chat_id, fetch):
     def download(command, msg, directory, fetch):
         current_user = usercheck()
         session = f"./{current_user}"
-        process = subprocess.Popen(
-            command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=False
-        )
+        process = subprocess.Popen(command,
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE,
+                                   shell=False)
         while True:
             output = process.stdout.readline()
             if output == b"":
@@ -44,9 +45,10 @@ def download_insta(command, msg, directory, username, chat_id, fetch):
                     <b>Type</b> : <code>{fetch}</code>'
 
                     time.sleep(DOWNLOAD_STATUS_UPDATE_INTERVAL)
-                    bot.edit_message_text(
-                        msg, msg.chat.id, msg.message_id, parse_mode="HTML"
-                    )
+                    bot.edit_message_text(msg,
+                                          msg.chat.id,
+                                          msg.message_id,
+                                          parse_mode="HTML")
                     LOGGER.info(output.decode("UTF8"))
                 except TelegramError as error:
                     LOGGER.info(error)
@@ -62,9 +64,10 @@ def download_insta(command, msg, directory, username, chat_id, fetch):
                             Last Updated : <code>{ist_time}</code>"
 
                     time.sleep(DOWNLOAD_STATUS_UPDATE_INTERVAL)
-                    bot.edit_message_text(
-                        ermsg, msg.chat.id, msg.message_id, parse_mode="HTML"
-                    )
+                    bot.edit_message_text(ermsg,
+                                          msg.chat.id,
+                                          msg.message_id,
+                                          parse_mode="HTML")
                     LOGGER.info(error.decode("UTF8"))
                 except TelegramError as error:
                     LOGGER.info(error)
@@ -76,6 +79,6 @@ def download_insta(command, msg, directory, username, chat_id, fetch):
             pass
         clean_download(directory)
 
-    threading.Thread(target=download, args=(
-        command, msg, directory, fetch)).start()
+    threading.Thread(target=download,
+                     args=(command, msg, directory, fetch)).start()
     return True

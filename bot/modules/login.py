@@ -53,8 +53,8 @@ def user_login(update, context):
                 STATUS.add(1)
                 usersave(username)
                 editMessage(
-                    f"Fetching the details of @{username}\n Please wait...!", msg
-                )
+                    f"Fetching the details of @{username}\n Please wait...!",
+                    msg)
                 profile = Profile.from_username(INSTA.context, username)
                 media_count = profile.mediacount
                 name = profile.full_name
@@ -101,8 +101,8 @@ def user_login(update, context):
                 update,
             )
             return
-        sendMessage("Send /login <b>username</b> <b>password</b>",
-                    context.bot, update)
+        sendMessage("Send /login <b>username</b> <b>password</b>", context.bot,
+                    update)
         return
 
 
@@ -119,8 +119,8 @@ def codei_(update, context):
     code = update.message.text
     if code.isdigit():
         code = int(code)
-        msg = sendMessage(
-            "Checking given code.\n please wait...!", context.bot, update)
+        msg = sendMessage("Checking given code.\n please wait...!",
+                          context.bot, update)
         try:
             INSTA.two_factor_login(code)
             INSTA.save_session_to_file(filename=f"./{username}")
@@ -168,8 +168,8 @@ def logout(update, context):
         os.remove(f"./{current_user}")
         os.remove("username.txt")
     else:
-        sendMessage("You're not logged in.\n Try to /login.",
-                    context.bot, update)
+        sendMessage("You're not logged in.\n Try to /login.", context.bot,
+                    update)
 
 
 logout_handler = CommandHandler(
@@ -188,9 +188,8 @@ userlogin_handler = ConversationHandler(
     ],
     states={
         CODE_SAVE: [MessageHandler(Filters.text, codei_)],
-        ConversationHandler.TIMEOUT: [
-            MessageHandler(Filters.text | Filters.command, timeout)
-        ],
+        ConversationHandler.TIMEOUT:
+        [MessageHandler(Filters.text | Filters.command, timeout)],
     },
     fallbacks=[],
     conversation_timeout=30,

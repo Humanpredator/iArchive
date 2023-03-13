@@ -25,7 +25,8 @@ if os.path.exists("log.txt"):
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    handlers=[logging.FileHandler("log.txt"), logging.StreamHandler()],
+    handlers=[logging.FileHandler("log.txt"),
+              logging.StreamHandler()],
     datefmt="%d-%b-%y %H:%M:%S",
     level=logging.INFO,
 )

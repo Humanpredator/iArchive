@@ -21,9 +21,8 @@ def post(update, context):
     """Download Instagram Posts"""
     args = update.message.text.split(" ", maxsplit=1)
     if len(args) > 1:
-        msg = sendMessage(
-            "Checking the given username, please wait...!", context.bot, update
-        )
+        msg = sendMessage("Checking the given username, please wait...!",
+                          context.bot, update)
         if 1 not in STATUS:
             editMessage("You must /login ", msg)
 
@@ -41,27 +40,23 @@ def post(update, context):
                 )
 
             else:
-                reply_markup = InlineKeyboardMarkup(
+                reply_markup = InlineKeyboardMarkup([
                     [
-                        [
-                            InlineKeyboardButton(
-                                "Pictures Only", callback_data=f"photos#{username}"
-                            ),
-                            InlineKeyboardButton(
-                                "Videos Only", callback_data=f"videos#{username}"
-                            ),
-                        ],
-                        [
-                            InlineKeyboardButton(
-                                "Pictures and Videos",
-                                callback_data=f"picandvid#{username}",
-                            ),
-                            InlineKeyboardButton(
-                                "ALL Posts", callback_data=f"allposts#{username}"
-                            ),
-                        ],
-                    ]
-                )
+                        InlineKeyboardButton(
+                            "Pictures Only",
+                            callback_data=f"photos#{username}"),
+                        InlineKeyboardButton(
+                            "Videos Only", callback_data=f"videos#{username}"),
+                    ],
+                    [
+                        InlineKeyboardButton(
+                            "Pictures and Videos",
+                            callback_data=f"picandvid#{username}",
+                        ),
+                        InlineKeyboardButton(
+                            "ALL Posts", callback_data=f"allposts#{username}"),
+                    ],
+                ])
                 editMessage(
                     "Select the type of posts you want to fetch?",
                     msg,
@@ -77,9 +72,8 @@ def igtv(update, context):
     args = update.message.text.split(" ", maxsplit=1)
     if len(args) > 1:
         username = args[1]
-        msg = sendMessage(
-            "Checking the given username, please wait...!", context.bot, update
-        )
+        msg = sendMessage("Checking the given username, please wait...!",
+                          context.bot, update)
         if 1 not in STATUS:
             editMessage("You must login  /login ", msg)
 
@@ -98,15 +92,10 @@ def igtv(update, context):
         editMessage(f"Fetching IGTV from <code>@{username}</code>", msg)
         profile = Profile.from_username(INSTA.context, username)
         igtv_count = profile.igtvcount
-        reply_markup = InlineKeyboardMarkup(
-            [
-                [
-                    InlineKeyboardButton(
-                        "Yes", callback_data=f"yes#{username}"),
-                    InlineKeyboardButton("No", callback_data=f"no#{username}"),
-                ]
-            ]
-        )
+        reply_markup = InlineKeyboardMarkup([[
+            InlineKeyboardButton("Yes", callback_data=f"yes#{username}"),
+            InlineKeyboardButton("No", callback_data=f"no#{username}"),
+        ]])
         editMessage(
             f"Do you want to download all IGTV posts?\nThere are {igtv_count} posts.",
             msg,
@@ -121,9 +110,8 @@ def followers(update, context):
     args = update.message.text.split(" ", maxsplit=1)
     if len(args) > 1:
         username = args[1]
-        msg = sendMessage(
-            "Checking the given username, please wait...!", context.bot, update
-        )
+        msg = sendMessage("Checking the given username, please wait...!",
+                          context.bot, update)
         if 1 not in STATUS:
             editMessage("You must /login ", msg)
 
@@ -155,11 +143,13 @@ def followers(update, context):
                     "profile_pic_url": follower.profile_pic_url,
                     "profile_link": f"www.instagram.com/{follower.username}",
                 }
-            with open(f"{username}_followers.json", "w", encoding="UTF-8") as file:
+            with open(f"{username}_followers.json", "w",
+                      encoding="UTF-8") as file:
                 json.dump(followers_json, file)
             deleteMessage(context.bot, msg)
 
-            with open(f"{username}_followers.json", "r", encoding="UTF-8") as file:
+            with open(f"{username}_followers.json", "r",
+                      encoding="UTF-8") as file:
                 context.bot.send_document(
                     chat_id=chat_id,
                     document=file,
@@ -178,9 +168,8 @@ def following_(update, context):
     args = update.message.text.split(" ", maxsplit=1)
     if len(args) > 1:
         username = args[1]
-        msg = sendMessage(
-            "Checking the given username, please wait...!", context.bot, update
-        )
+        msg = sendMessage("Checking the given username, please wait...!",
+                          context.bot, update)
         if 1 not in STATUS:
             editMessage("You must /login ", msg)
 
@@ -212,11 +201,13 @@ def following_(update, context):
                     "profile_pic_url": following.profile_pic_url,
                     "profile_link": f"www.instagram.com/{following.username}",
                 }
-            with open(f"{username}_following.json", "w", encoding="UTF-8") as file:
+            with open(f"{username}_following.json", "w",
+                      encoding="UTF-8") as file:
                 json.dump(following_json, file)
             deleteMessage(context.bot, msg)
 
-            with open(f"{username}_following.json", "r", encoding="UTF-8") as file:
+            with open(f"{username}_following.json", "r",
+                      encoding="UTF-8") as file:
                 context.bot.send_document(
                     chat_id=chat_id,
                     document=file,
@@ -234,9 +225,8 @@ def fans_(update, context):
     """Get fans list of a given username"""
     args = update.message.text.split(" ", maxsplit=1)
     if len(args) > 1:
-        msg = sendMessage(
-            "Checking the given username, please wait...!", context.bot, update
-        )
+        msg = sendMessage("Checking the given username, please wait...!",
+                          context.bot, update)
         username = args[1]
         if 1 not in STATUS:
             editMessage("You must /login ", msg)
@@ -301,9 +291,8 @@ def not_following(update, context):
     """Get not following list of a given username"""
     args = update.message.text.split(" ", maxsplit=1)
     if len(args) > 1:
-        msg = sendMessage(
-            "Checking the given username, please wait...!", context.bot, update
-        )
+        msg = sendMessage("Checking the given username, please wait...!",
+                          context.bot, update)
         username = args[1]
         if 1 not in STATUS:
             editMessage("You must /login ", msg)
@@ -347,10 +336,12 @@ def not_following(update, context):
                     "user_name": fan,
                     "profile_link": f"www.instagram.com/{fan}",
                 }
-            with open(f"{username}_not_following.json", "w", encoding="UTF-8") as file:
+            with open(f"{username}_not_following.json", "w",
+                      encoding="UTF-8") as file:
                 json.dump(fans_json, file)
             deleteMessage(context.bot, msg)
-            with open(f"{username}_not_following.json", "r", encoding="UTF-8") as file:
+            with open(f"{username}_not_following.json", "r",
+                      encoding="UTF-8") as file:
                 bot.send_document(
                     chat_id=chat_id,
                     document=file,
@@ -360,8 +351,8 @@ def not_following(update, context):
                     <b>Total Following:</b>  {len(following_list)}",
                     parse_mode="HTML",
                 )
-            LOGGER.info("Not following list of %s sent to %s",
-                        full_name, chat_id)
+            LOGGER.info("Not following list of %s sent to %s", full_name,
+                        chat_id)
         except TelegramError as error:
             LOGGER.error(error)
             editMessage(f"Error occurred: {error}", msg)
@@ -376,8 +367,8 @@ def feed(update, context):
     session = f"./{current_user}"
     args = update.message.text.split(" ", maxsplit=1)
     directory = f"{OWNER_ID}/{current_user}"
-    msg = sendMessage("Checking the details, Please wait...!",
-                      context.bot, update)
+    msg = sendMessage("Checking the details, Please wait...!", context.bot,
+                      update)
     if len(args) > 1:
         if args[1].isdigit():
             count = args[1]
@@ -385,8 +376,8 @@ def feed(update, context):
                 editMessage("You must /login ", msg)
 
             editMessage(
-                f"Fetching {count} posts from <code>@{current_user}</code>'s feed.", msg
-            )
+                f"Fetching {count} posts from <code>@{current_user}</code>'s feed.",
+                msg)
             editMessage(
                 "Starting downloading..\nThis may take longer time depending upon number of posts.",
                 msg,
@@ -411,9 +402,12 @@ def feed(update, context):
                 count,
             ]
 
-            download_insta(
-                command, msg, directory, current_user, chat_id, fetch="My Feed"
-            )
+            download_insta(command,
+                           msg,
+                           directory,
+                           current_user,
+                           chat_id,
+                           fetch="My Feed")
         elif is_link(args[1]):
             editMessage("Please send a username only...!", msg)
         else:
@@ -436,8 +430,12 @@ def feed(update, context):
             directory,
             ":feed",
         ]
-        download_insta(command, msg, directory, current_user,
-                       chat_id, fetch="My Feed")
+        download_insta(command,
+                       msg,
+                       directory,
+                       current_user,
+                       chat_id,
+                       fetch="My Feed")
 
 
 def saved(update, context):
@@ -447,8 +445,8 @@ def saved(update, context):
     session = f"./{current_user}"
     args = update.message.text.split(" ", maxsplit=1)
     directory = f"{OWNER_ID}/{current_user}"
-    msg = sendMessage("Checking the details, Please wait...!",
-                      context.bot, update)
+    msg = sendMessage("Checking the details, Please wait...!", context.bot,
+                      update)
     if len(args) > 1:
         if 1 not in STATUS:
             editMessage("You must /login ", msg)
@@ -479,9 +477,12 @@ def saved(update, context):
                 "--count",
                 count,
             ]
-            download_insta(
-                command, msg, directory, current_user, chat_id, fetch="My Saved"
-            )
+            download_insta(command,
+                           msg,
+                           directory,
+                           current_user,
+                           chat_id,
+                           fetch="My Saved")
         elif is_link(args[1]):
             editMessage("Please send a username only...!", msg)
         else:
@@ -504,8 +505,12 @@ def saved(update, context):
             directory,
             ":saved",
         ]
-        download_insta(command, msg, directory, current_user,
-                       chat_id, fetch="My Saved")
+        download_insta(command,
+                       msg,
+                       directory,
+                       current_user,
+                       chat_id,
+                       fetch="My Saved")
 
 
 def tagged(update, context):
@@ -515,8 +520,8 @@ def tagged(update, context):
     session = f"./{current_user}"
     args = update.message.text.split(" ", maxsplit=1)
     directory = f"{OWNER_ID}/{current_user}"
-    msg = sendMessage("Checking the details, please wait...!",
-                      context.bot, update)
+    msg = sendMessage("Checking the details, please wait...!", context.bot,
+                      update)
     if len(args) > 1:
         username = args[1]
         if 1 not in STATUS:
@@ -534,8 +539,8 @@ def tagged(update, context):
                     msg,
                 )
 
-        editMessage(
-            f"Fetching posts from <code>@{username}</code>'s tagged", msg)
+        editMessage(f"Fetching posts from <code>@{username}</code>'s tagged",
+                    msg)
         editMessage(
             "Starting downloading..\nThis may take longer time depending upon number of posts.",
             msg,
@@ -559,8 +564,12 @@ def tagged(update, context):
             "--",
             username,
         ]
-        download_insta(command, msg, directory,
-                       username, chat_id, fetch="Tagged")
+        download_insta(command,
+                       msg,
+                       directory,
+                       username,
+                       chat_id,
+                       fetch="Tagged")
     else:
         sendMessage("Please send a username...!", context.bot, update)
 
@@ -571,8 +580,8 @@ def story(update, context):
     current_user = usercheck()
     session = f"./{current_user}"
     args = update.message.text.split(" ", maxsplit=1)
-    msg = sendMessage("Checking the details, please wait...!",
-                      context.bot, update)
+    msg = sendMessage("Checking the details, please wait...!", context.bot,
+                      update)
     if len(args) > 1:
         username = args[1]
         directory = f"{OWNER_ID}/{username}"
@@ -591,8 +600,8 @@ def story(update, context):
                     msg,
                 )
 
-        editMessage(
-            f"Fetching posts from <code>@{username}</code>'s story.", msg)
+        editMessage(f"Fetching posts from <code>@{username}</code>'s story.",
+                    msg)
         editMessage(
             "Starting downloading..\nThis may take longer time depending upon number of posts.",
             msg,
@@ -616,8 +625,12 @@ def story(update, context):
             "--",
             username,
         ]
-        download_insta(command, msg, directory, username,
-                       chat_id, fetch="Stories")
+        download_insta(command,
+                       msg,
+                       directory,
+                       username,
+                       chat_id,
+                       fetch="Stories")
 
     else:
         sendMessage("Please send a username...!", context.bot, update)
@@ -632,8 +645,8 @@ def stories(update, context):
     directory = f"{OWNER_ID}/{username}"
     args = update.message.text.split(" ", maxsplit=1)
     if len(args) < 1:
-        msg = sendMessage(
-            "Checking the details, Please wait...!", context.bot, update)
+        msg = sendMessage("Checking the details, Please wait...!", context.bot,
+                          update)
         if 1 not in STATUS:
             editMessage("You must /login ", msg)
 
@@ -659,9 +672,12 @@ def stories(update, context):
             directory,
             ":stories",
         ]
-        download_insta(
-            command, msg, directory, username, chat_id, fetch="My Following Stories"
-        )
+        download_insta(command,
+                       msg,
+                       directory,
+                       username,
+                       chat_id,
+                       fetch="My Following Stories")
     else:
         sendMessage("Please send command only..!", context.bot, update)
 
@@ -674,8 +690,8 @@ def highlights(update, context):
     args = update.message.text.split(" ", maxsplit=1)
 
     if len(args) > 1:
-        msg = sendMessage(
-            "Checking the details, Please wait...!", context.bot, update)
+        msg = sendMessage("Checking the details, Please wait...!", context.bot,
+                          update)
         username = args[1]
         directory = f"{OWNER_ID}/{username}"
         if 1 not in STATUS:
@@ -718,8 +734,12 @@ def highlights(update, context):
             "--",
             username,
         ]
-        download_insta(command, msg, directory, username,
-                       chat_id, fetch="Highlights")
+        download_insta(command,
+                       msg,
+                       directory,
+                       username,
+                       chat_id,
+                       fetch="Highlights")
     else:
         sendMessage("Please send a username...!", context.bot, update)
 

@@ -45,24 +45,22 @@ def stats_(update, context):
     cpuUsage = psutil.cpu_percent(interval=0.5)
     memory = psutil.virtual_memory().percent
     disk = psutil.disk_usage("/").percent
-    stats = (
-        f"<b>Bot Uptime:</b> <code>{currentTime}</code>\n"
-        f"<b>Total Disk Space:</b> <code>{total}</code>\n"
-        f"<b>Used:</b> <code>{used}</code> "
-        f"<b>Free:</b> <code>{free}</code>\n\n"
-        f"<b>Upload:</b> <code>{sent}</code>\n"
-        f"<b>Download:</b> <code>{recv}</code>\n\n"
-        f"<b>CPU:</b> <code>{cpuUsage}%</code> "
-        f"<b>RAM:</b> <code>{memory}%</code> "
-        f"<b>DISK:</b> <code>{disk}%</code>"
-    )
+    stats = (f"<b>Bot Uptime:</b> <code>{currentTime}</code>\n"
+             f"<b>Total Disk Space:</b> <code>{total}</code>\n"
+             f"<b>Used:</b> <code>{used}</code> "
+             f"<b>Free:</b> <code>{free}</code>\n\n"
+             f"<b>Upload:</b> <code>{sent}</code>\n"
+             f"<b>Download:</b> <code>{recv}</code>\n\n"
+             f"<b>CPU:</b> <code>{cpuUsage}%</code> "
+             f"<b>RAM:</b> <code>{memory}%</code> "
+             f"<b>DISK:</b> <code>{disk}%</code>")
     sendMessage(stats, context.bot, update)
 
 
 def restart(update, context):
     """Restart the bot"""
-    restart_message = sendMessage(
-        "Restarting Bot, Please wait!", context.bot, update)
+    restart_message = sendMessage("Restarting Bot, Please wait!", context.bot,
+                                  update)
     # Save restart message object in order to reply to it after restarting
     with open(".restartmsg", "w", encoding="UTF-8") as f:
         f.truncate(0)
@@ -103,11 +101,13 @@ def main():
     elif OWNER_ID:
         try:
             text = "<b>Bot Restarted!</b>"
-            bot.sendMessage(chat_id=OWNER_ID, text=text,
+            bot.sendMessage(chat_id=OWNER_ID,
+                            text=text,
                             parse_mode=ParseMode.HTML)
             if AUTHORIZED_CHATS:
                 for i in AUTHORIZED_CHATS:
-                    bot.sendMessage(chat_id=i, text=text,
+                    bot.sendMessage(chat_id=i,
+                                    text=text,
                                     parse_mode=ParseMode.HTML)
         except Exception as error:
             LOGGER.warning(error)

@@ -114,7 +114,6 @@ def timeout(update):
 
 def codei_(update, context):
     """Checks the 2F code and logs the user in."""
-
     username = usercheck()
     code = update.message.text
     if code.isdigit():

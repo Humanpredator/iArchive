@@ -22,6 +22,7 @@ from bot import (
     botStartTime,
     dispatcher,
     updater,
+    LOGGER
 )
 from bot.helper.ext_utils import fs_utils
 from bot.helper.ext_utils.bot_utils import (

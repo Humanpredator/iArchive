@@ -11,7 +11,7 @@ from telegram import TelegramError
 from bot import DOWNLOAD_STATUS_UPDATE_INTERVAL, LOGGER, TG_UPLOAD, bot
 from bot.helper.ext_utils.bot_utils import usercheck
 from bot.helper.ext_utils.fs_utils import clean_download, subfolder
-from bot.helper.upload_utilis.gdrive import gup
+from bot.helper.upload_utilis.gdrive import gup, upload_folder_to_drive
 from bot.helper.upload_utilis.tg_upload import tgup
 
 IST = pytz.timezone("Asia/Kolkata")
@@ -30,8 +30,8 @@ def download_insta(command, msg, directory, username, chat_id, fetch):
         while True:
             output = process.stdout.readline()
             if output == b"":
-                subfolder(directory)
-                gup(directory, msg, username, fetch)
+                # subfolder(directory)
+                upload_folder_to_drive(directory, msg, username, fetch)
                 break
             if output:
                 datetime_ist = datetime.now(IST)

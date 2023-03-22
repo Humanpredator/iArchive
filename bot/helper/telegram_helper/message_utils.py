@@ -51,7 +51,7 @@ def deleteMessage(bot, message: Message):
 
 
 def sendLogFile(bot, update: Update):
-    with open("log.txt", "rb") as f:
+    with open("logs.log", "rb") as f:
         bot.send_document(
             document=f,
             filename=f.name,

@@ -1,21 +1,31 @@
 import os
+import pickle
 import sys
-from os import path
 
-from pydrive.auth import GoogleAuth
+from google.auth.transport.requests import Request
+from google_auth_oauthlib.flow import InstalledAppFlow
 
-if path.exists("client_secrets.json"):
-    gauth = GoogleAuth()
+SCOPES = ['https://www.googleapis.com/auth/drive']
 
-    if gauth.credentials is None:
-        # Authenticate if they're not there
-        gauth.LocalWebserverAuth()
+creds_path = 'credentials.json'
+
+if os.path.exists('token.pickle'):
+    with open('token.pickle', 'rb') as token:
+        creds = pickle.load(token)
+        print('token.pickle file loaded')
+# If there are no (valid) credentials available, let the user log in
+if not creds or not creds.valid:
+    if creds and creds.expired and creds.refresh_token:
+        creds.refresh(Request())
     else:
-        # Initialize the saved creds
-        gauth.Authorize()
-    # Save the current credentials to a file
-    gauth.SaveCredentialsFile("credentials.json")
-    os.remove("client_secrets.json")
-else:
-    print("client_secrets.json file not found")
-    sys.exit()
+        if not os.path.exists(creds_path):
+            print('credentials.json file not found')
+            sys.exit()
+        flow = InstalledAppFlow.from_client_secrets_file(
+            'credentials.json', SCOPES)
+        creds = flow.run_local_server(port=0)
+    # Save the credentials for the next run
+    with open('token.pickle', 'wb') as token:
+        pickle.dump(creds, token)
+        print('token.pickle file created')
+    os.remove(creds_path)

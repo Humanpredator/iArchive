@@ -1,6 +1,12 @@
 import os
+import pickle
 from os import path
 
+from google.auth.transport.requests import Request
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
+from googleapiclient.http import MediaFileUpload
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 from telegram import InlineKeyboardMarkup
@@ -14,15 +20,6 @@ from bot.helper.ext_utils.bot_utils import (
 )
 from bot.helper.telegram_helper import button_build
 from bot.helper.telegram_helper.message_utils import editMessage
-
-import os
-import pickle
-
-from google.auth.transport.requests import Request
-from google_auth_oauthlib.flow import InstalledAppFlow
-from googleapiclient.discovery import build
-from googleapiclient.errors import HttpError
-from googleapiclient.http import MediaFileUpload
 
 DRIVE = parent_id
 
@@ -226,19 +223,17 @@ def gup(dir: str, m, username, fetch):
     LOGGER.warning("No Credentials File Found..Upload stopped")
 
 
-
-
 # Recursive function to upload all files and subfolders in a local folder to Google Drive
 def upload_folder_to_drive(dir: str, m, username, fetch):
     # Build the credentials object using the token.pickle file
     count = 0
     editMessage(
-            "Drive Upload Starts, Please Wait....!\nThis may take longer time Depending upon number of posts.",
-            m,
-        )
+        "Drive Upload Starts, Please Wait....!\nThis may take longer time Depending upon number of posts.",
+        m,
+    )
     creds = None
-    if os.path.exists('token.pickle'):
-        with open(token.pickle, 'rb') as token:
+    if os.path.exists("token.pickle"):
+        with open(token.pickle, "rb") as token:
             creds = pickle.load(token)
 
     # If there are no (valid) credentials available, let the user log in
@@ -246,25 +241,35 @@ def upload_folder_to_drive(dir: str, m, username, fetch):
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
-           editMessage("No Token File Found..Upload stopped", m)
+            editMessage("No Token File Found..Upload stopped", m)
 
     # Create the Drive API client
-    drive_service = build('drive', 'v3', credentials=creds)
+    drive_service = build("drive", "v3", credentials=creds)
 
     # Get the name of the local folder
     folder_name = os.path.basename(dir)
 
     # Check if a folder with the same name already exists in the parent folder
     query = f"name='{folder_name}' and mimeType='application/vnd.google-apps.folder' and trashed=false and '{DRIVE}' in parents"
-    existing_folders = drive_service.files().list(q=query, fields='files(id)').execute().get('files', [])
+    existing_folders = (
+        drive_service.files()
+        .list(q=query, fields="files(id)")
+        .execute()
+        .get("files", [])
+    )
     if existing_folders:
-        folder_id = existing_folders[0]['id']
+        folder_id = existing_folders[0]["id"]
     else:
         # If the folder doesn't exist, create it
-        folder_metadata = {'name': folder_name, 'parents': [DRIVE],
-                           'mimeType': 'application/vnd.google-apps.folder'}
-        folder = drive_service.files().create(body=folder_metadata, fields='id').execute()
-        folder_id = folder.get('id')
+        folder_metadata = {
+            "name": folder_name,
+            "parents": [DRIVE],
+            "mimeType": "application/vnd.google-apps.folder",
+        }
+        folder = (
+            drive_service.files().create(body=folder_metadata, fields="id").execute()
+        )
+        folder_id = folder.get("id")
 
     # Upload all files in the local folder to Google Drive
     for file_name in os.listdir(dir):
@@ -276,28 +281,40 @@ def upload_folder_to_drive(dir: str, m, username, fetch):
         try:
             # check the filename already exist
             query = f"name='{file_name}' and trashed=false and '{folder_id}' in parents"
-            existing_files = drive_service.files().list(q=query, fields='files(id)').execute().get('files', [])
+            existing_files = (
+                drive_service.files()
+                .list(q=query, fields="files(id)")
+                .execute()
+                .get("files", [])
+            )
             # If the file already exists, update it
             if existing_files:
-                file_metadata = {'name': file_name, 'addParents': [folder_id]}
+                file_metadata = {"name": file_name, "addParents": [folder_id]}
                 media = MediaFileUpload(file_path, resumable=True)
-                file_id = existing_files[0]['id']
+                file_id = existing_files[0]["id"]
                 LOGGER.info(f"File {file_name} already exist")
-                file = drive_service.files().update(fileId=file_id, body=file_metadata,
-                                                    media_body=media).execute()
+                file = (
+                    drive_service.files()
+                    .update(fileId=file_id, body=file_metadata, media_body=media)
+                    .execute()
+                )
                 LOGGER.info(f"File {file_name} is Successfully Updated")
                 msg = f"""
 <b>Uploading: </b><code>{progress_bar(count, fcount(dir))}</code>                
 <b>Files: </b><code>0{count}/{fcount(dir)}</code>
 <b>File Name: </b><code>{file_name}</code>
 <b>Folder Size: </b><code>{get_readable_file_size(fsize(dir))}</code>
-"""         
+"""
                 editMessage(msg, m)
                 continue
             # If the file doesn't exist, create it
-            file_metadata = {'name': file_name, 'parents': [folder_id]}
+            file_metadata = {"name": file_name, "parents": [folder_id]}
             media = MediaFileUpload(file_path, resumable=True)
-            file = drive_service.files().create(body=file_metadata, media_body=media, fields='id').execute()
+            file = (
+                drive_service.files()
+                .create(body=file_metadata, media_body=media, fields="id")
+                .execute()
+            )
             LOGGER.info(f"File {file_name} is Successfully Uploaded")
             count += 1
             msg = f"""
@@ -305,20 +322,31 @@ def upload_folder_to_drive(dir: str, m, username, fetch):
 <b>Files: </b><code>0{count}/{fcount(dir)}</code>
 <b>File Name: </b><code>{file_name}</code>
 <b>Folder Size: </b><code>{get_readable_file_size(fsize(dir))}</code>
-"""         
+"""
             editMessage(msg, m)
         except HttpError as error:
             # If the file already exists, update it
             if error.resp.status == 409:
-                query = f"name='{file_name}' and trashed=false and '{folder_id}' in parents"
-                existing_files = drive_service.files().list(q=query, fields='files(id)').execute().get('files', [])
+                query = (
+                    f"name='{file_name}' and trashed=false and '{folder_id}' in parents"
+                )
+                existing_files = (
+                    drive_service.files()
+                    .list(q=query, fields="files(id)")
+                    .execute()
+                    .get("files", [])
+                )
                 if existing_files:
-                    file_metadata = {'name': file_name, 'addParents': [folder_id]}
+                    file_metadata = {"name": file_name,
+                                     "addParents": [folder_id]}
                     media = MediaFileUpload(file_path, resumable=True)
-                    file_id = existing_files[0]['id']
+                    file_id = existing_files[0]["id"]
 
-                    file = drive_service.files().update(fileId=file_id, body=file_metadata,
-                                                        media_body=media).execute()
+                    file = (
+                        drive_service.files()
+                        .update(fileId=file_id, body=file_metadata, media_body=media)
+                        .execute()
+                    )
                     LOGGER.info(f"File {file_name} is Successfully Updated")
                     count += 1
                     msg = f"""
@@ -326,13 +354,13 @@ def upload_folder_to_drive(dir: str, m, username, fetch):
 <b>Files: </b><code>0{count}/{fcount(dir)}</code>
 <b>File Name: </b><code>{file_name}</code>
 <b>Folder Size: </b><code>{get_readable_file_size(fsize(dir))}</code>
-"""         
+"""
                     editMessage(msg, m)
                 else:
-                    print(f'An Error Occurred: {error}')
+                    print(f"An Error Occurred: {error}")
                     editMessage(msg, m)
             else:
-                print(f'An Error Occurred: {error}')
+                print(f"An Error Occurred: {error}")
                 editMessage(msg, m)
     LOGGER.info("All Files was Successfully Uploaded")
     msg = f"""
@@ -350,4 +378,4 @@ def upload_folder_to_drive(dir: str, m, username, fetch):
     markup = InlineKeyboardMarkup(buttons.build_menu(1))
     LOGGER.info(f"Uploaded Completed: {username}")
     editMessage(msg, m, markup)
-    return True    
+    return True

@@ -16,13 +16,13 @@ from bot import (
     AUTHORIZED_CHATS,
     IGNORE_PENDING_REQUESTS,
     INSTA,
+    LOGGER,
     OWNER_ID,
     STATUS,
     app,
     botStartTime,
     dispatcher,
     updater,
-    LOGGER
 )
 from bot.helper.ext_utils import fs_utils
 from bot.helper.ext_utils.bot_utils import (

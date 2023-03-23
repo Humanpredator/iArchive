@@ -5,24 +5,24 @@ import signal
 import time
 from sys import executable
 
-# noinspection PyUnresolvedReferences
-from bot import modules
 import psutil
 from pyrogram import idle
 from telegram import ParseMode, TelegramError
 from telegram.ext import CommandHandler
 
+# noinspection PyUnresolvedReferences
 from bot import (
     AUTHORIZED_CHATS,
     IGNORE_PENDING_REQUESTS,
     INSTA,
+    LOGGER,
     OWNER_ID,
     STATUS,
     app,
     botStartTime,
     dispatcher,
+    modules,
     updater,
-    LOGGER
 )
 from bot.helper.ext_utils import fs_utils
 from bot.helper.ext_utils.bot_utils import (

@@ -6,7 +6,7 @@ import time
 from sys import executable
 
 # noinspection PyUnresolvedReferences
-import modules
+from bot import modules
 import psutil
 from pyrogram import idle
 from telegram import ParseMode, TelegramError
@@ -35,7 +35,7 @@ from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.message_utils import *
 
 
-def stats_(update, context):
+def stats(update, context):
     current_time = get_readable_time(time.time() - botStartTime)
     total, used, free = shutil.disk_usage(".")
     total = get_readable_file_size(total)

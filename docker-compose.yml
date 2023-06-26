@@ -1,0 +1,15 @@
+version: "3.3"
+
+services:
+  iarchive:
+    container_name: iarchive-container
+    build: .
+    image: iarchive-image
+    command: bash start.sh
+    restart: on-failure
+    ports:
+      - "80:80"
+    volumes:
+      - ./sessionfile:./sessionfile
+      - ./config.env:./config.env
+

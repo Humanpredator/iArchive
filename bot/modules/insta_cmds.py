@@ -1,690 +1,552 @@
-import os
+"""InstaDL-Bot, Telegram Bot to download Instagram Posts and Reels"""
 
 from instaloader import Profile
-from telegram import InlineKeyboardButton
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ParseMode
 from telegram.ext import CommandHandler
 
-from bot import INSTA, OWNER_ID, STATUS, dispatcher
-from bot.helper.down_utilis.insta_down import download_insta
-from bot.helper.ext_utils.bot_utils import acc_type, is_link, usercheck, yes_or_no
-from bot.helper.telegram_helper.bot_commands import BotCommands
-from bot.helper.telegram_helper.filters import CustomFilters
-from bot.helper.telegram_helper.message_utils import *
+from bot import INSTA, STATUS, dispatcher, bot
+from bot.helper.ext_utils.bot_utils import is_link, allow_access
+from bot.helper.ig_utils.ig_down import download_content, check_username, download_highlights, download_stories, \
+    fetch_followers, fetch_following, mutual_follow, download_tagged, download_feed, download_saved, \
+    download_following_stories
+from bot.helper.tg_utils.bot_commands import BotCommands
+from bot.helper.tg_utils.filters import CustomFilters
+from bot.helper.tg_utils.message_utils import sendMessage, editMessage, deleteMessage
 
 
-def post(update, context):
-    args = update.message.text.split(" ", maxsplit=1)
-    if len(args) > 1:
-        m = sendMessage(
-            "Checking the given username, please wait...!", context.bot, update
+def my_account(update, context):
+    if 1 not in STATUS:
+        sendMessage(f"You must /{BotCommands.LoginCommand}", context.bot, update)
+        return
+    msg = sendMessage(
+        f"Checking Given Details...!, Please Wait...!", context.bot, update
+    )
+
+    profile = Profile.own_profile(INSTA.context)
+    media_count = profile.mediacount
+    name = profile.full_name
+    bio = profile.biography
+    ppic = profile.profile_pic_url
+    username = profile.username
+    igtv_count = profile.igtvcount
+    followers = profile.followers
+    following = profile.followees
+    reply_markup = InlineKeyboardMarkup(
+        [
+            [
+                InlineKeyboardButton(
+                    "Download My Profile Pic", callback_data=f"PPIC#{username}"
+                ),
+                InlineKeyboardButton(
+                    "Go To Profile", url=f"https://www.instagram.com/{username}"
+                ),
+            ],
+            [
+                InlineKeyboardButton(
+                    "My Post", callback_data=f"POST#{username}"),
+                InlineKeyboardButton(
+                    "My Tagged Posts", callback_data=f"TAG#{username}"
+                ),
+                InlineKeyboardButton(
+                    "Posts In My Feed", callback_data=f"FEED#{username}"
+                ),
+            ],
+            [
+                InlineKeyboardButton(
+                    "My Saved Posts", callback_data=f"SAVED#{username}"
+                ),
+                InlineKeyboardButton(
+                    "My IGTV Posts", callback_data=f"IGTV#{username}"
+                ),
+            ],
+            [
+                InlineKeyboardButton(
+                    "My Highlights", callback_data=f"HIGHLIGHT#{username}"
+                ),
+                InlineKeyboardButton(
+                    "My Stories ", callback_data=f"STORY#{username}"
+                ),
+                InlineKeyboardButton(
+                    "Stories of My Following", callback_data=f"FSTORY#{username}"
+                ),
+            ],
+            [
+                InlineKeyboardButton(
+                    "List Of My Followers", callback_data=f"FOLLOWER#{username}"
+                ),
+                InlineKeyboardButton(
+                    "List Of My Following", callback_data=f"FOLLOWING#{username}"
+                ),
+            ],
+        ]
+    )
+    deleteMessage(context.bot, msg)
+    bot.send_photo(
+        chat_id=update.message.chat_id,
+        photo=ppic,
+        caption=f"You are already logged in as {name}\n\n<b>Your Account Details</b>\n\n🏷 <b>Name</b>: {name}\n🔖 <b>Username</b>: {profile.username}\n📝 <b>Bio</b>: {bio}\n📍 <b>Account Type</b>: {profile.is_private}\n🏭 <b>Is Business Account?</b>: {profile.is_business_account}\n👥 <b>Total Followers</b>: {followers}\n👥 <b>Total Following</b>: {following}\n📸 <b>Total Posts</b>: {media_count}\n📺 <b>IGTV Videos</b>: {igtv_count}",
+        parse_mode=ParseMode.HTML,
+        reply_markup=reply_markup,
+    )
+
+
+def dl_content(update, context):
+    args = update.message.text.strip().split(" ", maxsplit=1)
+    if len(args) <= 1:
+        sendMessage("Send insta post links after /mirror ",
+                    context.bot, update)
+    else:
+        url = args[1]
+        msg = sendMessage(
+            f"Checking Given Details...!, Please Wait...!", context.bot, update
         )
         if 1 not in STATUS:
-            editMessage("You must /login ", m)
+            editMessage(f"You must /{BotCommands.LoginCommand}", msg)
+            return
+        editMessage("Fetching data from Instagram🔗...!", msg)
+        download_content(url, msg)
+
+
+def ig(update, context):
+    args = update.message.text.strip().split(" ", maxsplit=1)
+
+    if len(args) <= 1:
+        sendMessage(f"Please Send IG Username After /{BotCommands.IgPostCommand}", context.bot, update)
+    else:
+        username = args[1]
+        msg = sendMessage(
+            f"Checking IG Username <b>@{username}</b>, Please Wait...!", context.bot, update
+        )
+        if 1 not in STATUS:
+            editMessage(f"You must /{BotCommands.LoginCommand}", msg)
 
         elif is_link(args[1]):
-            editMessage("Please send a username only...!", m)
+            editMessage("Please send a username only...!", msg)
         else:
-            username = args[1]
-            profile = Profile.from_username(INSTA.context, username)
-            is_followed = yes_or_no(profile.followed_by_viewer)
-            ac_type = acc_type(profile.is_private)
-            if ac_type == "🔒Private🔒" and is_followed == "No":
+            profile, error = check_username(username)
+            if error:
                 editMessage(
-                    f"Sorry!\nI can't fetch details from that account.\nSince its a private account and you are not following <code>@{username}</code>.",
-                    m,
+                    f"Sorry...! <b>{error}</b>!",
+                    msg,
                 )
-
             else:
-                reply_markup = InlineKeyboardMarkup(
-                    [
+                media_count = profile.mediacount
+                name = profile.full_name
+                ppic = profile.profile_pic_url
+                igtv_count = profile.igtvcount
+                bio = profile.biography
+                followers = profile.followers
+                following = profile.followees
+                if not allow_access(profile):
+                    reply_markup = InlineKeyboardMarkup(
                         [
-                            InlineKeyboardButton(
-                                "Pictures Only", callback_data=f"photos#{username}"
-                            ),
-                            InlineKeyboardButton(
-                                "Videos Only", callback_data=f"videos#{username}"
-                            ),
-                        ],
+                            [
+                                InlineKeyboardButton(
+                                    "Download Profile Pic",
+                                    callback_data=f"PPIC#{username}",
+                                ),
+                                InlineKeyboardButton(
+                                    "Go To Profile",
+                                    url=f"https://www.instagram.com/{username}",
+                                ),
+                            ]
+                        ]
+                    )
+                else:
+                    reply_markup = InlineKeyboardMarkup(
                         [
-                            InlineKeyboardButton(
-                                "Pictures and Videos",
-                                callback_data=f"picandvid#{username}",
-                            ),
-                            InlineKeyboardButton(
-                                "ALL Posts", callback_data=f"allposts#{username}"
-                            ),
-                        ],
-                    ]
-                )
-                editMessage(
-                    "Select the type of posts you want to fetch?",
-                    m,
+                            [
+                                InlineKeyboardButton(
+                                    "Profile Pic", callback_data=f"PPIC#{username}"
+                                ),
+                                InlineKeyboardButton(
+                                    "Go To Profile",
+                                    url=f"https://www.instagram.com/{username}",
+                                ),
+                            ],
+                            [
+                                InlineKeyboardButton(
+                                    "All Post", callback_data=f"POST#{username}"
+                                ),
+                                InlineKeyboardButton(
+                                    "All Tagged Posts",
+                                    callback_data=f"TAG#{username}",
+                                ),
+                            ],
+                            [
+                                InlineKeyboardButton(
+                                    "All IGTV", callback_data=f"IGTV#{username}"
+                                ),
+                                InlineKeyboardButton(
+                                    "Stories ", callback_data=f"STORY#{username}"
+                                ),
+                                InlineKeyboardButton(
+                                    "Highlights", callback_data=f"HIGHLIGHT#{username}"
+                                ),
+                            ],
+                            [
+                                InlineKeyboardButton(
+                                    f"{name}'s Followers",
+                                    callback_data=f"FOLLOWER#{username}",
+                                ),
+                                InlineKeyboardButton(
+                                    f"{name}'s Following",
+                                    callback_data=f"FOLLOWING#{username}",
+                                ),
+                            ],
+                        ]
+                    )
+                deleteMessage(context.bot, msg)
+                bot.send_photo(
+                    chat_id=update.message.chat.id,
+                    photo=ppic,
+                    caption=f"🏷 <b>Name</b>: {name}\n🔖 <b>Username</b>: {profile.username}\n📝 <b>Bio</b>: {bio}\n📍 <b>Account Type</b>: {'Private' if profile.is_private else 'Public'}\n🏭 <b>Is Business Account?</b>: {'Yes' if profile.is_business_account else 'No'}\n👥 <b>Total Followers</b>: {followers}\n👥 <b>Total Following</b>: {following}\n📸 <b>Total Posts</b>: {media_count}\n📺 <b>IGTV Videos</b>: {igtv_count}",
+                    parse_mode=ParseMode.HTML,
                     reply_markup=reply_markup,
                 )
 
+
+def post(update, context):
+    """Download Instagram Posts"""
+    args = update.message.text.strip().split(" ", maxsplit=1)
+
+    if len(args) <= 1:
+        sendMessage(f"Please Send IG Username After /{BotCommands.IgPostCommand}", context.bot, update)
     else:
-        sendMessage("Please send a username...!", context.bot, update)
+        username = args[1]
+        msg = sendMessage(
+            f"Checking IG Username <b>@{username}</b>, Please Wait...!", context.bot, update
+        )
+        if 1 not in STATUS:
+            editMessage(f"You must /{BotCommands.LoginCommand}", msg)
+
+        elif is_link(args[1]):
+            editMessage("Please send a username only...!", msg)
+        else:
+            profile, error = check_username(username)
+            if error:
+                editMessage(
+                    f"Sorry...! <b>{error}</b>!",
+                    msg,
+                )
+            else:
+                if not allow_access(profile):
+                    editMessage(f"Please follow <code>@{username}</code>", msg)
+                else:
+                    reply_markup = InlineKeyboardMarkup(
+                        [
+                            [
+                                InlineKeyboardButton(
+                                    "Picture Posts", callback_data=f"PIC#{profile.username}"
+                                ),
+                                InlineKeyboardButton(
+                                    "Video Posts", callback_data=f"VID#{profile.username}"
+                                ),
+                            ],
+                            [
+                                InlineKeyboardButton(
+                                    "Picture & Video Posts",
+                                    callback_data=f"PICVID#{profile.username}",
+                                ),
+                                InlineKeyboardButton(
+                                    "ALL Posts", callback_data=f"ALLPOST#{profile.username}"
+                                ),
+                            ],
+                        ]
+                    )
+                    editMessage(
+                        f"Choose the type of post to download from <code>@{profile.username}</code>",
+                        msg,
+                        reply_markup=reply_markup,
+                    )
 
 
 def igtv(update, context):
-    args = update.message.text.split(" ", maxsplit=1)
-    if len(args) > 1:
+    """Download IGTV from a given username"""
+    args = update.message.text.strip().split(" ", maxsplit=1)
+    if len(args) <= 1:
+        sendMessage(f"Please Send IG Username After /{BotCommands.IgPostCommand}", context.bot, update)
+    else:
         username = args[1]
-        m = sendMessage(
-            "Checking the given username, please wait...!", context.bot, update
+        msg = sendMessage(
+            f"Checking IG Username {username}, Please Wait...!", context.bot, update
         )
         if 1 not in STATUS:
-            editMessage("You must login  /login ", m)
+            editMessage(f"You Must login /{BotCommands.LoginCommand}", msg)
 
         elif is_link(args[1]):
-            editMessage("Please send a username only...!", m)
+            editMessage("Please send a username only...!", msg)
         else:
-            profile = Profile.from_username(INSTA.context, username)
-            is_followed = yes_or_no(profile.followed_by_viewer)
-            ac_type = acc_type(profile.is_private)
-            if ac_type == "🔒Private🔒" and is_followed == "No":
+            profile, error = check_username(username)
+            if error:
                 editMessage(
-                    f"Sorry!\nI can't fetch details from that account.\nSince its a private account and you are not following <code>@{username}</code>.",
-                    m,
+                    f"Sorry...! <b>{error}</b>!",
+                    msg,
                 )
-
-        editMessage(f"Fetching IGTV from <code>@{username}</code>", m)
-        profile = Profile.from_username(INSTA.context, username)
-        igtv_count = profile.igtvcount
-        reply_markup = InlineKeyboardMarkup(
-            [
-                [
-                    InlineKeyboardButton(
-                        "Yes", callback_data=f"yes#{username}"),
-                    InlineKeyboardButton("No", callback_data=f"no#{username}"),
-                ]
-            ]
-        )
-        editMessage(
-            f"Do you want to download all IGTV posts?\nThere are {igtv_count} posts.",
-            m,
-            reply_markup=reply_markup,
-        )
-    else:
-        sendMessage("Please send a username...!", context.bot, update)
-
-
-def followers(update, context):
-    args = update.message.text.split(" ", maxsplit=1)
-    if len(args) > 1:
-        username = args[1]
-        m = sendMessage(
-            "Checking the given username, please wait...!", context.bot, update
-        )
-        if 1 not in STATUS:
-            editMessage("You must /login ", m)
-
-        elif is_link(args[1]):
-            editMessage("Please send a username only...!", m)
-        else:
-            profile = Profile.from_username(INSTA.context, username)
-            is_followed = yes_or_no(profile.followed_by_viewer)
-            ac_type = acc_type(profile.is_private)
-            if ac_type == "🔒Private🔒" and is_followed == "No":
-                editMessage(
-                    f"Sorry!\nI can't fetch details from that account.\nSince its a private account and you are not following <code>@{username}</code>.",
-                    m,
-                )
-
-        profile = Profile.from_username(INSTA.context, username)
-        name = profile.full_name
-        editMessage(
-            f"Fetching followers list of <code>@{username}</code>\n It may take few minutes, pls be patient...!",
-            m,
-        )
-        chat_id = update.message.chat_id
-        try:
-            followers = f"**Followers List for {name}**\n\n"
-            f = profile.get_followers()
-            for p in f:
-                followers += f"\nName: {p.username}:Link to Profile: www.instagram.com/{p.username}"
-            text_file = open(
-                f"{username}'s_followers_list.txt", mode="w", encoding="utf-8"
-            )
-            text_file.write(followers)
-            text_file.close()
-            deleteMessage(context.bot, m)
-            bot.send_document(
-                chat_id=chat_id,
-                document=open(f"{username}'s_followers_list.txt", "rb"),
-                caption=f"Followers List for {name}",
-            )
-            os.remove(f"{username}'s_followers_list.txt")
-            LOGGER.info("followers list removed")
-        except Exception as e:
-            LOGGER.error(e)
-            editMessage(f"Error Occurred: {e}", m)
-    else:
-        sendMessage("Please send a username...!", context.bot, update)
-
-
-def following(update, context):
-    args = update.message.text.split(" ", maxsplit=1)
-    if len(args) > 1:
-        username = args[1]
-        m = sendMessage(
-            "Checking the given username, please wait...!", context.bot, update
-        )
-        if 1 not in STATUS:
-            editMessage("You must /login ", m)
-
-        elif is_link(args[1]):
-            editMessage("Please send a username only...!", m)
-        else:
-            profile = Profile.from_username(INSTA.context, username)
-            is_followed = yes_or_no(profile.followed_by_viewer)
-            ac_type = acc_type(profile.is_private)
-            if ac_type == "🔒Private🔒" and is_followed == "No":
-                editMessage(
-                    f"Sorry!\nI can't fetch details from that account.\nSince its a private account and you are not following <code>@{username}</code>.",
-                    m,
-                )
-
-        profile = Profile.from_username(INSTA.context, username)
-        full_name = profile.full_name
-        editMessage(
-            f"Fetching following list of <code>@{username}</code>\n It may take few minutes, pls be patient...!",
-            m,
-        )
-        chat_id = update.message.chat_id
-        try:
-            followees = f"**Following List for {full_name}**\n\n"
-            f = profile.get_followees()
-            for p in f:
-                followees += f"\nName: {p.username}:Link to Profile: www.instagram.com/{p.username}"
-            text_file = open(
-                f"{username}'s_following_list.txt", mode="w", encoding="utf-8"
-            )
-            text_file.write(followees)
-            text_file.close()
-            deleteMessage(context.bot, m)
-            bot.send_document(
-                chat_id=chat_id,
-                document=open(f"{username}'s_following_list.txt", "rb"),
-                caption=f"Following List for {full_name}",
-            )
-            os.remove(f"{username}'s_following_list.txt")
-            LOGGER.info("following list removed")
-        except Exception as e:
-            LOGGER.error(e)
-            editMessage(f"Error occurred: {e}", m)
-    else:
-        sendMessage("Please send a username...!", context.bot, update)
-
-
-def fans(update, context):
-    args = update.message.text.split(" ", maxsplit=1)
-    if len(args) > 1:
-        m = sendMessage(
-            "Checking the given username, please wait...!", context.bot, update
-        )
-        username = args[1]
-        if 1 not in STATUS:
-            editMessage("You must /login ", m)
-
-        elif is_link(args[1]):
-            editMessage("Please send a username only...!", m)
-        else:
-            profile = Profile.from_username(INSTA.context, username)
-            is_followed = yes_or_no(profile.followed_by_viewer)
-            ac_type = acc_type(profile.is_private)
-            if ac_type == "🔒Private🔒" and is_followed == "No":
-                editMessage(
-                    f"Sorry!\nI can't fetch details from that account.\nSince its a private account and you are not following <code>@{username}</code>.",
-                    m,
-                )
-
-        profile = Profile.from_username(INSTA.context, username)
-        full_name = profile.full_name
-        editMessage(
-            f"Fetching fans list of <code>@{username}</code>\n It may take few minutes, pls be patient...!",
-            m,
-        )
-        chat_id = update.message.chat_id
-        f = profile.get_followers()
-        fl = profile.get_followees()
-        flist = []
-        fmlist = []
-        for fn in f:
-            u = fn.username
-            flist.append(u)
-        for fm in fl:
-            n = fm.username
-            fmlist.append(n)
-        fans = [value for value in fmlist if value in flist]
-        followers = f"**Fans List for {full_name}**\n\n"
-        for p in fans:
-            followers += f"\n[{p}](www.instagram.com/{p})"
-        try:
-            followers = f"**Fans List for {full_name}**\n\n"
-            for p in fans:
-                followers += f"\nName: {p}:Link to Profile: www.instagram.com/{p}"
-            text_file = open(f"{username}'s_fans_list.txt",
-                             mode="w", encoding="utf-8")
-            text_file.write(followers)
-            text_file.close()
-            deleteMessage(context.bot, m)
-            bot.send_document(
-                chat_id=chat_id,
-                document=open(f"{username}'s_fans_list.txt", "rb"),
-                caption=f"<b>{full_name}'s fans</b>\n\n<b>Total Fans:</b> {len(fans)}\n\n<b>Total Followers:</b>  {len(flist)}\n\n<b>Total Following:</b>  {len(fmlist)}\n\n<b>Total Followers who follow {username}:</b>  {len(fans)}\n\nT<b>otal Following who follow {username}:</b> {len(flist)}",
-                parse_mode="HTML",
-            )
-            os.remove(f"{username}'s_fans_list.txt")
-            LOGGER.info(f"fans list of {full_name} removed")
-
-        except Exception as e:
-            LOGGER.error(e)
-            editMessage(f"Error occurred: {e}", m)
-    else:
-        sendMessage("Please send a username...!", context.bot, update)
-
-
-def not_following(update, context):
-    args = update.message.text.split(" ", maxsplit=1)
-    if len(args) > 1:
-        m = sendMessage(
-            "Checking the given username, please wait...!", context.bot, update
-        )
-        username = args[1]
-        if 1 not in STATUS:
-            editMessage("You must /login ", m)
-
-        elif is_link(args[1]):
-            editMessage("Please send a username only...!", m)
-        else:
-            profile = Profile.from_username(INSTA.context, username)
-            is_followed = yes_or_no(profile.followed_by_viewer)
-            ac_type = acc_type(profile.is_private)
-            if ac_type == "🔒Private🔒" and is_followed == "No":
-                editMessage(
-                    f"Sorry!\nI can't fetch details from that account.\nSince its a private account and you are not following <code>@{username}</code>.",
-                    m,
-                )
-
-        profile = Profile.from_username(INSTA.context, username)
-        full_name = profile.full_name
-        editMessage(
-            f"Fetching list of accounts who don't follow <code>@{username}</code>\n It may take few minutes, pls be patient...!",
-            m,
-        )
-        chat_id = update.message.chat_id
-        f = profile.get_followers()
-        fl = profile.get_followees()
-        flist = []
-        fmlist = []
-        for fn in f:
-            u = fn.username
-            flist.append(u)
-        for fm in fl:
-            n = fm.username
-            fmlist.append(n)
-
-        fans = list(set(fmlist) - set(flist))
-
-        try:
-            followers = f"Following of <code>@{username}</code> who is <b>not</b> following <code>@{username}</code>\n\n"
-            for p in fans:
-                followers += f"\nName: {p} :     Link to Profile: www.instagram.com/{p}"
-            text_file = open(
-                f"{username}'s_not_following_list.txt", mode="w", encoding="utf-8"
-            )
-            text_file.write(followers)
-            text_file.close()
-            deleteMessage(context.bot, m)
-            bot.send_document(
-                chat_id=chat_id,
-                document=open(f"{username}'s_not_following_list.txt", "rb"),
-                caption=f"<b>{full_name}'s Non_followers list</b>\n\n<b>Total Non_followers:</b> {len(fans)}\n\n<b>Total Followers:</b>  {len(flist)}\n\n<b>Total Following:</b>  {len(fmlist)}\n\n<b>Total Followers who follow {username}:</b>  {len(fans)}\n\n<b>Total Following who follow {username}:</b> {len(flist)}",
-                parse_mode="HTML",
-            )
-            os.remove(f"{username}'s_not_following_list.txt")
-            LOGGER.info("non_followers list removed")
-        except Exception as e:
-            LOGGER.error(e)
-            editMessage(f"Error occurred: {e}", m)
-    else:
-        sendMessage("Please send a username...!", context.bot, update)
-
-
-def feed(update, context):
-    chat_id = update.message.chat_id
-    USER = usercheck()
-    session = f"./{USER}"
-    args = update.message.text.split(" ", maxsplit=1)
-    dir = f"{OWNER_ID}/{USER}"
-    m = sendMessage("Checking the details, Please wait...!",
-                    context.bot, update)
-    if len(args) > 1:
-        if args[1].isdigit():
-            count = args[1]
-            if 1 not in STATUS:
-                editMessage("You must /login ", m)
-
-            editMessage(
-                f"Fetching {count} posts from <code>@{USER}</code>'s feed.", m)
-            editMessage(
-                "Starting downloading..\nThis may take longer time depending upon number of posts.",
-                m,
-            )
-            command = [
-                "instaloader",
-                "--no-metadata-json",
-                "--no-compress-json",
-                "--no-profile-pic",
-                "--no-posts",
-                "--no-captions",
-                "--no-video-thumbnails",
-                "--filename-pattern={profile}_UTC_{date_utc}",
-                "--login",
-                USER,
-                "--sessionfile",
-                session,
-                "--dirname-pattern",
-                dir,
-                ":feed",
-                "--count",
-                count,
-            ]
-
-            download_insta(command, m, dir, USER, chat_id, fetch="My Feed")
-        elif is_link(args[1]):
-            editMessage("Please send a username only...!", m)
-        else:
-            editMessage("Please send a valid number...!", m)
-    else:
-        command = [
-            "instaloader",
-            "--no-metadata-json",
-            "--no-compress-json",
-            "--no-profile-pic",
-            "--no-posts",
-            "--no-captions",
-            "--no-video-thumbnails",
-            "--filename-pattern={profile}_UTC_{date_utc}",
-            "--login",
-            USER,
-            "--sessionfile",
-            session,
-            "--dirname-pattern",
-            dir,
-            ":feed",
-        ]
-        download_insta(command, m, dir, USER, chat_id, fetch="My Feed")
-
-
-def saved(update, context):
-    chat_id = update.message.chat_id
-    USER = usercheck()
-    session = f"./{USER}"
-    args = update.message.text.split(" ", maxsplit=1)
-    dir = f"{OWNER_ID}/{USER}"
-    m = sendMessage("Checking the details, Please wait...!",
-                    context.bot, update)
-    if len(args) > 1:
-        if 1 not in STATUS:
-            editMessage("You must /login ", m)
-
-        if args[1].isdigit():
-            count = args[1]
-            editMessage(f"Fetching {count} posts from saved.", m)
-            editMessage(
-                "Starting downloading..\nThis may take longer time depending upon number of posts.",
-                m,
-            )
-            command = [
-                "instaloader",
-                "--no-metadata-json",
-                "--no-compress-json",
-                "--no-profile-pic",
-                "--no-posts",
-                "--no-captions",
-                "--no-video-thumbnails",
-                "--filename-pattern={profile}_UTC_{date_utc}",
-                "--login",
-                USER,
-                "-f",
-                session,
-                "--dirname-pattern",
-                dir,
-                ":saved",
-                "--count",
-                count,
-            ]
-            download_insta(command, m, dir, USER, chat_id, fetch="My Saved")
-        elif is_link(args[1]):
-            editMessage("Please send a username only...!", m)
-        else:
-            editMessage("Please send a count...!", m)
-    else:
-        command = [
-            "instaloader",
-            "--no-metadata-json",
-            "--no-compress-json",
-            "--no-profile-pic",
-            "--no-posts",
-            "--no-captions",
-            "--no-video-thumbnails",
-            "--filename-pattern={profile}_UTC_{date_utc}",
-            "--login",
-            USER,
-            "-f",
-            session,
-            "--dirname-pattern",
-            dir,
-            ":saved",
-        ]
-        download_insta(command, m, dir, USER, chat_id, fetch="My Saved")
-
-
-def tagged(update, context):
-    chat_id = update.message.chat_id
-    USER = usercheck()
-    session = f"./{USER}"
-    args = update.message.text.split(" ", maxsplit=1)
-    dir = f"{OWNER_ID}/{USER}"
-    m = sendMessage("Checking the details, please wait...!",
-                    context.bot, update)
-    if len(args) > 1:
-        username = args[1]
-        if 1 not in STATUS:
-            editMessage("You must /login ", m)
-
-        elif is_link(args[1]):
-            editMessage("Please send a username only...!", m)
-        else:
-            profile = Profile.from_username(INSTA.context, username)
-            is_followed = yes_or_no(profile.followed_by_viewer)
-            ac_type = acc_type(profile.is_private)
-            if ac_type == "🔒Private🔒" and is_followed == "No":
-                editMessage(
-                    f"This account is private and you are not following {username}.", m
-                )
-
-        editMessage(
-            f"Fetching posts from <code>@{username}</code>'s tagged", m)
-        editMessage(
-            "Starting downloading..\nThis may take longer time depending upon number of posts.",
-            m,
-        )
-        command = [
-            "instaloader",
-            "--no-metadata-json",
-            "--no-compress-json",
-            "--no-profile-pic",
-            "--no-posts",
-            "--tagged",
-            "--no-captions",
-            "--no-video-thumbnails",
-            "--filename-pattern={profile}_UTC_{date_utc}",
-            "--login",
-            USER,
-            "-f",
-            session,
-            "--dirname-pattern",
-            dir,
-            "--",
-            username,
-        ]
-        download_insta(command, m, dir, username, chat_id, fetch="Tagged")
-    else:
-        sendMessage("Please send a username...!", context.bot, update)
-
-
-def story(update, context):
-    chat_id = update.message.chat_id
-    USER = usercheck()
-    session = f"./{USER}"
-    args = update.message.text.split(" ", maxsplit=1)
-    m = sendMessage("Checking the details, please wait...!",
-                    context.bot, update)
-    if len(args) > 1:
-        username = args[1]
-        dir = f"{OWNER_ID}/{username}"
-        if 1 not in STATUS:
-            editMessage("You must /login ", m)
-
-        elif is_link(args[1]):
-            editMessage("Please send a username only...!", m)
-        else:
-            profile = Profile.from_username(INSTA.context, username)
-            is_followed = yes_or_no(profile.followed_by_viewer)
-            ac_type = acc_type(profile.is_private)
-            if ac_type == "🔒Private🔒" and is_followed == "No":
-                editMessage(
-                    f"This account is private and you are not following {username}.", m
-                )
-
-        editMessage(
-            f"Fetching posts from <code>@{username}</code>'s story.", m)
-        editMessage(
-            "Starting downloading..\nThis may take longer time depending upon number of posts.",
-            m,
-        )
-        command = [
-            "instaloader",
-            "--no-metadata-json",
-            "--no-compress-json",
-            "--no-profile-pic",
-            "--no-posts",
-            "--stories",
-            "--no-captions",
-            "--no-video-thumbnails",
-            "--filename-pattern={profile}_UTC_{date_utc}",
-            "--login",
-            USER,
-            "-f",
-            session,
-            "--dirname-pattern",
-            dir,
-            "--",
-            username,
-        ]
-        download_insta(command, m, dir, username, chat_id, fetch="Stories")
-
-    else:
-        sendMessage("Please send a username...!", context.bot, update)
-
-
-def stories(update, context):
-    chat_id = update.message.chat_id
-    USER = usercheck()
-    session = f"./{USER}"
-    username = USER
-    dir = f"{OWNER_ID}/{username}"
-    args = update.message.text.split(" ", maxsplit=1)
-    if len(args) < 1:
-        m = sendMessage("Checking the details, Please wait...!",
-                        context.bot, update)
-        if 1 not in STATUS:
-            editMessage("You must /login ", m)
-
-        editMessage("Fetching posts from your stories.", m)
-        editMessage(
-            "Starting downloading..\nThis may take longer time depending upon number of posts.",
-            m,
-        )
-        command = [
-            "instaloader",
-            "--no-metadata-json",
-            "--no-compress-json",
-            "--no-profile-pic",
-            "--no-captions",
-            "--no-posts",
-            "--no-video-thumbnails",
-            "--filename-pattern={profile}_UTC_{date_utc}",
-            "--login",
-            USER,
-            "-f",
-            session,
-            "--dirname-pattern",
-            dir,
-            ":stories",
-        ]
-        download_insta(command, m, dir, username, chat_id,
-                       fetch="My Following Stories")
-    else:
-        sendMessage("Please send command only..!", context.bot, update)
+            else:
+                if not allow_access(profile):
+                    editMessage(
+                        f"Please follow <code>@{username}</code>",
+                        msg,
+                    )
+                else:
+                    profile = Profile.from_username(INSTA.context, username)
+                    igtv_count = profile.igtvcount
+                    reply_markup = InlineKeyboardMarkup(
+                        [
+                            [
+                                InlineKeyboardButton(
+                                    "Yes", callback_data=f"YES#{username}"),
+                                InlineKeyboardButton("No", callback_data=f"NO#{username}"),
+                            ]
+                        ]
+                    )
+                    editMessage(
+                        f"Total IGTV Count: <code>{igtv_count}</code>\nDo you want to download all IGTV videos of <code>@{username}</code>?",
+                        msg,
+                        reply_markup=reply_markup,
+                    )
 
 
 def highlights(update, context):
-    chat_id = update.message.chat_id
-    USER = usercheck()
-    session = f"./{USER}"
-    args = update.message.text.split(" ", maxsplit=1)
+    """Download posts from a given username"""
 
-    if len(args) > 1:
-        m = sendMessage("Checking the details, Please wait...!",
-                        context.bot, update)
+    args = update.message.text.strip().split(" ", maxsplit=1)
+
+    if len(args) <= 1:
+        sendMessage(f"Please Send IG Username After /{BotCommands.IgHighlightsCommand}", context.bot, update)
+    else:
         username = args[1]
-        dir = f"{OWNER_ID}/{username}"
+        msg = sendMessage(
+            f"Checking IG Username <b>@{username}</b>, Please Wait...!", context.bot, update
+        )
         if 1 not in STATUS:
-            editMessage("You must /login ", m)
+            editMessage(f"You must /{BotCommands.LoginCommand}", msg)
 
         elif is_link(args[1]):
-            editMessage("Please send a username only...!", m)
+            editMessage("Please send a username only...!", msg)
         else:
-            profile = Profile.from_username(INSTA.context, username)
-            is_followed = yes_or_no(profile.followed_by_viewer)
-            ac_type = acc_type(profile.is_private)
-            if ac_type == "🔒Private🔒" and is_followed == "No":
+            profile, error = check_username(username)
+            if error:
                 editMessage(
-                    f"This account is private and you are not following {username}.", m
+                    f"Sorry...! <b>{error}</b>!",
+                    msg,
                 )
+            else:
+                if not allow_access(profile):
+                    editMessage(f"Please follow <code>@{username}</code>", msg)
 
-        editMessage(
-            f"Fetching posts from <code>@{username}</code>'s highlights.", m)
-        editMessage(
-            "Starting downloading..\nThis may take longer time depending upon number of posts.",
-            m,
-        )
-        command = [
-            "instaloader",
-            "--no-metadata-json",
-            "--no-compress-json",
-            "--no-profile-pic",
-            "--no-posts",
-            "--highlights",
-            "--no-captions",
-            "--no-video-thumbnails",
-            "--filename-pattern={profile}_UTC_{date_utc}",
-            "--login",
-            USER,
-            "-f",
-            session,
-            "--dirname-pattern",
-            dir,
-            "--",
-            username,
-        ]
-        download_insta(command, m, dir, username, chat_id, fetch="Highlights")
+                else:
+                    download_highlights(profile, msg)
+
+
+def story(update, context):
+    args = update.message.text.strip().split(" ", maxsplit=1)
+    if len(args) <= 1:
+        sendMessage(f"Please Send IG Username After /{BotCommands.IgStoryCommand}", context.bot, update)
     else:
-        sendMessage("Please send a username...!", context.bot, update)
+        username = args[1]
+        msg = sendMessage(
+            f"Checking IG Username <b>@{username}</b>, Please Wait...!", context.bot, update
+        )
+        if 1 not in STATUS:
+            editMessage(f"You must /{BotCommands.LoginCommand}", msg)
+
+        elif is_link(args[1]):
+            editMessage("Please send a username only...!", msg)
+        else:
+            profile, error = check_username(username)
+            if error:
+                editMessage(
+                    f"Sorry...! <b>{error}</b>!",
+                    msg,
+                )
+            else:
+                if not allow_access(profile):
+                    editMessage(f"Please follow <code>@{username}</code>", msg)
+
+                else:
+                    download_stories(profile, msg)
+
+
+def followers(update, context):
+    """Get followers list of a given username"""
+    args = update.message.text.split(" ", maxsplit=1)
+    if len(args) <= 1:
+        sendMessage(f"Please Send IG Username After /{BotCommands.IgPostCommand}", context.bot, update)
+    else:
+        username = args[1]
+        msg = sendMessage(
+            f"Checking IG Username {username}, Please Wait...!", context.bot, update
+        )
+        if 1 not in STATUS:
+            editMessage(f"You Must login /{BotCommands.LoginCommand}", msg)
+
+        elif is_link(args[1]):
+            editMessage("Please send a username only...!", msg)
+        else:
+            profile, error = check_username(username)
+            if error:
+                editMessage(
+                    f"Sorry...! <b>{error}</b>!",
+                    msg,
+                )
+            else:
+                if not allow_access(profile):
+                    editMessage(
+                        f"Please follow <code>@{username}</code>",
+                        msg,
+                    )
+                else:
+
+                    editMessage(
+                        f"Fetching followers list of <code>@{username}</code>",
+                        msg,
+                    )
+                    fetch_followers(profile, msg)
+
+
+def following(update, context):
+    """Get following list of a given username"""
+    args = update.message.text.split(" ", maxsplit=1)
+    if len(args) <= 1:
+        sendMessage(f"Please Send IG Username After /{BotCommands.IgPostCommand}", context.bot, update)
+    else:
+        username = args[1]
+        msg = sendMessage(
+            "Checking the given username, please wait...!", context.bot, update
+        )
+        if 1 not in STATUS:
+            editMessage("You must /login ", msg)
+
+        elif is_link(args[1]):
+            editMessage("Please send a username only...!", msg)
+        else:
+            profile, error = check_username(username)
+            if error:
+                editMessage(
+                    f"Sorry...! <b>{error}</b>!",
+                    msg,
+                )
+            else:
+                if not allow_access(profile):
+                    editMessage(
+                        f"Please follow <code>@{username}</code>",
+                        msg,
+                    )
+                else:
+                    editMessage(
+                        f"Fetching following list of <code>@{username}</code>",
+                        msg,
+                    )
+                    fetch_following(profile, msg)
+
+
+def mutual_following(update, context):
+    """Get fans list of a given username"""
+    args = update.message.text.split(" ", maxsplit=1)
+    if len(args) <= 1:
+        sendMessage(f"Please Send IG Username After /{BotCommands.IgPostCommand}", context.bot, update)
+    else:
+        username = args[1]
+        msg = sendMessage(
+            "Checking the given username, please wait...!", context.bot, update
+        )
+        if 1 not in STATUS:
+            editMessage("You must /login ", msg)
+
+        elif is_link(args[1]):
+            editMessage("Please send a username only...!", msg)
+        else:
+            profile, error = check_username(username)
+            if error:
+                editMessage(
+                    f"Sorry...! <b>{error}</b>!",
+                    msg,
+                )
+            else:
+                if not allow_access(profile):
+                    editMessage(
+                        f"Please follow <code>@{username}</code>",
+                        msg,
+                    )
+                else:
+                    editMessage(
+                        f"Fetching fans list of <code>@{username}</code>",
+                        msg,
+                    )
+                    mutual_follow(profile, msg)
+
+
+def tagged(update, context):
+    """Download posts from a given username"""
+    args = update.message.text.strip().split(" ", maxsplit=1)
+    if len(args) <= 1:
+        sendMessage(f"Please Send IG Username After /{BotCommands.IgPostCommand}", context.bot, update)
+    else:
+        username = args[1]
+        msg = sendMessage(
+            f"Checking IG Account, Please Wait...!", context.bot, update
+        )
+        if 1 not in STATUS:
+            editMessage(f"You must /{BotCommands.LoginCommand}", msg)
+
+        elif is_link(args[1]):
+            editMessage("Please send a username only...!", msg)
+
+        else:
+            profile, error = check_username(username)
+            if error:
+                editMessage(f"Sorry...! <b>{error}</b>!", msg)
+                return
+            download_tagged(profile, msg)
+
+
+def feed(update, context):
+    """Download posts from a given username"""
+    msg = sendMessage(
+        f"Checking IG Account, Please Wait...!", context.bot, update
+    )
+    if 1 not in STATUS:
+        editMessage(f"You must /{BotCommands.LoginCommand}", msg)
+
+
+    else:
+        download_feed(msg)
+
+
+def saved(update, context):
+    """Download posts from a given username"""
+    msg = sendMessage(
+        f"Checking IG Account, Please Wait...!", context.bot, update
+    )
+    if 1 not in STATUS:
+        editMessage(f"You must /{BotCommands.LoginCommand}", msg)
+
+    else:
+        profile, error = check_username(INSTA.context.username)
+        if error:
+            editMessage(f"Sorry...! <b>{error}</b>!", msg)
+            return
+        download_saved(profile, msg)
+
+
+def following_stories(update, context):
+    """Download posts from a given username"""
+    args = update.message.text.strip().split(" ", maxsplit=1)
+
+    msg = sendMessage(
+        f"Checking IG Account, Please Wait...!", context.bot, update
+    )
+    if 1 not in STATUS:
+        editMessage(f"You must /{BotCommands.LoginCommand}", msg)
+
+    else:
+        profile, error = check_username(INSTA.context.username)
+        if error:
+            editMessage(f"Sorry...! <b>{error}</b>!", msg)
+            return
+        download_following_stories(msg)
 
 
 post_handler = CommandHandler(
@@ -717,7 +579,7 @@ followers_handler = CommandHandler(
 )
 dispatcher.add_handler(followers_handler)
 
-followees_handler = CommandHandler(
+following_handler = CommandHandler(
     BotCommands.IgFollowingCommand,
     following,
     CustomFilters.authorized_chat
@@ -725,27 +587,17 @@ followees_handler = CommandHandler(
     | CustomFilters.authorized_user,
     run_async=True,
 )
-dispatcher.add_handler(followees_handler)
+dispatcher.add_handler(following_handler)
 
-fans_handler = CommandHandler(
-    BotCommands.IgFansCommand,
-    fans,
+mutual_follow_handler = CommandHandler(
+    BotCommands.IgMutualCommand,
+    mutual_following,
     CustomFilters.authorized_chat
     | CustomFilters.owner_filter
     | CustomFilters.authorized_user,
     run_async=True,
 )
-dispatcher.add_handler(fans_handler)
-
-not_following_handler = CommandHandler(
-    BotCommands.IgNotFollowingCommand,
-    not_following,
-    CustomFilters.authorized_chat
-    | CustomFilters.owner_filter
-    | CustomFilters.authorized_user,
-    run_async=True,
-)
-dispatcher.add_handler(not_following_handler)
+dispatcher.add_handler(mutual_follow_handler)
 
 feed_handler = CommandHandler(
     BotCommands.IgFeedCommand,
@@ -789,7 +641,7 @@ dispatcher.add_handler(story_handler)
 
 stories_handler = CommandHandler(
     BotCommands.IgStoriesCommand,
-    stories,
+    following_stories,
     CustomFilters.authorized_chat
     | CustomFilters.owner_filter
     | CustomFilters.authorized_user,
@@ -806,3 +658,31 @@ highlights_handler = CommandHandler(
     run_async=True,
 )
 dispatcher.add_handler(highlights_handler)
+
+account_handler = CommandHandler(
+    BotCommands.IgAccountCommand,
+    my_account,
+    filters=CustomFilters.owner_filter | CustomFilters.sudo_user,
+    run_async=True,
+)
+dispatcher.add_handler(account_handler)
+
+iglink_handler = CommandHandler(
+    BotCommands.IgSearchCommand,
+    ig,
+    CustomFilters.authorized_chat
+    | CustomFilters.owner_filter
+    | CustomFilters.authorized_user,
+    run_async=True,
+)
+dispatcher.add_handler(iglink_handler)
+
+mirrorlink_handler = CommandHandler(
+    BotCommands.IgMirrorCommand,
+    dl_content,
+    CustomFilters.authorized_chat
+    | CustomFilters.owner_filter
+    | CustomFilters.authorized_user,
+    run_async=True,
+)
+dispatcher.add_handler(mirrorlink_handler)

@@ -10,16 +10,6 @@
     ],
     "repository": "",
     "env": {
-      "TELEGRAM_API": {
-        "description": "Get this value from https://my.telegram.org",
-        "value": "",
-        "required": true
-      },
-      "TELEGRAM_HASH": {
-        "description": "Get this value from https://my.telegram.org",
-        "value": "",
-        "required": true
-      },
       "BOT_TOKEN": {
         "description": "Your bot token from @BotFather",
         "value": "",
@@ -65,13 +55,11 @@
         "value": "False",
         "required": false
       },
-      "INDEX_URL": {
-        "description": "Enter your index url",
+      "IG_USERNAME": {
+        "description": "Enter your session file insta username",
         "value": "",
-        "required": false
+        "required": true
       }
-
-
     },
     "formation": {
       "worker": {

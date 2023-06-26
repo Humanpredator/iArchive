@@ -1,13 +1,15 @@
+"""Module To Authorize Users To Use The Bot"""
 from telegram.ext import CommandHandler
 
 from bot import AUTHORIZED_CHATS, DB_URI, SUDO_USERS, dispatcher
 from bot.helper.ext_utils.db_handler import DbManger
-from bot.helper.telegram_helper.bot_commands import BotCommands
-from bot.helper.telegram_helper.filters import CustomFilters
-from bot.helper.telegram_helper.message_utils import sendMessage
+from bot.helper.tg_utils.bot_commands import BotCommands
+from bot.helper.tg_utils.filters import CustomFilters
+from bot.helper.tg_utils.message_utils import sendMessage
 
 
 def authorize(update, context):
+    """Authorize a user to use the bot"""
     reply_message = update.message.reply_to_message
     message_ = update.message.text.split(" ")
     if len(message_) == 2:
@@ -17,7 +19,7 @@ def authorize(update, context):
         elif DB_URI is not None:
             msg = DbManger().db_auth(user_id)
         else:
-            with open("authorized_chats.txt", "a") as file:
+            with open("authorized_chats.txt", "a", encoding="UTF-8") as file:
                 file.write(f"{user_id}\n")
                 AUTHORIZED_CHATS.add(user_id)
                 msg = f"User({user_id}) Authorized"
@@ -30,7 +32,7 @@ def authorize(update, context):
         elif DB_URI is not None:
             msg = DbManger().db_auth(chat_id)
         else:
-            with open("authorized_chats.txt", "a") as file:
+            with open("authorized_chats.txt", "a", encoding="UTF-8") as file:
                 file.write(f"{chat_id}\n")
                 AUTHORIZED_CHATS.add(chat_id)
                 msg = f"Chat({chat_id}) Authorized"
@@ -42,14 +44,15 @@ def authorize(update, context):
         elif DB_URI is not None:
             msg = DbManger().db_auth(user_id)
         else:
-            with open("authorized_chats.txt", "a") as file:
+            with open("authorized_chats.txt", "a", encoding="UTF-8") as file:
                 file.write(f"{user_id}\n")
                 AUTHORIZED_CHATS.add(user_id)
                 msg = f"User({user_id}) Authorized"
     sendMessage(msg, context.bot, update)
 
 
-def unauthorize(update, context):
+def un_authorize(update, context):
+    """Unauthorize a user to use the bot"""
     reply_message = update.message.reply_to_message
     message_ = update.message.text.split(" ")
     if len(message_) == 2:
@@ -84,14 +87,15 @@ def unauthorize(update, context):
                 msg = f"User({user_id}) Unauthorized"
         else:
             msg = f"User({user_id}) Already Unauthorized"
-    with open("authorized_chats.txt", "a") as file:
+    with open("authorized_chats.txt", "a", encoding="UTF-8") as file:
         file.truncate(0)
         for i in AUTHORIZED_CHATS:
             file.write(f"{i}\n")
     sendMessage(msg, context.bot, update)
 
 
-def addSudo(update, context):
+def add_sudo(update, context):
+    """Promote a user to Sudo"""
     reply_message = update.message.reply_to_message
     message_ = update.message.text.split(" ")
     if len(message_) == 2:
@@ -101,7 +105,7 @@ def addSudo(update, context):
         elif DB_URI is not None:
             msg = DbManger().db_addsudo(user_id)
         else:
-            with open("sudo_users.txt", "a") as file:
+            with open("sudo_users.txt", "a", encoding="UTF-8") as file:
                 file.write(f"{user_id}\n")
                 SUDO_USERS.add(user_id)
                 msg = f"User({user_id}) is Promoted as Sudo"
@@ -115,14 +119,15 @@ def addSudo(update, context):
         elif DB_URI is not None:
             msg = DbManger().db_addsudo(user_id)
         else:
-            with open("sudo_users.txt", "a") as file:
+            with open("sudo_users.txt", "a", encoding="UTF-8") as file:
                 file.write(f"{user_id}\n")
                 SUDO_USERS.add(user_id)
                 msg = f"User({user_id}) is Promoted as Sudo"
     sendMessage(msg, context.bot, update)
 
 
-def removeSudo(update, context):
+def remove_sudo(update, context):
+    """Remove a user from Sudo"""
     reply_message = update.message.reply_to_message
     message_ = update.message.text.split(" ")
     if len(message_) == 2:
@@ -148,19 +153,23 @@ def removeSudo(update, context):
         else:
             msg = f"User({user_id}) was Not a Sudo"
     if DB_URI is None:
-        with open("sudo_users.txt", "a") as file:
+        with open("sudo_users.txt", "a", encoding="UTF-8") as file:
             file.truncate(0)
             for i in SUDO_USERS:
                 file.write(f"{i}\n")
     sendMessage(msg, context.bot, update)
 
 
-def sendAuthChats(update, context):
+def send_auth_chats(update, context):
+    """Send the list of authorized chats"""
     user = sudo = ""
     user += "\n".join(str(id) for id in AUTHORIZED_CHATS)
     sudo += "\n".join(str(id) for id in SUDO_USERS)
     sendMessage(
-        f"<b><u>Authorized Chats</u></b>\n<code>{user}</code>\n<b><u>Sudo Users</u></b>\n<code>{sudo}</code>",
+        f"<b><u>Authorized Chats</u></b>\n\
+                <code>{user}</code>\n\
+                <b><u>Sudo Users</u></b>\n\
+                <code>{sudo}</code>",
         context.bot,
         update,
     )
@@ -168,7 +177,7 @@ def sendAuthChats(update, context):
 
 send_auth_handler = CommandHandler(
     command=BotCommands.AuthorizedUsersCommand,
-    callback=sendAuthChats,
+    callback=send_auth_chats,
     filters=CustomFilters.owner_filter | CustomFilters.sudo_user,
     run_async=True,
 )
@@ -178,27 +187,27 @@ authorize_handler = CommandHandler(
     filters=CustomFilters.owner_filter | CustomFilters.sudo_user,
     run_async=True,
 )
-unauthorize_handler = CommandHandler(
+un_authorize_handler = CommandHandler(
     command=BotCommands.UnAuthorizeCommand,
-    callback=unauthorize,
+    callback=un_authorize,
     filters=CustomFilters.owner_filter | CustomFilters.sudo_user,
     run_async=True,
 )
-addsudo_handler = CommandHandler(
+add_sudo_handler = CommandHandler(
     command=BotCommands.AddSudoCommand,
-    callback=addSudo,
+    callback=add_sudo,
     filters=CustomFilters.owner_filter,
     run_async=True,
 )
-removesudo_handler = CommandHandler(
+remove_sudo_handler = CommandHandler(
     command=BotCommands.RmSudoCommand,
-    callback=removeSudo,
+    callback=remove_sudo,
     filters=CustomFilters.owner_filter,
     run_async=True,
 )
 
 dispatcher.add_handler(send_auth_handler)
 dispatcher.add_handler(authorize_handler)
-dispatcher.add_handler(unauthorize_handler)
-dispatcher.add_handler(addsudo_handler)
-dispatcher.add_handler(removesudo_handler)
+dispatcher.add_handler(un_authorize_handler)
+dispatcher.add_handler(add_sudo_handler)
+dispatcher.add_handler(remove_sudo_handler)

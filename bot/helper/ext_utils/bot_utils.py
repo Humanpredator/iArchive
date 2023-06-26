@@ -1,9 +1,9 @@
-import logging
 import os
 import re
 
+from bot import LOGGER
+
 SIZE_UNITS = ["B", "KB", "MB", "GB", "TB", "PB"]
-LOGGER = logging.getLogger(__name__)
 
 
 def get_readable_file_size(size_in_bytes) -> str:
@@ -68,31 +68,64 @@ def progress_bar(count, size):
     return pbar
 
 
-def usersave(username):
-    file = open("username.txt", "w")
-    if os.path.isfile("username.txt"):
-        with open("username.txt") as f:
-            file.write(username)
-            file.close()
+def allow_access(profile):
+    is_followed = profile.followed_by_viewer
+    pt_acc = profile.is_private
+    if pt_acc and not is_followed:
+        return False
+    elif pt_acc and is_followed:
+        return True
+    elif not pt_acc:
+        return True
+    else:
+        return False
 
 
-def usercheck():
-    if os.path.isfile("username.txt"):
-        with open("username.txt") as f:
-            username = f.read()
-            return username
+
+def extract_story_info(url):
+    pattern = r"https?://(?:www\.)?instagram\.com/stories/([a-zA-Z0-9._]+)/(\d+)/?"
+    match = re.match(pattern, url)
+    url_json = {}
+    if not match:
+        return None
+    url_json["content_type"] = 'STORY'
+    url_json["username"] = match.group(1)
+    url_json["shortcode"] = match.group(2)
+    return url_json
 
 
-def acc_type(val):
-    if val:
-        return "🔒Private🔒"
-    return "🔓Public🔓"
+def extract_content_info(url):
+    pattern = r"https?://(?:www\.)?instagram\.com/([a-zA-Z0-9._]+/)?(p|tv|reel)/([A-Za-z0-9_\-]+)/?"
+    match = re.match(pattern, url)
+    url_json = {}
+    post_type = {"p": "POST", "tv": "IGTV", "reel": "REEL"}
+    if not match:
+        return None
+    url_json["content_type"] = post_type.get(match.group(2))
+    url_json["username"] = None
+    url_json["shortcode"] = match.group(3)
+    return url_json
 
 
-def yes_or_no(val):
-    if val:
-        return "Yes"
-    return "No"
+def check_instagram_url(url):
+    pattern = r"https?://(?:www\.)?instagram\.com/(?:[a-zA-Z0-9._]+)/?"
+    match = re.match(pattern, url)
+    if not match:
+        return None
+    if "/stories/highlights/" in url:
+        return None
+    if "/stories/" in url:
+        url_json = extract_story_info(url)
+        return url_json
+    if "/p/" in url:
+        url_json = extract_content_info(url)
+        return url_json
+    if "/tv/" in url:
+        url_json = extract_content_info(url)
+        return url_json
+    if "/reel/" in url:
+        url_json = extract_content_info(url)
+        return url_json
 
 
 def is_link(args):

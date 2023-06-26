@@ -1,3 +1,4 @@
+"""Telegram Bot for downloading Instagram media"""
 import faulthandler
 import logging
 import os
@@ -7,23 +8,25 @@ import time
 
 import psycopg2
 import requests
-import telegram.ext as tg
+import shortuuid
 from dotenv import load_dotenv
 from instaloader import Instaloader
 from psycopg2 import Error
-from pyrogram import Client
+from telegram.ext import Updater
+from telegraph import Telegraph
 
 faulthandler.enable()
 socket.setdefaulttimeout(600)
 
 botStartTime = time.time()
-if os.path.exists("log.txt"):
-    with open("log.txt", "a+") as f:
-        f.truncate(0)
+
+if os.path.exists("StreamLog.log"):
+    with open("StreamLog.log", "a+", encoding="UTF-8") as file:
+        file.truncate(0)
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    handlers=[logging.FileHandler("log.txt"), logging.StreamHandler()],
+    handlers=[logging.FileHandler("StreamLog.log"), logging.StreamHandler()],
     datefmt="%d-%b-%y %H:%M:%S",
     level=logging.INFO,
 )
@@ -32,7 +35,7 @@ LOGGER = logging.getLogger(__name__)
 
 CONFIG_FILE_URL = os.environ.get("CONFIG_FILE_URL")
 if CONFIG_FILE_URL is not None:
-    res = requests.get(CONFIG_FILE_URL)
+    res = requests.get(CONFIG_FILE_URL, timeout=200)
     if res.status_code == 200:
         with open("config.env", "wb+") as f:
             f.write(res.content)
@@ -43,20 +46,22 @@ if CONFIG_FILE_URL is not None:
 load_dotenv("config.env")
 
 
-def getConfig(name: str):
+def get_config(name: str):
+    """Get config from environment variables or config file"""
     return os.environ[name]
 
 
 def mktable():
+    """Create table in database"""
     try:
-        conn = psycopg2.connect(DB_URI)
-        cur = conn.cursor()
-        sql = "CREATE TABLE users (uid bigint, sudo boolean DEFAULT FALSE);"
-        cur.execute(sql)
-        conn.commit()
+        connection = psycopg2.connect(DB_URI)
+        cursor = connection.cursor()
+        create_query = "CREATE TABLE users (uid bigint, sudo boolean DEFAULT FALSE);"
+        cursor.execute(create_query)
+        connection.commit()
         logging.info("Table Created!")
-    except Error as e:
-        logging.error(e)
+    except Error as error:
+        logging.error(error)
         sys.exit(1)
 
 
@@ -66,102 +71,93 @@ AUTHORIZED_CHATS = set()
 SUDO_USERS = set()
 
 if os.path.exists("authorized_chats.txt"):
-    with open("authorized_chats.txt", "r+") as f:
-        lines = f.readlines()
+    with open("authorized_chats.txt", "r+", encoding="UTF-8") as file:
+        lines = file.readlines()
         for line in lines:
             AUTHORIZED_CHATS.add(int(line.split()[0]))
 if os.path.exists("sudo_users.txt"):
-    with open("sudo_users.txt", "r+") as f:
-        lines = f.readlines()
+    with open("sudo_users.txt", "r+", encoding="UTF-8") as file:
+        lines = file.readlines()
         for line in lines:
             SUDO_USERS.add(int(line.split()[0]))
 try:
-    achats = getConfig("AUTHORIZED_CHATS")
+    achats = get_config("AUTHORIZED_CHATS")
     achats = achats.split(" ")
     for chats in achats:
         AUTHORIZED_CHATS.add(int(chats))
-except:
+except ValueError:
     pass
 try:
-    schats = getConfig("SUDO_USERS")
+    schats = get_config("SUDO_USERS")
     schats = schats.split(" ")
     for chats in schats:
         SUDO_USERS.add(int(chats))
-except:
+except ValueError:
     pass
 try:
-    BOT_TOKEN = getConfig("BOT_TOKEN")
-    parent_id = getConfig("GDRIVE_FOLDER_ID")
+    BOT_TOKEN = get_config("BOT_TOKEN")
+    parent_id = get_config("GDRIVE_FOLDER_ID")
     DOWNLOAD_STATUS_UPDATE_INTERVAL = int(
-        getConfig("DOWNLOAD_STATUS_UPDATE_INTERVAL"))
-    OWNER_ID = int(getConfig("OWNER_ID"))
-    TELEGRAM_API = getConfig("TELEGRAM_API")
-    TELEGRAM_HASH = getConfig("TELEGRAM_HASH")
-except:
+        get_config("DOWNLOAD_STATUS_UPDATE_INTERVAL"))
+    OWNER_ID = int(get_config("OWNER_ID"))
+    IG_USERNAME = get_config('IG_USERNAME')
+except KeyError:
     LOGGER.error("One or more env variables missing! Exiting now")
     sys.exit(1)
 try:
-    DB_URI = getConfig("DATABASE_URL")
+    DB_URI = get_config("DATABASE_URL")
     if len(DB_URI) == 0:
         raise KeyError
-except:
+except KeyError:
     DB_URI = None
 if DB_URI is not None:
     try:
         conn = psycopg2.connect(DB_URI)
         cur = conn.cursor()
-        sql = "SELECT * from users;"
-        cur.execute(sql)
+        SELECT_QUERY = "SELECT * from users;"
+        cur.execute(SELECT_QUERY)
         rows = cur.fetchall()  # returns a list ==> (uid, sudo)
         for row in rows:
             AUTHORIZED_CHATS.add(row[0])
             if row[1]:
                 SUDO_USERS.add(row[0])
+        cur.close()
+        conn.close()
     except Error as e:
         if 'relation "users" does not exist' in str(e):
             mktable()
         else:
             LOGGER.error(e)
             sys.exit(1)
-    finally:
-        cur.close()
-        conn.close()
 
 LOGGER.info("Generating USER_SESSION_STRING")
-app = Client(
-    "Insta_Scrap",
-    api_id=int(TELEGRAM_API),
-    api_hash=TELEGRAM_HASH,
-    bot_token=BOT_TOKEN,
-)
 
 # IG CONFIG
-S = "0"
-STATUS = {int(x) for x in S.split()}
+
+STATUS = {0}
 INSTA = Instaloader()
+INSTA.context.max_connection_attempts = 5
+INSTA.context.sleep = False
+INSTA.context.quiet = True
 
 # Generate Telegraph Token
-# sname = ''.join(random.SystemRandom().choices(string.ascii_letters, k=9))
-# LOGGER.info("Generating TELEGRAPH_TOKEN using '" + sname + "' name")
-# telegraph = Telegraph()
-# telegraph_token = telegraph.create_account(short_name=sname).get_access_token()
+sname = str(shortuuid.uuid())
+LOGGER.info(f"Generating TELEGRAPH_TOKEN using {sname} name")
+telegraph = Telegraph(domain="graph.org")
+telegraph_token = telegraph.create_account(short_name=sname).get("access_token")
 
 try:
-    IGNORE_PENDING_REQUESTS = getConfig("IGNORE_PENDING_REQUESTS")
+    IGNORE_PENDING_REQUESTS = get_config("IGNORE_PENDING_REQUESTS")
     IGNORE_PENDING_REQUESTS = IGNORE_PENDING_REQUESTS.lower() == "true"
-except:
+except KeyError:
     IGNORE_PENDING_REQUESTS = False
-try:
-    INDEX_URL = getConfig("INDEX_URL")
-except:
-    INDEX_URL = "drive.teamplague.com"
 
 try:
-    TG_UPLOAD = getConfig("TG_UPLOAD")
+    TG_UPLOAD = get_config("TG_UPLOAD")
     TG_UPLOAD = TG_UPLOAD.lower() == "true"
-except:
+except KeyError:
     TG_UPLOAD = False
 
-updater = tg.Updater(token=BOT_TOKEN)
-bot = updater.bot
-dispatcher = updater.dispatcher
+app = Updater(token=BOT_TOKEN)
+bot = app.bot
+dispatcher = app.dispatcher

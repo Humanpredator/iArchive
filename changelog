@@ -3,3 +3,11 @@ IS-v1.0 beta-stable release(2022-08-06)
 -Added G-drive Upload.
 -Added Progress bar.
 -Improved Upload (both Gdrive and TG) Function and Messages.
+
+IA-v1.0 stable release(2023-06-26)
+-removed pyrogram.
+-removed download IG post using subprocess.
+-port to instaloader library.
+-session file fetched from firefox.
+-removed pydrive, ported to google drive library.
+-added docker

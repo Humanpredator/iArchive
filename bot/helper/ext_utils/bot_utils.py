@@ -73,12 +73,11 @@ def allow_access(profile):
     pt_acc = profile.is_private
     if pt_acc and not is_followed:
         return False
-    elif pt_acc and is_followed:
+    if pt_acc and is_followed:
         return True
-    elif not pt_acc:
+    if not pt_acc:
         return True
-    else:
-        return False
+    return False
 
 
 

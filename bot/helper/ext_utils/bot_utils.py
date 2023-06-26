@@ -78,6 +78,7 @@ def allow_access(profile):
         return True
     return False
 
+
 def extract_story_info(url):
     pattern = r"https?://(?:www\.)?instagram\.com/stories/([a-zA-Z0-9._]+)/(\d+)/?"
     match = re.match(pattern, url)

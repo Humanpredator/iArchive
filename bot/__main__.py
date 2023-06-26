@@ -90,10 +90,10 @@ def errorhandler(update, context):
 def main():
     """Start the bot"""
     start_cleanup()
-    if not os.path.exists(f"./sessionfile"):
-        LOGGER.info(f"No Session File Loaded...!")
+    if not os.path.exists("./sessionfile"):
+        LOGGER.info("No Session File Loaded...!")
     else:
-        INSTA.load_session_from_file(IG_USERNAME, filename=f"./sessionfile")
+        INSTA.load_session_from_file(IG_USERNAME, filename="./sessionfile")
         STATUS.add(1)
         LOGGER.info(f"{IG_USERNAME} - Session File Loaded")
     if os.path.isfile(".restart-msg"):

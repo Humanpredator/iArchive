@@ -29,7 +29,7 @@ def my_account(update, context):
         sendMessage(f"You must /{BotCommands.LoginCommand}", context.bot,
                     update)
         return
-    msg = sendMessage(f"Checking Given Details...!, Please Wait...!",
+    msg = sendMessage("Checking Given Details...!, Please Wait...!",
                       context.bot, update)
 
     profile = Profile.own_profile(INSTA.context)
@@ -93,7 +93,7 @@ def dl_content(update, context):
                     update)
     else:
         url = args[1]
-        msg = sendMessage(f"Checking Given Details...!, Please Wait...!",
+        msg = sendMessage("Checking Given Details...!, Please Wait...!",
                           context.bot, update)
         if 1 not in STATUS:
             editMessage(f"You must /{BotCommands.LoginCommand}", msg)
@@ -507,7 +507,7 @@ def tagged(update, context):
         )
     else:
         username = args[1]
-        msg = sendMessage(f"Checking IG Account, Please Wait...!", context.bot,
+        msg = sendMessage("Checking IG Account, Please Wait...!", context.bot,
                           update)
         if 1 not in STATUS:
             editMessage(f"You must /{BotCommands.LoginCommand}", msg)
@@ -525,7 +525,7 @@ def tagged(update, context):
 
 def feed(update, context):
     """Download posts from a given username"""
-    msg = sendMessage(f"Checking IG Account, Please Wait...!", context.bot,
+    msg = sendMessage("Checking IG Account, Please Wait...!", context.bot,
                       update)
     if 1 not in STATUS:
         editMessage(f"You must /{BotCommands.LoginCommand}", msg)
@@ -536,7 +536,7 @@ def feed(update, context):
 
 def saved(update, context):
     """Download posts from a given username"""
-    msg = sendMessage(f"Checking IG Account, Please Wait...!", context.bot,
+    msg = sendMessage("Checking IG Account, Please Wait...!", context.bot,
                       update)
     if 1 not in STATUS:
         editMessage(f"You must /{BotCommands.LoginCommand}", msg)
@@ -553,7 +553,7 @@ def following_stories(update, context):
     """Download posts from a given username"""
     args = update.message.text.strip().split(" ", maxsplit=1)
 
-    msg = sendMessage(f"Checking IG Account, Please Wait...!", context.bot,
+    msg = sendMessage("Checking IG Account, Please Wait...!", context.bot,
                       update)
     if 1 not in STATUS:
         editMessage(f"You must /{BotCommands.LoginCommand}", msg)

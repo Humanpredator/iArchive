@@ -57,7 +57,7 @@ def download_posts(profile, msg, picture: bool = False, video: bool = False):
         except Exception as e:
             LOGGER.info(str(e))
             editMessage(str(e), msg)
-    cmp_msg = f"Successfully Downloaded Posts"
+    cmp_msg = "Successfully Downloaded Posts"
     LOGGER.info("Download Completed-%s", profile.username)
     editMessage(cmp_msg, msg)
     INSTA.close()
@@ -154,7 +154,7 @@ def download_all_posts(profile, msg):
     LOGGER.info(f"User IGTV Download Completed-{profile.username}")
 
     INSTA.close()
-    cmp_msg = f"Successfully Downloaded Posts"
+    cmp_msg = "Successfully Downloaded Posts"
     LOGGER.info("Download Completed-%s", profile.username)
     editMessage(cmp_msg, msg)
 
@@ -426,7 +426,7 @@ def download_tagged(profile, msg):
         except Exception as e:
             LOGGER.info(str(e))
             editMessage(str(e), msg)
-    cmp_msg = f"Successfully Downloaded Posts"
+    cmp_msg = "Successfully Downloaded Posts"
     LOGGER.info("Download Completed-%s", INSTA.context.username)
     editMessage(cmp_msg, msg)
     INSTA.close()
@@ -532,7 +532,7 @@ def download_saved(profile, msg):
         except Exception as e:
             LOGGER.info(str(e))
             editMessage(str(e), msg)
-    cmp_msg = f"Successfully Downloaded Posts"
+    cmp_msg = "Successfully Downloaded Posts"
     LOGGER.info("Download Completed-%s", INSTA.context.username)
     editMessage(cmp_msg, msg)
     INSTA.close()
@@ -569,7 +569,7 @@ def download_feed(msg, max_count=10):
         except Exception as e:
             LOGGER.info(str(e))
             editMessage(str(e), msg)
-    cmp_msg = f"Successfully Downloaded Posts"
+    cmp_msg = "Successfully Downloaded Posts"
     LOGGER.info("Download Completed-%s", INSTA.context.username)
     editMessage(cmp_msg, msg)
     INSTA.close()
@@ -607,7 +607,7 @@ def download_following_stories(msg):
         except Exception as e:
             LOGGER.info(str(e))
             editMessage(str(e), msg)
-    cmp_msg = f"Successfully Downloaded Posts"
+    cmp_msg = "Successfully Downloaded Posts"
     LOGGER.info("Download Completed-%s", INSTA.context.username)
     editMessage(cmp_msg, msg)
     INSTA.close()

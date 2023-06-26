@@ -62,9 +62,8 @@ def get_readable_time(seconds: int) -> str:
 def progress_bar(count, size):
     percent = 100
     bar_length = 20
-    pbar = "\r[{:20s}] {:2.1f}%".format(
-        "#" * int(count / size * bar_length), count / size * percent
-    )
+    pbar = "\r[{:20s}] {:2.1f}%".format("#" * int(count / size * bar_length),
+                                        count / size * percent)
     return pbar
 
 
@@ -73,13 +72,11 @@ def allow_access(profile):
     pt_acc = profile.is_private
     if pt_acc and not is_followed:
         return False
-    elif pt_acc and is_followed:
+    if pt_acc and is_followed:
         return True
-    elif not pt_acc:
+    if not pt_acc:
         return True
-    else:
-        return False
-
+    return False
 
 
 def extract_story_info(url):
@@ -88,7 +85,7 @@ def extract_story_info(url):
     url_json = {}
     if not match:
         return None
-    url_json["content_type"] = 'STORY'
+    url_json["content_type"] = "STORY"
     url_json["username"] = match.group(1)
     url_json["shortcode"] = match.group(2)
     return url_json

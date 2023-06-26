@@ -153,7 +153,7 @@ def logout(update, context):
     if 1 in STATUS:
         sendMessage("You're successfully logged out.", context.bot, update)
         STATUS.remove(1)
-        os.remove(f"./sessionfile")
+        os.remove("./sessionfile")
     else:
         sendMessage("You're not logged in.\n Try to /login.", context.bot,
                     update)

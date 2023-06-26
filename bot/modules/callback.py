@@ -207,7 +207,7 @@ def cb_handler(update, context):
 
         msg = bot.send_message(
             query.message.chat.id,
-            f"Something went wrong. Please try again later.")
+            "Something went wrong. Please try again later.")
 
 
 callback_handler = CallbackQueryHandler(cb_handler)

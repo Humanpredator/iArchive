@@ -4,6 +4,7 @@ from bot import AUTHORIZED_CHATS, DB_URI, LOGGER, SUDO_USERS
 
 
 class DbManger:
+
     def __init__(self):
         self.err = False
 

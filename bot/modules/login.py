@@ -11,16 +11,10 @@ from telegram import ParseMode
 from telegram.ext import CommandHandler, ConversationHandler, Filters, MessageHandler
 
 from bot import INSTA, STATUS, bot, dispatcher
-from bot.helper.ext_utils.bot_utils import (
-    is_link,
-)
+from bot.helper.ext_utils.bot_utils import is_link
 from bot.helper.tg_utils.bot_commands import BotCommands
 from bot.helper.tg_utils.filters import CustomFilters
-from bot.helper.tg_utils.message_utils import (
-    deleteMessage,
-    editMessage,
-    sendMessage,
-)
+from bot.helper.tg_utils.message_utils import deleteMessage, editMessage, sendMessage
 
 CODE_SAVE = range(2)
 
@@ -49,9 +43,10 @@ def user_login(update, context):
                 INSTA.save_session_to_file(filename="./sessionfile")
                 STATUS.add(1)
                 editMessage(
-                    f"Fetching the details of @{username}\n Please wait...!", msg
-                )
-                profile = Profile.from_username(INSTA.context, INSTA.context.username)
+                    f"Fetching the details of @{username}\n Please wait...!",
+                    msg)
+                profile = Profile.from_username(INSTA.context,
+                                                INSTA.context.username)
                 media_count = profile.mediacount
                 name = profile.full_name
                 bio = profile.biography
@@ -96,8 +91,8 @@ def user_login(update, context):
                 update,
             )
             return
-        sendMessage("Send /login <b>username</b> <b>password</b>",
-                    context.bot, update)
+        sendMessage("Send /login <b>username</b> <b>password</b>", context.bot,
+                    update)
         return
 
 
@@ -112,14 +107,15 @@ def codei_(update, context):
     code = update.message.text
     if code.isdigit():
         code = int(code)
-        msg = sendMessage(
-            "Checking given code.\n please wait...!", context.bot, update)
+        msg = sendMessage("Checking given code.\n please wait...!",
+                          context.bot, update)
         try:
             INSTA.two_factor_login(code)
             INSTA.save_session_to_file(filename="./sessionfile")
             STATUS.add(1)
             editMessage("Fetching details from Instagram..!", msg)
-            profile = Profile.from_username(INSTA.context, INSTA.context.username)
+            profile = Profile.from_username(INSTA.context,
+                                            INSTA.context.username)
             media_count = profile.mediacount
             name = profile.full_name
             bio = profile.biography
@@ -159,8 +155,8 @@ def logout(update, context):
         STATUS.remove(1)
         os.remove(f"./sessionfile")
     else:
-        sendMessage("You're not logged in.\n Try to /login.",
-                    context.bot, update)
+        sendMessage("You're not logged in.\n Try to /login.", context.bot,
+                    update)
 
 
 logout_handler = CommandHandler(
@@ -179,9 +175,8 @@ userlogin_handler = ConversationHandler(
     ],
     states={
         CODE_SAVE: [MessageHandler(Filters.text, codei_)],
-        ConversationHandler.TIMEOUT: [
-            MessageHandler(Filters.text | Filters.command, timeout)
-        ],
+        ConversationHandler.TIMEOUT:
+        [MessageHandler(Filters.text | Filters.command, timeout)],
     },
     fallbacks=[],
     conversation_timeout=30,

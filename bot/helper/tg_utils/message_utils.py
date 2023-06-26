@@ -18,7 +18,8 @@ def sendMessage(text: str, bot, update: Update):
         LOGGER.error(str(e))
 
 
-def sendMarkup(text: str, bot, update: Update, reply_markup: InlineKeyboardMarkup):
+def sendMarkup(text: str, bot, update: Update,
+               reply_markup: InlineKeyboardMarkup):
     return bot.send_message(
         update.message.chat_id,
         reply_to_message_id=update.message.message_id,
@@ -30,8 +31,7 @@ def sendMarkup(text: str, bot, update: Update, reply_markup: InlineKeyboardMarku
 
 
 def sendDoc(filepath: str, message: Message, caption: str = None):
-    bot.delete_message(chat_id=message.chat.id,
-                       message_id=message.message_id)
+    bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
 
     with open(filepath, "rb") as file:
         bot.send_document(

@@ -26,7 +26,8 @@ if os.path.exists("StreamLog.log"):
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    handlers=[logging.FileHandler("StreamLog.log"), logging.StreamHandler()],
+    handlers=[logging.FileHandler("StreamLog.log"),
+              logging.StreamHandler()],
     datefmt="%d-%b-%y %H:%M:%S",
     level=logging.INFO,
 )
@@ -100,7 +101,7 @@ try:
     DOWNLOAD_STATUS_UPDATE_INTERVAL = int(
         get_config("DOWNLOAD_STATUS_UPDATE_INTERVAL"))
     OWNER_ID = int(get_config("OWNER_ID"))
-    IG_USERNAME = get_config('IG_USERNAME')
+    IG_USERNAME = get_config("IG_USERNAME")
 except KeyError:
     LOGGER.error("One or more env variables missing! Exiting now")
     sys.exit(1)
@@ -144,7 +145,8 @@ INSTA.context.quiet = True
 sname = str(shortuuid.uuid())
 LOGGER.info(f"Generating TELEGRAPH_TOKEN using {sname} name")
 telegraph = Telegraph(domain="graph.org")
-telegraph_token = telegraph.create_account(short_name=sname).get("access_token")
+telegraph_token = telegraph.create_account(
+    short_name=sname).get("access_token")
 
 try:
     IGNORE_PENDING_REQUESTS = get_config("IGNORE_PENDING_REQUESTS")

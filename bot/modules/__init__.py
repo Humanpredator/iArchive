@@ -1,2 +1,10 @@
 """Modules Import"""
-from bot.modules import authorize, callback, shell, speedtest,login,insta_cmds,start_help
+from bot.modules import (
+    authorize,
+    callback,
+    insta_cmds,
+    login,
+    shell,
+    speedtest,
+    start_help,
+)

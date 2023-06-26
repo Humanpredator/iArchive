@@ -4,23 +4,33 @@ from instaloader import Profile
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ParseMode
 from telegram.ext import CommandHandler
 
-from bot import INSTA, STATUS, dispatcher, bot
-from bot.helper.ext_utils.bot_utils import is_link, allow_access
-from bot.helper.ig_utils.ig_down import download_content, check_username, download_highlights, download_stories, \
-    fetch_followers, fetch_following, mutual_follow, download_tagged, download_feed, download_saved, \
-    download_following_stories
+from bot import INSTA, STATUS, bot, dispatcher
+from bot.helper.ext_utils.bot_utils import allow_access, is_link
+from bot.helper.ig_utils.ig_down import (
+    check_username,
+    download_content,
+    download_feed,
+    download_following_stories,
+    download_highlights,
+    download_saved,
+    download_stories,
+    download_tagged,
+    fetch_followers,
+    fetch_following,
+    mutual_follow,
+)
 from bot.helper.tg_utils.bot_commands import BotCommands
 from bot.helper.tg_utils.filters import CustomFilters
-from bot.helper.tg_utils.message_utils import sendMessage, editMessage, deleteMessage
+from bot.helper.tg_utils.message_utils import deleteMessage, editMessage, sendMessage
 
 
 def my_account(update, context):
     if 1 not in STATUS:
-        sendMessage(f"You must /{BotCommands.LoginCommand}", context.bot, update)
+        sendMessage(f"You must /{BotCommands.LoginCommand}", context.bot,
+                    update)
         return
-    msg = sendMessage(
-        f"Checking Given Details...!, Please Wait...!", context.bot, update
-    )
+    msg = sendMessage(f"Checking Given Details...!, Please Wait...!",
+                      context.bot, update)
 
     profile = Profile.own_profile(INSTA.context)
     media_count = profile.mediacount
@@ -31,55 +41,41 @@ def my_account(update, context):
     igtv_count = profile.igtvcount
     followers = profile.followers
     following = profile.followees
-    reply_markup = InlineKeyboardMarkup(
+    reply_markup = InlineKeyboardMarkup([
         [
-            [
-                InlineKeyboardButton(
-                    "Download My Profile Pic", callback_data=f"PPIC#{username}"
-                ),
-                InlineKeyboardButton(
-                    "Go To Profile", url=f"https://www.instagram.com/{username}"
-                ),
-            ],
-            [
-                InlineKeyboardButton(
-                    "My Post", callback_data=f"POST#{username}"),
-                InlineKeyboardButton(
-                    "My Tagged Posts", callback_data=f"TAG#{username}"
-                ),
-                InlineKeyboardButton(
-                    "Posts In My Feed", callback_data=f"FEED#{username}"
-                ),
-            ],
-            [
-                InlineKeyboardButton(
-                    "My Saved Posts", callback_data=f"SAVED#{username}"
-                ),
-                InlineKeyboardButton(
-                    "My IGTV Posts", callback_data=f"IGTV#{username}"
-                ),
-            ],
-            [
-                InlineKeyboardButton(
-                    "My Highlights", callback_data=f"HIGHLIGHT#{username}"
-                ),
-                InlineKeyboardButton(
-                    "My Stories ", callback_data=f"STORY#{username}"
-                ),
-                InlineKeyboardButton(
-                    "Stories of My Following", callback_data=f"FSTORY#{username}"
-                ),
-            ],
-            [
-                InlineKeyboardButton(
-                    "List Of My Followers", callback_data=f"FOLLOWER#{username}"
-                ),
-                InlineKeyboardButton(
-                    "List Of My Following", callback_data=f"FOLLOWING#{username}"
-                ),
-            ],
-        ]
-    )
+            InlineKeyboardButton("Download My Profile Pic",
+                                 callback_data=f"PPIC#{username}"),
+            InlineKeyboardButton("Go To Profile",
+                                 url=f"https://www.instagram.com/{username}"),
+        ],
+        [
+            InlineKeyboardButton("My Post", callback_data=f"POST#{username}"),
+            InlineKeyboardButton("My Tagged Posts",
+                                 callback_data=f"TAG#{username}"),
+            InlineKeyboardButton("Posts In My Feed",
+                                 callback_data=f"FEED#{username}"),
+        ],
+        [
+            InlineKeyboardButton("My Saved Posts",
+                                 callback_data=f"SAVED#{username}"),
+            InlineKeyboardButton("My IGTV Posts",
+                                 callback_data=f"IGTV#{username}"),
+        ],
+        [
+            InlineKeyboardButton("My Highlights",
+                                 callback_data=f"HIGHLIGHT#{username}"),
+            InlineKeyboardButton("My Stories ",
+                                 callback_data=f"STORY#{username}"),
+            InlineKeyboardButton("Stories of My Following",
+                                 callback_data=f"FSTORY#{username}"),
+        ],
+        [
+            InlineKeyboardButton("List Of My Followers",
+                                 callback_data=f"FOLLOWER#{username}"),
+            InlineKeyboardButton("List Of My Following",
+                                 callback_data=f"FOLLOWING#{username}"),
+        ],
+    ])
     deleteMessage(context.bot, msg)
     bot.send_photo(
         chat_id=update.message.chat_id,
@@ -93,13 +89,12 @@ def my_account(update, context):
 def dl_content(update, context):
     args = update.message.text.strip().split(" ", maxsplit=1)
     if len(args) <= 1:
-        sendMessage("Send insta post links after /mirror ",
-                    context.bot, update)
+        sendMessage("Send insta post links after /mirror ", context.bot,
+                    update)
     else:
         url = args[1]
-        msg = sendMessage(
-            f"Checking Given Details...!, Please Wait...!", context.bot, update
-        )
+        msg = sendMessage(f"Checking Given Details...!, Please Wait...!",
+                          context.bot, update)
         if 1 not in STATUS:
             editMessage(f"You must /{BotCommands.LoginCommand}", msg)
             return
@@ -111,11 +106,17 @@ def ig(update, context):
     args = update.message.text.strip().split(" ", maxsplit=1)
 
     if len(args) <= 1:
-        sendMessage(f"Please Send IG Username After /{BotCommands.IgPostCommand}", context.bot, update)
+        sendMessage(
+            f"Please Send IG Username After /{BotCommands.IgPostCommand}",
+            context.bot,
+            update,
+        )
     else:
         username = args[1]
         msg = sendMessage(
-            f"Checking IG Username <b>@{username}</b>, Please Wait...!", context.bot, update
+            f"Checking IG Username <b>@{username}</b>, Please Wait...!",
+            context.bot,
+            update,
         )
         if 1 not in STATUS:
             editMessage(f"You must /{BotCommands.LoginCommand}", msg)
@@ -138,64 +139,55 @@ def ig(update, context):
                 followers = profile.followers
                 following = profile.followees
                 if not allow_access(profile):
-                    reply_markup = InlineKeyboardMarkup(
-                        [
-                            [
-                                InlineKeyboardButton(
-                                    "Download Profile Pic",
-                                    callback_data=f"PPIC#{username}",
-                                ),
-                                InlineKeyboardButton(
-                                    "Go To Profile",
-                                    url=f"https://www.instagram.com/{username}",
-                                ),
-                            ]
-                        ]
-                    )
+                    reply_markup = InlineKeyboardMarkup([[
+                        InlineKeyboardButton(
+                            "Download Profile Pic",
+                            callback_data=f"PPIC#{username}",
+                        ),
+                        InlineKeyboardButton(
+                            "Go To Profile",
+                            url=f"https://www.instagram.com/{username}",
+                        ),
+                    ]])
                 else:
-                    reply_markup = InlineKeyboardMarkup(
+                    reply_markup = InlineKeyboardMarkup([
                         [
-                            [
-                                InlineKeyboardButton(
-                                    "Profile Pic", callback_data=f"PPIC#{username}"
-                                ),
-                                InlineKeyboardButton(
-                                    "Go To Profile",
-                                    url=f"https://www.instagram.com/{username}",
-                                ),
-                            ],
-                            [
-                                InlineKeyboardButton(
-                                    "All Post", callback_data=f"POST#{username}"
-                                ),
-                                InlineKeyboardButton(
-                                    "All Tagged Posts",
-                                    callback_data=f"TAG#{username}",
-                                ),
-                            ],
-                            [
-                                InlineKeyboardButton(
-                                    "All IGTV", callback_data=f"IGTV#{username}"
-                                ),
-                                InlineKeyboardButton(
-                                    "Stories ", callback_data=f"STORY#{username}"
-                                ),
-                                InlineKeyboardButton(
-                                    "Highlights", callback_data=f"HIGHLIGHT#{username}"
-                                ),
-                            ],
-                            [
-                                InlineKeyboardButton(
-                                    f"{name}'s Followers",
-                                    callback_data=f"FOLLOWER#{username}",
-                                ),
-                                InlineKeyboardButton(
-                                    f"{name}'s Following",
-                                    callback_data=f"FOLLOWING#{username}",
-                                ),
-                            ],
-                        ]
-                    )
+                            InlineKeyboardButton(
+                                "Profile Pic",
+                                callback_data=f"PPIC#{username}"),
+                            InlineKeyboardButton(
+                                "Go To Profile",
+                                url=f"https://www.instagram.com/{username}",
+                            ),
+                        ],
+                        [
+                            InlineKeyboardButton(
+                                "All Post", callback_data=f"POST#{username}"),
+                            InlineKeyboardButton(
+                                "All Tagged Posts",
+                                callback_data=f"TAG#{username}",
+                            ),
+                        ],
+                        [
+                            InlineKeyboardButton(
+                                "All IGTV", callback_data=f"IGTV#{username}"),
+                            InlineKeyboardButton(
+                                "Stories ", callback_data=f"STORY#{username}"),
+                            InlineKeyboardButton(
+                                "Highlights",
+                                callback_data=f"HIGHLIGHT#{username}"),
+                        ],
+                        [
+                            InlineKeyboardButton(
+                                f"{name}'s Followers",
+                                callback_data=f"FOLLOWER#{username}",
+                            ),
+                            InlineKeyboardButton(
+                                f"{name}'s Following",
+                                callback_data=f"FOLLOWING#{username}",
+                            ),
+                        ],
+                    ])
                 deleteMessage(context.bot, msg)
                 bot.send_photo(
                     chat_id=update.message.chat.id,
@@ -211,11 +203,17 @@ def post(update, context):
     args = update.message.text.strip().split(" ", maxsplit=1)
 
     if len(args) <= 1:
-        sendMessage(f"Please Send IG Username After /{BotCommands.IgPostCommand}", context.bot, update)
+        sendMessage(
+            f"Please Send IG Username After /{BotCommands.IgPostCommand}",
+            context.bot,
+            update,
+        )
     else:
         username = args[1]
         msg = sendMessage(
-            f"Checking IG Username <b>@{username}</b>, Please Wait...!", context.bot, update
+            f"Checking IG Username <b>@{username}</b>, Please Wait...!",
+            context.bot,
+            update,
         )
         if 1 not in STATUS:
             editMessage(f"You must /{BotCommands.LoginCommand}", msg)
@@ -233,27 +231,28 @@ def post(update, context):
                 if not allow_access(profile):
                     editMessage(f"Please follow <code>@{username}</code>", msg)
                 else:
-                    reply_markup = InlineKeyboardMarkup(
+                    reply_markup = InlineKeyboardMarkup([
                         [
-                            [
-                                InlineKeyboardButton(
-                                    "Picture Posts", callback_data=f"PIC#{profile.username}"
-                                ),
-                                InlineKeyboardButton(
-                                    "Video Posts", callback_data=f"VID#{profile.username}"
-                                ),
-                            ],
-                            [
-                                InlineKeyboardButton(
-                                    "Picture & Video Posts",
-                                    callback_data=f"PICVID#{profile.username}",
-                                ),
-                                InlineKeyboardButton(
-                                    "ALL Posts", callback_data=f"ALLPOST#{profile.username}"
-                                ),
-                            ],
-                        ]
-                    )
+                            InlineKeyboardButton(
+                                "Picture Posts",
+                                callback_data=f"PIC#{profile.username}",
+                            ),
+                            InlineKeyboardButton(
+                                "Video Posts",
+                                callback_data=f"VID#{profile.username}",
+                            ),
+                        ],
+                        [
+                            InlineKeyboardButton(
+                                "Picture & Video Posts",
+                                callback_data=f"PICVID#{profile.username}",
+                            ),
+                            InlineKeyboardButton(
+                                "ALL Posts",
+                                callback_data=f"ALLPOST#{profile.username}",
+                            ),
+                        ],
+                    ])
                     editMessage(
                         f"Choose the type of post to download from <code>@{profile.username}</code>",
                         msg,
@@ -265,12 +264,15 @@ def igtv(update, context):
     """Download IGTV from a given username"""
     args = update.message.text.strip().split(" ", maxsplit=1)
     if len(args) <= 1:
-        sendMessage(f"Please Send IG Username After /{BotCommands.IgPostCommand}", context.bot, update)
+        sendMessage(
+            f"Please Send IG Username After /{BotCommands.IgPostCommand}",
+            context.bot,
+            update,
+        )
     else:
         username = args[1]
-        msg = sendMessage(
-            f"Checking IG Username {username}, Please Wait...!", context.bot, update
-        )
+        msg = sendMessage(f"Checking IG Username {username}, Please Wait...!",
+                          context.bot, update)
         if 1 not in STATUS:
             editMessage(f"You Must login /{BotCommands.LoginCommand}", msg)
 
@@ -292,15 +294,12 @@ def igtv(update, context):
                 else:
                     profile = Profile.from_username(INSTA.context, username)
                     igtv_count = profile.igtvcount
-                    reply_markup = InlineKeyboardMarkup(
-                        [
-                            [
-                                InlineKeyboardButton(
-                                    "Yes", callback_data=f"YES#{username}"),
-                                InlineKeyboardButton("No", callback_data=f"NO#{username}"),
-                            ]
-                        ]
-                    )
+                    reply_markup = InlineKeyboardMarkup([[
+                        InlineKeyboardButton("Yes",
+                                             callback_data=f"YES#{username}"),
+                        InlineKeyboardButton("No",
+                                             callback_data=f"NO#{username}"),
+                    ]])
                     editMessage(
                         f"Total IGTV Count: <code>{igtv_count}</code>\nDo you want to download all IGTV videos of <code>@{username}</code>?",
                         msg,
@@ -314,11 +313,17 @@ def highlights(update, context):
     args = update.message.text.strip().split(" ", maxsplit=1)
 
     if len(args) <= 1:
-        sendMessage(f"Please Send IG Username After /{BotCommands.IgHighlightsCommand}", context.bot, update)
+        sendMessage(
+            f"Please Send IG Username After /{BotCommands.IgHighlightsCommand}",
+            context.bot,
+            update,
+        )
     else:
         username = args[1]
         msg = sendMessage(
-            f"Checking IG Username <b>@{username}</b>, Please Wait...!", context.bot, update
+            f"Checking IG Username <b>@{username}</b>, Please Wait...!",
+            context.bot,
+            update,
         )
         if 1 not in STATUS:
             editMessage(f"You must /{BotCommands.LoginCommand}", msg)
@@ -343,11 +348,17 @@ def highlights(update, context):
 def story(update, context):
     args = update.message.text.strip().split(" ", maxsplit=1)
     if len(args) <= 1:
-        sendMessage(f"Please Send IG Username After /{BotCommands.IgStoryCommand}", context.bot, update)
+        sendMessage(
+            f"Please Send IG Username After /{BotCommands.IgStoryCommand}",
+            context.bot,
+            update,
+        )
     else:
         username = args[1]
         msg = sendMessage(
-            f"Checking IG Username <b>@{username}</b>, Please Wait...!", context.bot, update
+            f"Checking IG Username <b>@{username}</b>, Please Wait...!",
+            context.bot,
+            update,
         )
         if 1 not in STATUS:
             editMessage(f"You must /{BotCommands.LoginCommand}", msg)
@@ -373,12 +384,15 @@ def followers(update, context):
     """Get followers list of a given username"""
     args = update.message.text.split(" ", maxsplit=1)
     if len(args) <= 1:
-        sendMessage(f"Please Send IG Username After /{BotCommands.IgPostCommand}", context.bot, update)
+        sendMessage(
+            f"Please Send IG Username After /{BotCommands.IgPostCommand}",
+            context.bot,
+            update,
+        )
     else:
         username = args[1]
-        msg = sendMessage(
-            f"Checking IG Username {username}, Please Wait...!", context.bot, update
-        )
+        msg = sendMessage(f"Checking IG Username {username}, Please Wait...!",
+                          context.bot, update)
         if 1 not in STATUS:
             editMessage(f"You Must login /{BotCommands.LoginCommand}", msg)
 
@@ -398,7 +412,6 @@ def followers(update, context):
                         msg,
                     )
                 else:
-
                     editMessage(
                         f"Fetching followers list of <code>@{username}</code>",
                         msg,
@@ -410,12 +423,15 @@ def following(update, context):
     """Get following list of a given username"""
     args = update.message.text.split(" ", maxsplit=1)
     if len(args) <= 1:
-        sendMessage(f"Please Send IG Username After /{BotCommands.IgPostCommand}", context.bot, update)
+        sendMessage(
+            f"Please Send IG Username After /{BotCommands.IgPostCommand}",
+            context.bot,
+            update,
+        )
     else:
         username = args[1]
-        msg = sendMessage(
-            "Checking the given username, please wait...!", context.bot, update
-        )
+        msg = sendMessage("Checking the given username, please wait...!",
+                          context.bot, update)
         if 1 not in STATUS:
             editMessage("You must /login ", msg)
 
@@ -446,12 +462,15 @@ def mutual_following(update, context):
     """Get fans list of a given username"""
     args = update.message.text.split(" ", maxsplit=1)
     if len(args) <= 1:
-        sendMessage(f"Please Send IG Username After /{BotCommands.IgPostCommand}", context.bot, update)
+        sendMessage(
+            f"Please Send IG Username After /{BotCommands.IgPostCommand}",
+            context.bot,
+            update,
+        )
     else:
         username = args[1]
-        msg = sendMessage(
-            "Checking the given username, please wait...!", context.bot, update
-        )
+        msg = sendMessage("Checking the given username, please wait...!",
+                          context.bot, update)
         if 1 not in STATUS:
             editMessage("You must /login ", msg)
 
@@ -482,12 +501,15 @@ def tagged(update, context):
     """Download posts from a given username"""
     args = update.message.text.strip().split(" ", maxsplit=1)
     if len(args) <= 1:
-        sendMessage(f"Please Send IG Username After /{BotCommands.IgPostCommand}", context.bot, update)
+        sendMessage(
+            f"Please Send IG Username After /{BotCommands.IgPostCommand}",
+            context.bot,
+            update,
+        )
     else:
         username = args[1]
-        msg = sendMessage(
-            f"Checking IG Account, Please Wait...!", context.bot, update
-        )
+        msg = sendMessage(f"Checking IG Account, Please Wait...!", context.bot,
+                          update)
         if 1 not in STATUS:
             editMessage(f"You must /{BotCommands.LoginCommand}", msg)
 
@@ -504,12 +526,10 @@ def tagged(update, context):
 
 def feed(update, context):
     """Download posts from a given username"""
-    msg = sendMessage(
-        f"Checking IG Account, Please Wait...!", context.bot, update
-    )
+    msg = sendMessage(f"Checking IG Account, Please Wait...!", context.bot,
+                      update)
     if 1 not in STATUS:
         editMessage(f"You must /{BotCommands.LoginCommand}", msg)
-
 
     else:
         download_feed(msg)
@@ -517,9 +537,8 @@ def feed(update, context):
 
 def saved(update, context):
     """Download posts from a given username"""
-    msg = sendMessage(
-        f"Checking IG Account, Please Wait...!", context.bot, update
-    )
+    msg = sendMessage(f"Checking IG Account, Please Wait...!", context.bot,
+                      update)
     if 1 not in STATUS:
         editMessage(f"You must /{BotCommands.LoginCommand}", msg)
 
@@ -535,9 +554,8 @@ def following_stories(update, context):
     """Download posts from a given username"""
     args = update.message.text.strip().split(" ", maxsplit=1)
 
-    msg = sendMessage(
-        f"Checking IG Account, Please Wait...!", context.bot, update
-    )
+    msg = sendMessage(f"Checking IG Account, Please Wait...!", context.bot,
+                      update)
     if 1 not in STATUS:
         editMessage(f"You must /{BotCommands.LoginCommand}", msg)
 

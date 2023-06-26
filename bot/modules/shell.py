@@ -16,9 +16,10 @@ def shell(update, context):
         message.reply_text("No command to execute was given.")
         return
     cmd = cmd[1]
-    process = subprocess.Popen(
-        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True
-    )
+    process = subprocess.Popen(cmd,
+                               stdout=subprocess.PIPE,
+                               stderr=subprocess.PIPE,
+                               shell=True)
     stdout, stderr = process.communicate()
     reply = ""
     stderr = stderr.decode()
@@ -43,7 +44,8 @@ def shell(update, context):
         message.reply_text(reply, parse_mode=ParseMode.MARKDOWN)
 
 
-SHELL_HANDLER = CommandHandler(
-    BotCommands.ShellCommand, shell, filters=CustomFilters.owner_filter, run_async=True
-)
+SHELL_HANDLER = CommandHandler(BotCommands.ShellCommand,
+                               shell,
+                               filters=CustomFilters.owner_filter,
+                               run_async=True)
 dispatcher.add_handler(SHELL_HANDLER)

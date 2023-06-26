@@ -8,12 +8,16 @@ from sqlite3 import OperationalError, connect
 
 def get_cookiefile():
     default_cookiefile = {
-        "Windows": "~/AppData/Roaming/Mozilla/Firefox/Profiles/*/cookies.sqlite",
-        "Darwin": "~/Library/Application Support/Firefox/Profiles/*/cookies.sqlite",
+        "Windows":
+        "~/AppData/Roaming/Mozilla/Firefox/Profiles/*/cookies.sqlite",
+        "Darwin":
+        "~/Library/Application Support/Firefox/Profiles/*/cookies.sqlite",
     }.get(system(), "~/.mozilla/firefox/*/cookies.sqlite")
     cookiefiles = glob(expanduser(default_cookiefile))
     if not cookiefiles:
-        raise SystemExit("No Cookies Found For Instagram. Please Login Your IG on Firefox...!")
+        raise SystemExit(
+            "No Cookies Found For Instagram. Please Login Your IG on Firefox...!"
+        )
     return cookiefiles[0]
 
 

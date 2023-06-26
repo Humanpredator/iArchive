@@ -2,8 +2,7 @@ from telegram import InlineKeyboardMarkup
 from telegram.ext import CommandHandler
 from telegraph import Telegraph
 
-from bot import dispatcher
-from bot import telegraph_token
+from bot import dispatcher, telegraph_token
 from bot.helper.tg_utils import button_build
 from bot.helper.tg_utils.bot_commands import BotCommands
 from bot.helper.tg_utils.filters import CustomFilters
@@ -12,11 +11,11 @@ from bot.helper.tg_utils.message_utils import sendMarkup
 
 def start(update, context):
     buttons = button_build.ButtonMaker()
-    buttons.buildbutton(
-        "Insta-Scrap Repo", "https://github.com/Humanpredator/iScrap"
-    )
+    buttons.buildbutton("Insta-Scrap Repo",
+                        "https://github.com/Humanpredator/iScrap")
     reply_markup = InlineKeyboardMarkup(buttons.build_menu(1))
-    if CustomFilters.authorized_user(update) or CustomFilters.authorized_chat(update):
+    if CustomFilters.authorized_user(update) or CustomFilters.authorized_chat(
+            update):
         start_string = f"""
 Thanks to Slam and SUBIN\n
 This bot can download all the Instagram Accounts posts..!
@@ -68,11 +67,12 @@ help_string_telegraph = f"""
 
 """
 
-ighelp = Telegraph(access_token=telegraph_token, domain="graph.org").create_page(
-    title="Instagram Bot Help",
-    author_name="Humanpredator",
-    author_url="https://github.com/Humanpredator",
-    html_content=help_string_telegraph,
+ighelp = Telegraph(access_token=telegraph_token,
+                   domain="graph.org").create_page(
+                       title="Instagram Bot Help",
+                       author_name="Humanpredator",
+                       author_url="https://github.com/Humanpredator",
+                       html_content=help_string_telegraph,
 )["path"]
 
 help_string = f"""
@@ -111,8 +111,8 @@ ighelp_handler = CommandHandler(
     BotCommands.HelpCommand,
     igbot_help,
     filters=CustomFilters.authorized_chat
-            | CustomFilters.authorized_user
-            | CustomFilters.owner_filter,
+    | CustomFilters.authorized_user
+    | CustomFilters.owner_filter,
     run_async=True,
 )
 

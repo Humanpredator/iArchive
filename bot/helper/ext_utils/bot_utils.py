@@ -62,9 +62,8 @@ def get_readable_time(seconds: int) -> str:
 def progress_bar(count, size):
     percent = 100
     bar_length = 20
-    pbar = "\r[{:20s}] {:2.1f}%".format(
-        "#" * int(count / size * bar_length), count / size * percent
-    )
+    pbar = "\r[{:20s}] {:2.1f}%".format("#" * int(count / size * bar_length),
+                                        count / size * percent)
     return pbar
 
 
@@ -81,14 +80,13 @@ def allow_access(profile):
         return False
 
 
-
 def extract_story_info(url):
     pattern = r"https?://(?:www\.)?instagram\.com/stories/([a-zA-Z0-9._]+)/(\d+)/?"
     match = re.match(pattern, url)
     url_json = {}
     if not match:
         return None
-    url_json["content_type"] = 'STORY'
+    url_json["content_type"] = "STORY"
     url_json["username"] = match.group(1)
     url_json["shortcode"] = match.group(2)
     return url_json

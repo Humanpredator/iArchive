@@ -38,8 +38,8 @@ def exit_clean_up(signal, frame):
 
 
 def datetime_india():
-    datetime_str = datetime.now(pytz.timezone(
-        'Asia/Kolkata')).strftime("%Y-%m-%d %H:%M:%S.%f")
+    datetime_str = datetime.now(
+        pytz.timezone("Asia/Kolkata")).strftime("%Y-%m-%d %H:%M:%S.%f")
     datetime_obj = datetime.strptime(str(datetime_str), "%Y-%m-%d %H:%M:%S.%f")
 
     return datetime_str

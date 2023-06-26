@@ -4,7 +4,7 @@ from datetime import datetime
 
 from telegram import InputMediaPhoto, InputMediaVideo
 
-from bot import LOGGER, DOWNLOAD_STATUS_UPDATE_INTERVAL
+from bot import DOWNLOAD_STATUS_UPDATE_INTERVAL, LOGGER
 from bot.helper.ext_utils.bot_utils import progress_bar
 from bot.helper.tg_utils.message_utils import editMessage, sendMediaGroup
 
@@ -59,10 +59,14 @@ def tgup(msg, directory):
 
     for media, currently_uploading in media_groups:
         if currently_uploading == "Pictures":
-            media_list = [InputMediaPhoto(open(photo, "rb")) for photo in media]
+            media_list = [
+                InputMediaPhoto(open(photo, "rb")) for photo in media
+            ]
             upload_media(media_list, currently_uploading)
         elif currently_uploading == "Videos":
-            media_list = [InputMediaVideo(open(video, "rb")) for video in media]
+            media_list = [
+                InputMediaVideo(open(video, "rb")) for video in media
+            ]
             upload_media(media_list, currently_uploading)
 
     editMessage("Telegram Upload Completed", msg)

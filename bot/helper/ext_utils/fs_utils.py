@@ -28,7 +28,6 @@ def clean_all():
         shutil.rmtree(dir)
     except FileNotFoundError:
         pass
-    return
 
 
 def exit_clean_up(signal, frame):

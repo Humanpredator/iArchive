@@ -309,7 +309,6 @@ def igtv(update, context):
 
 def highlights(update, context):
     """Download posts from a given username"""
-
     args = update.message.text.strip().split(" ", maxsplit=1)
 
     if len(args) <= 1:

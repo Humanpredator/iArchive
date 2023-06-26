@@ -39,7 +39,7 @@ def import_session():
     filename = "./sessionfile"
 
     with open(filename, "wb") as file:
-        cookies_dict = {name: value for name, value in cookie_data}
+        cookies_dict = dict(cookie_data)
         pickle.dump(cookies_dict, file)
 
     print("Session File Have Been Stored To: ".format(filename))
